@@ -18,10 +18,6 @@ public class CardRFID {
 		password[5] = (byte) 0xFF;
 		
 		iccrf.init();
-//		boolean openPort = iccrf.init();
-//		if(!openPort){
-//			throw new Exception("请正确连接发卡器");
-//		}
 	}
 	
 	public ImplementationIccrf getIccrf() {

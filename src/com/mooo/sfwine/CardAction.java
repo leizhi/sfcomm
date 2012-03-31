@@ -75,7 +75,6 @@ public class CardAction {
 			
 			dbObjcet.save(card);
 			
-			
 			JOptionPane.showMessageDialog(null, "发卡成功","系统提示",
 					JOptionPane.INFORMATION_MESSAGE);
 			}catch (NullPointerException e) {

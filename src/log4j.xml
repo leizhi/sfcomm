@@ -33,7 +33,7 @@
 	</appender>
 
     <!-- The root for struts -->
-    <category name="com.mooo.db" additivity="false">
+    <category name="com.mooo.mycoz.db" additivity="false">
         <priority value="debug"/>
         <appender-ref ref="dbLog"/>
     </category>

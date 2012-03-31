@@ -123,9 +123,12 @@ public class ImplementationIccrf implements InterfaceRFID {
 	public void setPort(String port) {
 		this.port = port;
 	}
+	
 	public void destroy() {
-		sm.closePort();
+		if(sm!=null)
+			sm.closePort();
 	}
+	
 	private boolean testConnection() {
 		
     	byte [] command = CommandsIccrf.versionRequest().getBytes();

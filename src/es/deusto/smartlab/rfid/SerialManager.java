@@ -105,15 +105,16 @@ public class SerialManager {
 		Vector<Byte> temporal = new Vector<Byte>();
 
 		try {
-			Thread.sleep(500);
+			Thread.sleep(37);
 			while (in.available() > 0) {
 				int newData = 0;
-				byte[] newDatas = new byte[400];
+				byte[] newDatas = new byte[512];
 				try {
 					newData = in.read(newDatas);
 					for (int i = 0; i < newData; i++)
 						temporal.addElement(newDatas[i]);
-					Thread.sleep(250);
+					
+//					Thread.sleep(250);
 				} catch (IOException ex) {
 					System.out.println("Error:"+ex.getMessage());
 				}
