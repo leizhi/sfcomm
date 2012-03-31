@@ -11,13 +11,13 @@ import com.mooo.mycoz.db.pool.DbConnectionManager;
 
 public class CardDBObject {
 
-	private static final String ADD_CARD="INSERT INTO Card(id,createDate,jobTypeId,wineJarId) VALUES(?,?,?,?)";
+	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId) VALUES(?,?,?,?)";
 	
 	private static final String ADD_JOB_TYPE="INSERT INTO JobType(id,typeName) VALUES(?,?)";
 
 	private static final String ADD_WINERY="INSERT INTO Winery(id,wineryName) VALUES(?,?)";
 
-	private static final String ADD_WINEJAR="INSERT INTO WineJar(id,wineryName) VALUES(?,?)";
+	private static final String ADD_WINEJAR="INSERT INTO WineJar(id,wineryId,wineJarKey) VALUES(?,?,?)";
 	
 	private static final String FIND_CARD="SELECT count(*) FROM Card WHERE id=?";
 
@@ -182,12 +182,12 @@ public class CardDBObject {
 				pstmt.execute();
 			}
 			
-			exists = find("Winery","wineryName",card.getWineryName());
+			exists = find("WineJar","wineJarKey",card.getWineJarKey());
 
-			int wineryJarId = 0;
+			int wineJarId = 0;
 
 			if(exists){
-				wineryJarId = getId("Winery","wineryName",card.getWineryName());
+				wineJarId = getId("WineJar","wineJarKey",card.getWineJarKey());
 			}else{
 				
 				exists = find("Winery","wineryName",card.getWineryName());
@@ -204,9 +204,10 @@ public class CardDBObject {
 				}
 				
 				pstmt = conn.prepareStatement(ADD_WINEJAR);
-				wineryJarId = getNextID("WineJar");
-				pstmt.setInt(1, wineryJarId);
-				pstmt.setString(2, card.getWineryName());
+				wineJarId = getNextID("WineJar");
+				pstmt.setInt(1, wineJarId);
+				pstmt.setInt(2, wineryId);
+				pstmt.setString(3, card.getWineJarKey());
 				pstmt.execute();
 			}
 			
@@ -214,7 +215,7 @@ public class CardDBObject {
 			pstmt.setLong(1, card.getId());
 			pstmt.setTimestamp(2,new Timestamp(new Date().getTime()));
 			pstmt.setInt(3, jobTypeId);
-			pstmt.setInt(4, wineryJarId);
+			pstmt.setInt(4, wineJarId);
 			pstmt.execute();
 			
 			conn.commit();

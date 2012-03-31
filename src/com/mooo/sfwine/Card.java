@@ -10,17 +10,20 @@ public class Card {
 
 	private String wineJarKey;//酒罐编号 4
 	private String wineType;//酒香型 2
+	
 	private String wineLevel;//酒的品质 2
 	private String alcohol;//酒精度 3
-	private String operatorName;//操作人名称 3
+	private String operator;//操作人名称 3
 	private String supervisorCompanyKey;//监管公司代码 2
 	private String supervisorName;//监管人名称 3
 	private String brewingDate;//酿造日期 10
-	private String operatorDate;//操作日期 10
+	private String operationDate;//操作日期 10
 	private String wineJarVolume;//酒罐容积 8
 	private String wineVolume;//源酒容积 8
 	private String volumeUnit;//容积单位 2
 	
+	private String material;//原料 2
+
 	public Long getId() {
 		return id;
 	}
@@ -77,11 +80,11 @@ public class Card {
 	public void setAlcohol(String alcohol) {
 		this.alcohol = alcohol;
 	}
-	public String getOperatorName() {
-		return operatorName;
+	public String getOperator() {
+		return operator;
 	}
-	public void setOperatorName(String operatorName) {
-		this.operatorName = operatorName;
+	public void setOperator(String operator) {
+		this.operator = operator;
 	}
 	public String getSupervisorCompanyKey() {
 		return supervisorCompanyKey;
@@ -101,11 +104,11 @@ public class Card {
 	public void setBrewingDate(String brewingDate) {
 		this.brewingDate = brewingDate;
 	}
-	public String getOperatorDate() {
-		return operatorDate;
+	public String getOperationDate() {
+		return operationDate;
 	}
-	public void setOperatorDate(String operatorDate) {
-		this.operatorDate = operatorDate;
+	public void setOperationDate(String operationDate) {
+		this.operationDate = operationDate;
 	}
 	public String getWineJarVolume() {
 		return wineJarVolume;
@@ -124,6 +127,12 @@ public class Card {
 	}
 	public void setVolumeUnit(String volumeUnit) {
 		this.volumeUnit = volumeUnit;
+	}
+	public String getMaterial() {
+		return material;
+	}
+	public void setMaterial(String material) {
+		this.material = material;
 	}
 
 }
