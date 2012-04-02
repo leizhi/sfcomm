@@ -5,17 +5,17 @@ package com.mooo.sfwine;
  */
 public class User {
 
-	private Integer id;
+	private Long id;
 	private String name;
 	private String password;
 	private String alias;
 	private String active;
 	
-	public Integer getId() {
+	public Long getId() {
 	return id;
 	}
-	public void setId(Integer id) {
-	 this.id = id;
+	public void setId(Long cardId) {
+	 this.id = cardId;
 	}
 	public String getName() {
 	return name;

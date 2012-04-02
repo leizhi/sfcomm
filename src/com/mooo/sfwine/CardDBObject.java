@@ -5,26 +5,45 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.mooo.mycoz.db.pool.DbConnectionManager;
 
 public class CardDBObject {
-
+	
+	//Card
 	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId) VALUES(?,?,?,?)";
 	
-	private static final String ADD_JOB_TYPE="INSERT INTO JobType(id,typeName) VALUES(?,?)";
+	//JobType
+	private static final String ADD_JOB_TYPE="INSERT INTO JobType(id,definition) VALUES(?,?)";
+	
+	//Winery
+	private static final String ADD_WINERY="INSERT INTO Winery(id,definition) VALUES(?,?)";
+	
+	//WineType
+	private static final String ADD_WINE_TYPE="INSERT INTO WineType(id,definition) VALUES(?,?)";
 
-	private static final String ADD_WINERY="INSERT INTO Winery(id,wineryName) VALUES(?,?)";
+	//WineLevel
+	private static final String ADD_WINE_LEVEL="INSERT INTO WineLevel(id,definition) VALUES(?,?)";
 
-	private static final String ADD_WINEJAR="INSERT INTO WineJar(id,wineryId,wineJarKey) VALUES(?,?,?)";
+	//SupervisorCompany
+	private static final String ADD_SUPERVISOR_COMPANY="INSERT INTO SupervisorCompany(id,definition) VALUES(?,?)";
+
+	//Supervisor
+	private static final String ADD_SUPERVISOR="INSERT INTO Supervisor(id,companyId,definition) VALUES(?,?,?)";
+	
+	//WineJar
+	private static final String ADD_WINEJAR="INSERT INTO WineJar(id,wineryId,abbreviation,volume,brewingDate,material,wineTypeId,wineLevelId,alcohol,volumeUnit) VALUES(?,?,?,?,?,?,?,?,?,?)";
 	
 	private static final String FIND_CARD="SELECT count(*) FROM Card WHERE id=?";
 
 	private static final String SELECT_MAX_BY_TABLE="SELECT MAX(ID) maxid FROM ";
 
+	private static final SimpleDateFormat dformat = new SimpleDateFormat("yyy-MM-dd");
+
 //	public boolean find(String table,String category,String fieldName,String fieldValue){
-	public int getNextID(String table) {
+	public static int getNextID(String table) {
 		
 		Connection connection=null;
         PreparedStatement pstmt = null;
@@ -169,11 +188,12 @@ public class CardDBObject {
 			conn = DbConnectionManager.getConnection();
 			conn.setAutoCommit(false);
 			
-			boolean exists = find("JobType","typeName",card.getJobTypeName());
+			//JobType
+			boolean exists = find("JobType","definition",card.getJobTypeName());
 			
 			int jobTypeId = 0;
 			if(exists){
-				jobTypeId = getId("JobType","typeName",card.getJobTypeName());
+				jobTypeId = getId("JobType","definition",card.getJobTypeName());
 			}else{
 				pstmt = conn.prepareStatement(ADD_JOB_TYPE);
 				jobTypeId = getNextID("JobType");
@@ -182,19 +202,20 @@ public class CardDBObject {
 				pstmt.execute();
 			}
 			
-			exists = find("WineJar","wineJarKey",card.getWineJarKey());
+			//WineJar
+			exists = find("WineJar","abbreviation",card.getWineJarKey());
 
 			int wineJarId = 0;
 
 			if(exists){
-				wineJarId = getId("WineJar","wineJarKey",card.getWineJarKey());
+				wineJarId = getId("WineJar","abbreviation",card.getWineJarKey());
 			}else{
-				
-				exists = find("Winery","wineryName",card.getWineryName());
+				//Winery
+				exists = find("Winery","definition",card.getWineryName());
 				
 				int wineryId = 0;
 				if(exists){
-					wineryId = getId("Winery","wineryName",card.getWineryName());
+					wineryId = getId("Winery","definition",card.getWineryName());
 				}else{
 					pstmt = conn.prepareStatement(ADD_WINERY);
 					wineryId = getNextID("Winery");
@@ -203,11 +224,79 @@ public class CardDBObject {
 					pstmt.execute();
 				}
 				
+				//WineType
+				exists = find("WineType","definition",card.getWineType());
+				
+				int wineTypeId = 0;
+				if(exists){
+					wineTypeId = getId("WineType","definition",card.getWineType());
+				}else{
+					pstmt = conn.prepareStatement(ADD_WINE_TYPE);
+					wineTypeId = getNextID("WineType");
+					pstmt.setInt(1, wineTypeId);
+					pstmt.setString(2, card.getWineType());
+					pstmt.execute();
+				}
+				
+				//WineLevel
+				exists = find("WineLevel","definition",card.getWineLevel());
+				
+				int wineLevelId = 0;
+				if(exists){
+					wineLevelId = getId("WineLevel","definition",card.getWineLevel());
+				}else{
+					pstmt = conn.prepareStatement(ADD_WINE_LEVEL);
+					wineLevelId = getNextID("WineLevel");
+					pstmt.setInt(1, wineLevelId);
+					pstmt.setString(2, card.getWineLevel());
+					pstmt.execute();
+				}
+				
+				//SupervisorCompany
+				exists = find("SupervisorCompany","definition",card.getSupervisorCompanyKey());
+				
+				int companyId = 0;
+				if(exists){
+					wineLevelId = getId("SupervisorCompany","definition",card.getSupervisorCompanyKey());
+				}else{
+					pstmt = conn.prepareStatement(ADD_SUPERVISOR_COMPANY);
+					companyId = getNextID("SupervisorCompany");
+					pstmt.setInt(1, companyId);
+					pstmt.setString(2, card.getSupervisorCompanyKey());
+					pstmt.execute();
+				}
+				
+				//Supervisor
+				exists = find("Supervisor","definition",card.getSupervisorName());
+				
+				int supervisorId = 0;
+				if(exists){
+					wineLevelId = getId("Supervisor","definition",card.getSupervisorName());
+				}else{
+					pstmt = conn.prepareStatement(ADD_SUPERVISOR);
+					supervisorId = getNextID("Supervisor");
+					pstmt.setInt(1, supervisorId);
+					pstmt.setInt(2, companyId);
+					pstmt.setString(3, card.getSupervisorName());
+					pstmt.execute();
+				}
+				
+				//WineJar
 				pstmt = conn.prepareStatement(ADD_WINEJAR);
 				wineJarId = getNextID("WineJar");
 				pstmt.setInt(1, wineJarId);
 				pstmt.setInt(2, wineryId);
 				pstmt.setString(3, card.getWineJarKey());
+				
+				pstmt.setString(4, card.getWineJarVolume());
+				pstmt.setTimestamp(5,new Timestamp(dformat.parse(card.getBrewingDate()).getTime()));
+				pstmt.setString(6, card.getMaterial());
+				
+				pstmt.setInt(7, wineTypeId);
+				pstmt.setInt(8, wineLevelId);
+				pstmt.setString(9, card.getAlcohol());
+				pstmt.setString(10, card.getVolumeUnit());
+				
 				pstmt.execute();
 			}
 			
@@ -226,6 +315,7 @@ public class CardDBObject {
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
+			e.printStackTrace();
 		}finally{
 
 			try {

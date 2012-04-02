@@ -41,6 +41,39 @@ public class CardRFID {
 		iccrf.beep(10);//响10ms
 	}
 	
+	//清除所有数据
+	public void cleanAll() {
+		byte[] buffer = new byte[16];
+		for(int i=1;i<16;i++){
+			buffer[i] = (byte) 0x00;
+		}
+		
+		for(int i=1;i<16;i++){
+			ready(i);
+			iccrf.write((byte)(i*block+0),buffer);
+			iccrf.write((byte)(i*block+1),buffer);
+			iccrf.write((byte)(i*block+2),buffer);
+		}
+	}
+	//标签分类,标志位前1字节,剩下16位字节预留
+	public void saveType(byte flag,int secnr) {
+		try {
+			ready(secnr);
+			
+			byte[] buffer = new byte[16];
+			buffer[0] = flag;
+			
+			for(int i=1;i<16;i++){
+				buffer[i] = (byte) 0xEE;
+			}
+			
+			iccrf.write((byte)(secnr*block),buffer);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void save(String str,int secnr,int offset,int maxLength) {
 		ready(secnr);
 		
@@ -109,5 +142,27 @@ public class CardRFID {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public byte[] read(int secnr,int offset) {
+		byte[] buffer=null;
+		try {
+			ready(secnr);
+			buffer = iccrf.getBytes((byte)(secnr*block + offset));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return buffer;
+	}
+	
+	public String readGBK(int secnr,int offset) {
+		String buffer=null;
+		try {
+			ready(secnr);
+			buffer = iccrf.readGBK((byte)(secnr*block + offset));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return buffer;
 	}
 }

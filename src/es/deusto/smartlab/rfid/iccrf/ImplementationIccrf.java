@@ -255,6 +255,26 @@ public class ImplementationIccrf implements InterfaceRFID {
 		return null;
 	}
 	
+	public byte[] getBytes(byte address){
+		
+		byte[] respnse = read(address);
+		
+		if(respnse == null || respnse.length < 6){
+			return null;
+		}
+		
+		byte[] buffer = new byte[16];
+		for(int i=0;i<16;i++){
+			buffer[i] = respnse[4+i];
+		}
+		
+		return buffer;
+	}
+	
+	public String readGBK(byte address){
+		return getGBK(read(address));
+	}
+	
 	public String getGBK(byte[] respnse){
 		if(respnse == null || respnse.length < 6){
 			return null;
