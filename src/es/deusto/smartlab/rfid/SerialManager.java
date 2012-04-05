@@ -105,7 +105,8 @@ public class SerialManager {
 		Vector<Byte> temporal = new Vector<Byte>();
 
 		try {
-			Thread.sleep(37);
+			Thread.sleep(50);
+			
 			while (in.available() > 0) {
 				int newData = 0;
 				byte[] newDatas = new byte[512];

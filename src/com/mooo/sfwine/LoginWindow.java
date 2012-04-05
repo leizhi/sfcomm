@@ -62,6 +62,7 @@ public class LoginWindow {
 		
 		disLabel = new JLabel("用户名:");
 		disLabel.setBounds(x,y,width,hight);
+		disLabel.setForeground(Color.WHITE);
 		bodyPanel.add(disLabel);
 		
 		userNameText = new JTextField();
@@ -71,6 +72,7 @@ public class LoginWindow {
 		y += hight;
 		disLabel = new JLabel("密码:");
 		disLabel.setBounds(x,y,width,hight);
+		disLabel.setForeground(Color.WHITE);
 		bodyPanel.add(disLabel);
 		
 		passwordText = new JPasswordField();
@@ -102,6 +104,8 @@ public class LoginWindow {
 		confirm.requestFocus();
 //		confirm.addActionListener(new LoginAction(bodyPanel,execPanel,getUser()));
 		confirm.setBounds(x+width,y,execWidth,hight);//一个字符9 point
+		confirm.setBackground(new Color(105,177,35));
+		confirm.setForeground(Color.WHITE);
 
 		confirm.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e) {

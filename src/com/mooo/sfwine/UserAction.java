@@ -43,7 +43,7 @@ public class UserAction {
 	
 	public void promptLogin(){
 		if(processLogin())
-			new CardWindow(bodyPanel);
+			new CardAction(bodyPanel).promptNewCardId();
 		else
 			new LoginWindow(bodyPanel,message); // login again
 	}

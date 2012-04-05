@@ -1,8 +1,10 @@
 package com.mooo.sfwine;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -14,20 +16,26 @@ public class JMenuBarFactory {
     private static JMenuBar menuBar = null;
     private static Object menuBarLock = new Object();
     
+    private static Color bg = new Color(30,178,239);
+    private static Color fg = Color.WHITE;
+
     public static JMenuBar buildJMenuBar(final JPanel bodyPanel){
         if (menuBar == null) {
             synchronized(menuBarLock) {
                 if (menuBar == null) {
                 	menuBar = new JMenuBar();
-                	
-            		JMenu menuFile = new JMenu("开始");
-            		JMenu menuEdit = new JMenu("发卡");
-            		JMenu readCard = new JMenu("查询");
-            		JMenu menuPrint = new JMenu("打印");
-            		JMenu menuHelp = new JMenu("帮助");
+                	menuBar.setBackground(bg);
+                	menuBar.setBorder(BorderFactory.createLineBorder(bg));
 
+                	//开始
+            		JMenu menuFile = new JMenu("开始");
+            		menuFile.setBackground(bg);
+            		menuFile.setForeground(fg);
+            		
             		//主菜单
             		JMenuItem loginSystem = new JMenuItem("刷卡登录");
+            		loginSystem.setBackground(bg);
+            		loginSystem.setForeground(fg);
             		loginSystem.addActionListener(new ActionListener() {
             			public void actionPerformed(ActionEvent e) {
         					new CardLoginWindow(bodyPanel);
@@ -36,6 +44,9 @@ public class JMenuBarFactory {
             		menuFile.add(loginSystem);
             		
             		JMenuItem admin = new JMenuItem("登录");
+            		admin.setBackground(bg);
+            		admin.setForeground(fg);
+
             		admin.addActionListener(new ActionListener() {
             			public void actionPerformed(ActionEvent e) {
         					new LoginWindow(bodyPanel);
@@ -44,15 +55,27 @@ public class JMenuBarFactory {
             		menuFile.add(admin);
             		
             		JMenuItem menuFileExit = new JMenuItem("退出");
+            		menuFileExit.setBackground(bg);
+            		menuFileExit.setForeground(fg);
+
             		menuFileExit.addActionListener(new ActionListener() {
             			public void actionPerformed(ActionEvent e) {
             				System.exit(0);
             			}
             		});
             		menuFile.add(menuFileExit);
+            		
+            		menuBar.add(menuFile);
 
             		//发卡
+            		JMenu menuEdit = new JMenu("发卡");
+            		menuEdit.setBackground(bg);
+            		menuEdit.setForeground(fg);
+            		//
             		JMenuItem staff = new JMenuItem("员工卡");
+            		staff.setBackground(bg);
+            		staff.setForeground(fg);
+
             		staff.addActionListener( new ActionListener() {
         				public void actionPerformed(ActionEvent e) {
         					new StaffCardWindow(bodyPanel);
@@ -61,25 +84,69 @@ public class JMenuBarFactory {
             		menuEdit.add(staff);
 
             		JMenuItem cardId = new JMenuItem("标识卡");
+            		cardId.setBackground(bg);
+            		cardId.setForeground(fg);
+
             		cardId.addActionListener( new ActionListener() {
         				public void actionPerformed(ActionEvent e) {
-        					new CardWindow(bodyPanel);
+        					new CardAction(bodyPanel).promptNewCardId();
         				}
         			});
             		menuEdit.add(cardId);
+            		
+            		menuBar.add(menuEdit);
+
+            		JMenu readCard = new JMenu("查询");
+            		readCard.setBackground(bg);
+            		readCard.setForeground(fg);
 
             		JMenuItem viewStaff = new JMenuItem("员工卡");
-            		JMenuItem viewCardId = new JMenuItem("标识卡");
+            		viewStaff.setBackground(bg);
+            		viewStaff.setForeground(fg);
+            		viewStaff.addActionListener( new ActionListener() {
+        				public void actionPerformed(ActionEvent e) {
+        					new CardAction(bodyPanel).listCard();
+        				}
+        			});
             		readCard.add(viewStaff);
+
+            		JMenuItem viewCardId = new JMenuItem("标识卡");
+            		viewCardId.setBackground(bg);
+            		viewCardId.setForeground(fg);
+            		viewCardId.addActionListener( new ActionListener() {
+        				public void actionPerformed(ActionEvent e) {
+        					new CardAction(bodyPanel).listCard();
+        				}
+        			});
             		readCard.add(viewCardId);
 
-            		menuPrint.addSeparator();
+            		menuBar.add(readCard);
+
+            		JMenu menuPrint = new JMenu("打印");
+            		menuPrint.setBackground(bg);
+            		menuPrint.setForeground(fg);
+            		
             		JMenuItem printStaff = new JMenuItem("员工卡");
-            		JMenuItem printCardId = new JMenuItem("标识卡");
+            		printStaff.setBackground(bg);
+            		printStaff.setForeground(fg);
             		menuPrint.add(printStaff);
+
+//            		menuPrint.addSeparator();
+
+            		JMenuItem printCardId = new JMenuItem("标识卡");
+            		printCardId.setBackground(bg);
+            		printCardId.setForeground(fg);
             		menuPrint.add(printCardId);
+            		
+            		menuBar.add(menuPrint);
+
+            		JMenu menuHelp = new JMenu("帮助");
+            		menuHelp.setBackground(bg);
+            		menuHelp.setForeground(fg);
 
             		JMenuItem menuHelpAbout = new JMenuItem("关于");
+            		menuHelpAbout.setBackground(bg);
+            		menuHelpAbout.setForeground(fg);
             		menuHelpAbout.addActionListener(new ActionListener() {
             			public void actionPerformed(ActionEvent e) {
             				JOptionPane.showMessageDialog(SFWine.frame, "发卡系统 V1.0");
@@ -88,10 +155,6 @@ public class JMenuBarFactory {
 
             		menuHelp.add(menuHelpAbout);
 
-            		menuBar.add(menuFile);
-            		menuBar.add(menuEdit);
-            		menuBar.add(readCard);
-            		menuBar.add(menuPrint);
             		menuBar.add(menuHelp);
                 }
             }
