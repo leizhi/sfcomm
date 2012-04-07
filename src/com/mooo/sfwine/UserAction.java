@@ -21,6 +21,7 @@ public class UserAction {
 	private static final long serialVersionUID = 7168200530660156025L;
 	
 	private static Log log = LogFactory.getLog(UserAction.class);
+	
 	private static String message;
 
 	private static final String LOGIN_USER="SELECT count(*) FROM T_User WHERE name=? AND password=?";

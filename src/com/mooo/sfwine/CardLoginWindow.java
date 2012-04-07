@@ -102,7 +102,7 @@ public class CardLoginWindow {
 	
 	public boolean isOpenNetwork(){
 		try{
-			Socket socket = new Socket("122.225.88.86", 3306);
+			Socket socket = new Socket("122.225.88.84", 3306);
 			socket.setSoTimeout(50);
 			socket.close();
 			

@@ -312,6 +312,8 @@ public class CardDBObject {
 			pstmt.execute();
 			
 			conn.commit();
+			
+			if(log.isDebugEnabled()) log.debug("save finlsh");
 		} catch (Exception e) {
 			System.out.println("CardDBObject Exception="+e.getMessage());
 			try {
