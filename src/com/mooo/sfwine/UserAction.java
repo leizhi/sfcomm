@@ -23,13 +23,13 @@ public class UserAction {
 	private static Log log = LogFactory.getLog(UserAction.class);
 	private static String message;
 
-	private static final String LOGIN_USER="SELECT count(*) FROM User WHERE name=? AND password=?";
+	private static final String LOGIN_USER="SELECT count(*) FROM T_User WHERE name=? AND password=?";
 	
-	private static final String REISTER_USER="INSERT INTO User(id,name,password) VALUES(?,?,?)";
+	private static final String REISTER_USER="INSERT INTO T_User(name,password) VALUES(?,?)";
 
-	private static final String EXISTS_USER="SELECT count(*) FROM User WHERE name=?";
+	private static final String EXISTS_USER="SELECT count(*) FROM T_User WHERE name=?";
 
-	private static final String EXISTS_CARD="SELECT count(*) FROM User WHERE id=?";
+	private static final String EXISTS_CARD="SELECT count(*) FROM T_User WHERE user_id=?";
 
 	private JPanel bodyPanel;
 

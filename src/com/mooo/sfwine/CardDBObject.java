@@ -7,10 +7,13 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.mooo.mycoz.db.pool.DbConnectionManager;
 
 public class CardDBObject {
+	private static Log log = LogFactory.getLog(CardDBObject.class);
 	
 	//Card
 	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId) VALUES(?,?,?,?)";
@@ -191,6 +194,7 @@ public class CardDBObject {
 			//JobType
 			boolean exists = find("JobType","definition",card.getJobTypeName());
 			
+		
 			int jobTypeId = 0;
 			if(exists){
 				jobTypeId = getId("JobType","definition",card.getJobTypeName());

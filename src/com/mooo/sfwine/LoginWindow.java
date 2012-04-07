@@ -130,7 +130,7 @@ public class LoginWindow {
 	
 	public boolean isOpenNetwork(){
 		try{
-			Socket socket = new Socket("122.225.88.86", 3306);
+			Socket socket = new Socket("122.225.88.83", 1433);
 			socket.setSoTimeout(50);
 			socket.close();
 			
