@@ -363,6 +363,8 @@ public class CardAction {
 		CardRFID cardRFID = null;
 		
 		try {
+			fillCard();
+			
 			cardRFID = new CardRFID();
 
 			// 初始化检查
@@ -456,7 +458,7 @@ public class CardAction {
 			setDate((Date) evt.getNewValue());
 	}
 
-	public Card getCard() {
+	public void fillCard() {
 		
 		card.setJobTypeName(jobType.getSelectedItem().toString());
 		card.setWineType(wineType.getSelectedItem().toString());
@@ -474,8 +476,6 @@ public class CardAction {
 		card.setWineVolume(wineVolume.getText());
 		
 		card.setMaterial(material.getText());
-		
-		return card;
 	}
 	
 	public void listCard() {
