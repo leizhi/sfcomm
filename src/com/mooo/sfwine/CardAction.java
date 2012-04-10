@@ -524,4 +524,15 @@ public class CardAction {
 		
 		if(log.isDebugEnabled()) log.debug("listCard end");
 	}
+	
+	
+	public static void main(String[] a){
+		
+		
+		
+		
+		
+	}
+	
+	
 }

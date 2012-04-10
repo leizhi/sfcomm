@@ -1,5 +1,7 @@
 package com.mooo.sfwine;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,7 +18,7 @@ public class CardDBObject {
 	private static Log log = LogFactory.getLog(CardDBObject.class);
 	
 	//Card
-	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId) VALUES(?,?,?,?)";
+	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId,supervisorId,rfidcode) VALUES(?,?,?,?,?,?)";
 	
 	//JobType
 	private static final String ADD_JOB_TYPE="INSERT INTO JobType(id,definition) VALUES(?,?)";
@@ -205,7 +207,34 @@ public class CardDBObject {
 				pstmt.setString(2, card.getJobTypeName());
 				pstmt.execute();
 			}
+			//SupervisorCompany
+			exists = find("SupervisorCompany","definition",card.getSupervisorCompanyKey());
 			
+			int companyId = 0;
+			if(exists){
+				companyId = getId("SupervisorCompany","definition",card.getSupervisorCompanyKey());
+			}else{
+				pstmt = conn.prepareStatement(ADD_SUPERVISOR_COMPANY);
+				companyId = getNextID("SupervisorCompany");
+				pstmt.setInt(1, companyId);
+				pstmt.setString(2, card.getSupervisorCompanyKey());
+				pstmt.execute();
+			}
+			
+			//Supervisor
+			exists = find("Supervisor","definition",card.getSupervisorName());
+			
+			int supervisorId = 0;
+			if(exists){
+				supervisorId = getId("Supervisor","definition",card.getSupervisorName());
+			}else{
+				pstmt = conn.prepareStatement(ADD_SUPERVISOR);
+				supervisorId = getNextID("Supervisor");
+				pstmt.setInt(1, supervisorId);
+				pstmt.setInt(2, companyId);
+				pstmt.setString(3, card.getSupervisorName());
+				pstmt.execute();
+			}
 			//WineJar
 			exists = find("WineJar","abbreviation",card.getWineJarKey());
 
@@ -256,34 +285,8 @@ public class CardDBObject {
 					pstmt.execute();
 				}
 				
-				//SupervisorCompany
-				exists = find("SupervisorCompany","definition",card.getSupervisorCompanyKey());
 				
-				int companyId = 0;
-				if(exists){
-					wineLevelId = getId("SupervisorCompany","definition",card.getSupervisorCompanyKey());
-				}else{
-					pstmt = conn.prepareStatement(ADD_SUPERVISOR_COMPANY);
-					companyId = getNextID("SupervisorCompany");
-					pstmt.setInt(1, companyId);
-					pstmt.setString(2, card.getSupervisorCompanyKey());
-					pstmt.execute();
-				}
 				
-				//Supervisor
-				exists = find("Supervisor","definition",card.getSupervisorName());
-				
-				int supervisorId = 0;
-				if(exists){
-					wineLevelId = getId("Supervisor","definition",card.getSupervisorName());
-				}else{
-					pstmt = conn.prepareStatement(ADD_SUPERVISOR);
-					supervisorId = getNextID("Supervisor");
-					pstmt.setInt(1, supervisorId);
-					pstmt.setInt(2, companyId);
-					pstmt.setString(3, card.getSupervisorName());
-					pstmt.execute();
-				}
 				
 				//WineJar
 				pstmt = conn.prepareStatement(ADD_WINEJAR);
@@ -309,6 +312,8 @@ public class CardDBObject {
 			pstmt.setTimestamp(2,new Timestamp(new Date().getTime()));
 			pstmt.setInt(3, jobTypeId);
 			pstmt.setInt(4, wineJarId);
+			pstmt.setInt(5, supervisorId);
+			pstmt.setString(6, sixMD5(card.getId().toString()));
 			pstmt.execute();
 			
 			conn.commit();
@@ -338,5 +343,35 @@ public class CardDBObject {
 
 		}
 		
+	}
+	
+	public String sixMD5(String plainText){
+		
+		 String sixteen="";
+		 try {
+			   MessageDigest md = MessageDigest.getInstance("MD5");   
+			   md.update(plainText.getBytes());
+			   byte b[] = md.digest();
+
+			   int i;
+			   
+			   StringBuffer buf = new StringBuffer(""); 
+			   for (int offset = 0; offset < b.length; offset++) {
+			    i = b[offset];
+			    if(i<0) i+= 256;
+			    if(i<16)
+			     buf.append("0");
+			    buf.append(Integer.toHexString(i));
+			   }
+			   sixteen= buf.toString().substring(8,24);//16位的加密
+			  // System.out.println("result: " + buf.toString());//32位的加密
+			  // System.out.println("result: " + buf.toString().substring(8,24));//16位的加密
+
+			  } catch (NoSuchAlgorithmException e) {
+			   // TODO Auto-generated catch block
+			   e.printStackTrace();
+			  }
+
+		 return sixteen;
 	}
 }

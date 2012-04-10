@@ -2,7 +2,7 @@ package com.mooo.sfwine;
 
 public class Card {
 	private Long id; // 主键 卡唯一ID
-	
+	private String rfidcode;//序列号
 	private String jobTypeName;
 	private String zipCode;//邮编 6
 	private String wineryKey;//酒厂编号3
@@ -31,6 +31,12 @@ public class Card {
 		this.id = id;
 	}
 	
+	public String getRfidcode() {
+		return rfidcode;
+	}
+	public void setRfidcode(String rfidcode) {
+		this.rfidcode = rfidcode;
+	}
 	public String getJobTypeName() {
 		return jobTypeName;
 	}
