@@ -196,7 +196,7 @@ public class CardLoginWindow {
 				//check database
 				if(LoginSession.staffSignal){
 					if(LoginSession.allow)
-						new CardAction(bodyPanel).promptNewCardId();
+						new CardAction(bodyPanel).promptNewWineCard();
 				}
 				if (log.isDebugEnabled()) log.debug("run finlsh!"+LoginSession.staffSignal);
 			}

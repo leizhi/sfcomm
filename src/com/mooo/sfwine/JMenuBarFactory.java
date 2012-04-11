@@ -27,6 +27,9 @@ public class JMenuBarFactory {
                 	menuBar.setBackground(bg);
                 	menuBar.setBorder(BorderFactory.createLineBorder(bg));
 
+            		final CardAction cardAction = new CardAction(bodyPanel);
+            		final UserAction userAction = new UserAction(bodyPanel);
+            		
                 	//开始
             		JMenu menuFile = new JMenu("开始");
             		menuFile.setBackground(bg);
@@ -49,7 +52,7 @@ public class JMenuBarFactory {
 
             		admin.addActionListener(new ActionListener() {
             			public void actionPerformed(ActionEvent e) {
-        					new LoginWindow(bodyPanel);
+            				userAction.promptLogin();
             			}
             		});
             		menuFile.add(admin);
@@ -78,7 +81,7 @@ public class JMenuBarFactory {
 
             		staff.addActionListener( new ActionListener() {
         				public void actionPerformed(ActionEvent e) {
-        					new StaffCardWindow(bodyPanel);
+        					userAction.promptRegister();
         				}
         			});
             		menuEdit.add(staff);
@@ -89,7 +92,7 @@ public class JMenuBarFactory {
 
             		cardId.addActionListener( new ActionListener() {
         				public void actionPerformed(ActionEvent e) {
-        					new CardAction(bodyPanel).promptNewCardId();
+        					cardAction.promptNewWineCard();
         				}
         			});
             		menuEdit.add(cardId);
@@ -105,7 +108,7 @@ public class JMenuBarFactory {
             		viewStaff.setForeground(fg);
             		viewStaff.addActionListener( new ActionListener() {
         				public void actionPerformed(ActionEvent e) {
-        					new CardAction(bodyPanel).listCard();
+        					cardAction.listCard();
         				}
         			});
             		readCard.add(viewStaff);
@@ -115,7 +118,7 @@ public class JMenuBarFactory {
             		viewCardId.setForeground(fg);
             		viewCardId.addActionListener( new ActionListener() {
         				public void actionPerformed(ActionEvent e) {
-        					new CardAction(bodyPanel).listCard();
+        					cardAction.viewWineCard();
         				}
         			});
             		readCard.add(viewCardId);

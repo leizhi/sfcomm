@@ -34,7 +34,7 @@ public class SerialManager {
 	public boolean openPort(String whichPort, int whichSpeed) {
 		try {
 			CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(whichPort);
-			mySerialPort = (SerialPort) portId.open("Serial Port" + whichPort,2000);
+			mySerialPort = (SerialPort) portId.open("Serial Port" + whichPort,9600);
 			try {
 				mySerialPort.setSerialPortParams(whichSpeed,
 						SerialPort.DATABITS_8, SerialPort.STOPBITS_1,

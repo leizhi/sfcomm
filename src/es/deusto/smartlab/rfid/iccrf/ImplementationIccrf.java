@@ -2,6 +2,9 @@ package es.deusto.smartlab.rfid.iccrf;
 
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+
+import com.mooo.mycoz.common.StringUtils;
+
 import es.deusto.smartlab.rfid.*;
 
 /**
@@ -131,14 +134,17 @@ public class ImplementationIccrf implements InterfaceRFID {
 	
 	private boolean testConnection() {
 		
-    	byte [] command = CommandsIccrf.versionRequest().getBytes();
-		testCommand(command);
+    	byte [] command = CommandsIccrf.getVersion().getBytes();
+		
+		System.out.println("getVersion:");
+    	testCommand(command);
+		
 		sm.send(command);
 
 		byte[] response = sm.read();
 		byte[] compar = {(byte) 0xA7};
 
-		System.out.println(bytesToHexString(response));
+		System.out.println("getVersion response:"+StringUtils.toHex(response));
 
 		if (response.length == 0) {
 			return false;
@@ -149,23 +155,41 @@ public class ImplementationIccrf implements InterfaceRFID {
 		}
 	}
 
-	public long findId() {
+	public long findSerialNumber(short cardType) {
 		
-    	byte [] command = CommandsIccrf.findId().getBytes();
+    	byte [] command = CommandsIccrf.findSerialNumber(cardType).getBytes();
 		testCommand(command);
 		sm.send(command);
 
 		byte[] response = sm.read();
 		byte[] compar = {(byte) 0xA7};
 
-		System.out.println(bytesToHexString(response));
+		System.out.println(StringUtils.toHex(response));
 
 		if (response ==null || response.length == 0) {
-			return 0;
-		} else if (response[0] == compar[0] && crcByte(response) && response[2]==0) {
-			return byteToInt2(subBytes(response,4,4));
+			return -1;
+		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
+			return StringUtils.toInt(StringUtils.subBytes(response,4,4));
 		} else {
-			return 0;
+			return -2;
+		}
+	}
+	public short findCardType() {
+    	byte [] command = CommandsIccrf.findCardType().getBytes();
+		testCommand(command);
+		sm.send(command);
+
+		byte[] response = sm.read();
+		byte[] compar = {(byte) 0xA7};
+
+		System.out.println(StringUtils.toHex(response));
+
+		if (response ==null || response.length == 0) {
+			return -1;
+		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
+			return StringUtils.toShort(StringUtils.orderByDESC(StringUtils.subBytes(response,4,2)));
+		} else {
+			return -2;
 		}
 	}
 	
@@ -180,12 +204,12 @@ public class ImplementationIccrf implements InterfaceRFID {
 		byte[] response = sm.read();
 		byte[] compar = {(byte) 0xA7};
 
-		System.out.println(bytesToHexString(response));
+		System.out.println(StringUtils.toHex(response));
 	
 		if (response.length == 0) {
 			return null;
-		} else if (response[0] == compar[0] && crcByte(response) && response[2]==0) {
-	    	 return bytesToHexString(response);
+		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
+	    	 return StringUtils.toHex(response);
 		}
 		return null;
 	}
@@ -202,12 +226,12 @@ public class ImplementationIccrf implements InterfaceRFID {
 		byte[] response = sm.read();
 		byte[] compar = {(byte) 0xA7};
 
-		System.out.println(bytesToHexString(response));
+		System.out.println(StringUtils.toHex(response));
 	
 		if (response==null || response.length == 0) {
 			return null;
-		} else if (response[0] == compar[0] && crcByte(response) && response[2]==0) {
-	    	 return bytesToHexString(response);
+		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
+	    	 return StringUtils.toHex(response);
 		}
 		return null;
 	}
@@ -223,12 +247,12 @@ public class ImplementationIccrf implements InterfaceRFID {
 		byte[] response = sm.read();
 		byte[] compar = {(byte) 0xA7};
 		
-   	 	System.out.println(bytesToHexString(response));
+   	 	System.out.println(StringUtils.toHex(response));
 
 		if (response==null || response.length == 0) {
 			return null;
-		} else if (response[0] == compar[0] && crcByte(response) && response[2]==0) {
-	    	 return bytesToHexString(response);
+		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
+	    	 return StringUtils.toHex(response);
 		}
 		return null;
 	}
@@ -236,23 +260,44 @@ public class ImplementationIccrf implements InterfaceRFID {
 	
 	public byte[] read(byte address){
 		byte[] command = CommandsIccrf.read(address).getBytes();
-		testCommand(command);
 		
-		System.out.println("read");
+		System.out.println("read:");
+		testCommand(command);
 
 		sm.send(command);
 		
 		byte[] response = sm.read();
 		byte[] compar = {(byte) 0xA7};
 
-		System.out.println(bytesToHexString(response));
+		System.out.println("read response:"+StringUtils.toHex(response));
 		
 		if (response.length == 0) {
 			return null;
-		} else if (response[0] == compar[0] && crcByte(response) && response[2]==0) {
+		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
 	    	 return response;
 		}
 		return null;
+	}
+	
+	public boolean halt(){
+		byte[] command = CommandsIccrf.halt().getBytes();
+		
+		System.out.println("halt:");
+		testCommand(command);
+
+		sm.send(command);
+		
+		byte[] response = sm.read();
+		byte[] compar = {(byte) 0xA7};
+
+		System.out.println(StringUtils.toHex(response));
+		
+		if (response.length == 0) {
+			return false;
+		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
+	    	 return true;
+		}
+		return false;
 	}
 	
 	public byte[] getBytes(byte address){
@@ -292,97 +337,42 @@ public class ImplementationIccrf implements InterfaceRFID {
 	public String write(byte address,byte[] data){
 
 		byte[] command = CommandsIccrf.write(address,data).getBytes();
-
+		
+		System.out.println("write:");
 		testCommand(command);
-		System.out.println("write");
 
 		sm.send(command);
 		
 		byte[] response = sm.read();
 		byte[] compar = {(byte) 0xA7};
 
-		System.out.println(bytesToHexString(response));
+		System.out.println("write response:"+StringUtils.toHex(response));
 		
 		if (response==null || response.length == 0) {
 			return null;
-		} else if (response[0] == compar[0] && crcByte(response) && response[2]==0) {
-	    	 return bytesToHexString(response);
+		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
+	    	 return StringUtils.toHex(response);
 		}
 		return null;
 	}
 	
 	public String beep(int msec){
 		testCommand(CommandsIccrf.beep(msec).getBytes());
-		System.out.println("beep");
+		System.out.println("beep:");
 
 		sm.send(CommandsIccrf.beep(msec).getBytes());
 		
 		byte[] response = sm.read();
 		byte[] compar = {(byte) 0xA7};
 
-		System.out.println(bytesToHexString(response));
+		System.out.println("beep respnse:"+StringUtils.toHex(response));
 		
 		if (response==null || response.length == 0) {
 			return null;
-		} else if (response[0] == compar[0] && crcByte(response) && response[2]==0) {
-	    	 return bytesToHexString(response);
+		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
+	    	 return StringUtils.toHex(response);
 		}
 		return null;
-	}
-	
-	public boolean crcByte(byte[] data){
-		byte clc = 0x00;
-		if(data == null || data.length==1){
-			return false;
-		}
-		
-		int length = data.length;
-		
-		for(int i=0;i<length-1;i++){
-			clc = (byte) (clc ^ data[i]);
-		}
-		
-		if(clc == data[length-1]){
-			return true;
-		}else{
-			return false;
-		}
-	}
-	
-    public static String bytesToHexString(byte[] src){  
-        StringBuilder stringBuilder = new StringBuilder("");  
-        if (src == null || src.length <= 0) {  
-            return null;  
-        }  
-        for (int i = 0; i < src.length; i++) {  
-            int v = src[i] & 0xFF;  
-            String hv = Integer.toHexString(v);  
-            if (hv.length() < 2) {  
-                stringBuilder.append(0);  
-            }  
-            stringBuilder.append(hv);  
-        }  
-        return stringBuilder.toString().toUpperCase();  
-    }
-    
-	public static byte[] subBytes(byte[] src,int begin,int offset) {
-		byte[] subBytes = new byte[offset];
-		for(int i=0;i<offset;i++){
-			subBytes[i] = src[begin+i];
-		}
-		return subBytes;
-	}
-	
-	public static long byteToInt2(byte[] b) {
-		int mask = 0xff;
-		int temp = 0;
-		long n = 0;
-		for (int i = 4; i > 0 ; i--) {
-			n <<= 8;
-			temp = b[i-1] & mask;
-			n |= temp;
-		}
-		return n;
 	}
 	
     public static void testCommand(byte[] command){

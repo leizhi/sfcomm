@@ -7,7 +7,18 @@
 package es.deusto.smartlab.rfid.iccrf;
 
 class CommandsIccrf {
-	private final byte START_SYMBOL = (byte)0xA7;//起始符
+	private final static byte START_SYMBOL = (byte)0xA7;//起始符
+	
+	private final static byte MODE_ONE = (byte)0x00;//一张卡
+	
+//	private final static byte MODE_MORE = (byte)0x01;//多张卡
+	
+	private final static byte MODE_UL = (byte)0x26;
+
+	private final static short CARD_14443A_M1 = (byte)0x0004;
+
+	private final static short CARD_14443A_UL = (byte)0x0044;
+
 	private int length;//数据长度
 	private byte command;//命令字
 	private byte data[];//数据
@@ -22,82 +33,48 @@ class CommandsIccrf {
 	private void calculateFields() {
 		setLength(1 + (getData() == null ? 0 : getData().length));
 	}
-
-//	static CommandsIccrf setDriverRequest(byte deviceMask, byte state) {
-//		byte data[] = new byte[2];
-//		data[0] = deviceMask;
-//		data[1] = state;
-//		return new CommandsIccrf((byte) 1, (byte) 67, data);
-//	}
-
-//	static CommandsIccrf findTokenRequest() {
-//		return new CommandsIccrf((byte) 1, (byte) 65, new byte[] { 10 });
-//	}
-//
-//	static CommandsIccrf findTokenISO15693Request() {
-//		return new CommandsIccrf((byte) 4, (byte) 65, new byte[] { 10 });
-//	}
-//
-//	static CommandsIccrf findTokenTagitRequest() {
-//		return new CommandsIccrf((byte) 5, (byte) 65, new byte[] { 10 });
-//	}
-
-//	static CommandsIccrf readSingleBlockISO15693Request(byte[] id,
-//			int blockNumber) throws RFIDException {
-//		if (id == null)
-//			throw new RFIDException("The tag ID is null");
-//		ByteArrayOutputStream bytes = new ByteArrayOutputStream(11);
-//		bytes.write(0);
-//		bytes.write(1);
-//		bytes.write((byte) (blockNumber & 0xff));
-//		try {
-//			bytes.write(id);
-//		} catch (IOException ex) {
-//			RFIDException nex = new RFIDException(ex.getMessage());
-//			nex.setStackTrace(ex.getStackTrace());
-//			throw nex;
-//		}
-//		return new CommandsIccrf((byte) 4, (byte) 101, bytes.toByteArray());
-//	}
-
-//	static CommandsIccrf readSingleBlockTagitRequest(byte[] id, int blockNumber) {
-//		ByteArrayOutputStream bytes = new ByteArrayOutputStream(5);
-//		bytes.write((byte) (blockNumber & 0xff));
-//		try {
-//			bytes.write(id);
-//		} catch (IOException ex) {
-//		}
-//		return new CommandsIccrf((byte) 5, (byte) 97, bytes.toByteArray());
-//	}
-
-//	static CommandsIccrf readMultipleBlocksISO15693Request(byte[] id,
-//			int startBlockNumber, int numberOfBlocks) {
-//		ByteArrayOutputStream bytes = new ByteArrayOutputStream(12);
-//		bytes.write(0);
-//		bytes.write(0);
-//		bytes.write((byte) (startBlockNumber & 0xff));
-//		bytes.write((byte) (numberOfBlocks & 0xff));
-//		try {
-//			bytes.write(id);
-//		} catch (IOException ex) {
-//		}
-//		return new CommandsIccrf((byte) 4, (byte) 104, bytes.toByteArray());
-//	}
-//
-//	static CommandsIccrf stayQuietISO15693Request(byte[] uid) {
-//		return new CommandsIccrf((byte) 4, (byte) 100, uid);
-//	}
-//
-	static CommandsIccrf versionRequest() {
-		byte[] data = new byte[1];
-		data[0] = 0x00;
-		return new CommandsIccrf((byte) 0x01, data);
+	//定义命令
+	
+	static CommandsIccrf initialize() {
+		byte[] buffer = new byte[2];
+		buffer[0] = (byte) 0xC6;
+		buffer[1] = (byte) 0x0E;
+		return new CommandsIccrf((byte) 0x12,buffer);
 	}
 	
-	static CommandsIccrf findId() {
+	static CommandsIccrf shakeHands() {
+		byte[] buffer = new byte[1];
+		buffer[0] = 0x30;
+		
+		return new CommandsIccrf((byte) 0x13,buffer);
+	}
+	
+	static CommandsIccrf getVersion() {
+		return new CommandsIccrf((byte) 0x11,null);
+	}
+	
+	static CommandsIccrf findCardType() {
 		byte[] data = new byte[1];
-		data[0] = 0x00;
-		return new CommandsIccrf((byte) 0x01, data);
+		data[0] = MODE_ONE;
+		return new CommandsIccrf((byte) 0x02, data);
+	}
+	
+	static CommandsIccrf findSerialNumber(short cardType) {
+		byte[] data = new byte[1];
+
+		if(cardType==CARD_14443A_M1){
+			System.out.println("CARD_14443A_M1");
+
+			data[0] = MODE_ONE;
+			return new CommandsIccrf((byte) 0x01, data);
+		}else if(cardType==CARD_14443A_UL){
+			
+			System.out.println("MODE_UL");
+
+			data[0] = MODE_UL;
+			return new CommandsIccrf((byte) 0x38, data);
+		}else
+			return null;
 	}
 	
 	static CommandsIccrf initval(byte address,byte[] value) {
@@ -137,14 +114,20 @@ class CommandsIccrf {
 		return new CommandsIccrf((byte) 0x07, data);
 	}
 	
-	static CommandsIccrf write(byte address,byte[] newData) {
-		byte[] data = new byte[17];
-		data[0] = address;//M1卡块地址(0～63),ML卡页地址(0～11)
+	static CommandsIccrf write(byte address,byte[] buffer) {
 		
-		for(int i=0;i<16;i++)
-			data[1+i] = newData[i];
+		byte[] request = new byte[buffer.length+1];
 		
-		return new CommandsIccrf((byte) 0x08, data);
+		request[0] = address;//M1卡块地址(0～63),ML卡页地址(0～11)
+		
+		for(int i=0;i<buffer.length;i++)
+			request[1+i] = buffer[i];
+		
+		return new CommandsIccrf((byte) 0x08, request);
+	}
+	
+	static CommandsIccrf halt() {
+		return new CommandsIccrf((byte) 0x06, null);
 	}
 	
 	static CommandsIccrf beep(int msec) {
@@ -191,16 +174,21 @@ class CommandsIccrf {
 
 	public byte[] getBytes() {
 
-		int rLength=4+data.length;
+		int rLength=4;
+		
+		if(data!=null) 
+			rLength += data.length;
 		
 		byte[] request = new byte[rLength];
 		request[0] = START_SYMBOL;
 		request[1] = (byte) (length & 0xff);
 		request[2] = command;
 		
-		for(int i=3;i<rLength-1;i++){
-			request[i] = data[i-3];
-		}
+		if(data!=null)
+			for(int i=3;i<rLength-1;i++){
+				request[i] = data[i-3];
+			}
+		
 		request[rLength-1] = CRC;
 		
 		for(int i=0;i<rLength-1;i++){
