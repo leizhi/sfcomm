@@ -50,6 +50,7 @@ public class NewJFrame extends JFrame {
 	 */
 	public static void main(String args[]) {
 		java.awt.EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				new NewJFrame().setVisible(true);
 			}
@@ -85,6 +86,7 @@ public class NewJFrame extends JFrame {
 		jLabel2.setText("Date:");
 
 		jTextField2.addFocusListener(new FocusAdapter() {
+			@Override
 			public void focusLost(FocusEvent evt) {
 				dateFocusLost(evt);
 			}
@@ -93,6 +95,7 @@ public class NewJFrame extends JFrame {
 		jLabel3.setText("Time:");
 
 		jTextField3.addFocusListener(new FocusAdapter() {
+			@Override
 			public void focusLost(FocusEvent evt) {
 				timeFocusLost(evt);
 			}
@@ -101,6 +104,7 @@ public class NewJFrame extends JFrame {
 		jLabel4.setText("Date and Time:");
 
 		jTextField4.addFocusListener(new FocusAdapter() {
+			@Override
 			public void focusLost(FocusEvent evt) {
 				dateTimeFocusLost(evt);
 			}
@@ -108,12 +112,14 @@ public class NewJFrame extends JFrame {
 
 		jCalendarButton1
 				.addPropertyChangeListener(new PropertyChangeListener() {
+					@Override
 					public void propertyChange(PropertyChangeEvent evt) {
 						dateOnlyPopupChanged(evt);
 					}
 				});
 
 		jTimeButton1.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				timeOnlyPopupChanged(evt);
 			}
@@ -121,12 +127,14 @@ public class NewJFrame extends JFrame {
 
 		jCalendarButton2
 				.addPropertyChangeListener(new PropertyChangeListener() {
+					@Override
 					public void propertyChange(PropertyChangeEvent evt) {
 						datePopupChanged(evt);
 					}
 				});
 
 		jTimeButton2.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				timePopupChanged(evt);
 			}

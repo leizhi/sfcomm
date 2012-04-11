@@ -9,7 +9,8 @@ public class JFCResume2 extends JFrame implements ItemListener {
     public static void main (String[] args) {
         final JFCResume2 res = new JFCResume2();
         res.addWindowListener(new WindowAdapter(){
-            public void windowClosing(WindowEvent evt) {
+            @Override
+			public void windowClosing(WindowEvent evt) {
                 res.setVisible(false);
                 res.dispose();
                 System.exit(0);
@@ -180,7 +181,8 @@ public class JFCResume2 extends JFrame implements ItemListener {
 
     }//GEN-END:initComponents
 
-    public void itemStateChanged(ItemEvent evt) {
+    @Override
+	public void itemStateChanged(ItemEvent evt) {
         CardLayout card = (CardLayout)panel1.getLayout();
         card.show(panel1, (String)evt.getItem());
     }

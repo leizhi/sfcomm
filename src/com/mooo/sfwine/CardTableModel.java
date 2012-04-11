@@ -76,7 +76,8 @@ public class CardTableModel extends AbstractTableModel {
     /**
     * 让表格中某些值可修改，但需要setValueAt(Object value, int row, int col)方法配合才能使修改生效
     */
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
+    @Override
+	public boolean isCellEditable(int rowIndex, int columnIndex) {
         if (columnIndex == 0) {
             return false;
         }
@@ -86,25 +87,30 @@ public class CardTableModel extends AbstractTableModel {
     /**
     * 使修改的内容生效
     */
-    public void setValueAt(Object value, int row, int col) {
+    @Override
+	public void setValueAt(Object value, int row, int col) {
         ((Vector<?>) content.get(row)).remove(col);
-        ((Vector<Object>) content.get(row)).add(col, value);
+        content.get(row).add(col, value);
 //        fireTableCellUpdated(row, col);
     }
 
-    public String getColumnName(int col) {
+    @Override
+	public String getColumnName(int col) {
         return columnName[col];
     }
 
-    public int getColumnCount() {
+    @Override
+	public int getColumnCount() {
         return columnName.length;
     }
 
-    public int getRowCount() {
+    @Override
+	public int getRowCount() {
         return content.size();
     }
 
-    public Object getValueAt(int row, int col) {
+    @Override
+	public Object getValueAt(int row, int col) {
     	if(content != null && (row <content.size()) && (col<columnDb.length))
     		return ((Vector<?>) content.get(row)).get(col);
     	else
@@ -114,7 +120,8 @@ public class CardTableModel extends AbstractTableModel {
     /**
     * 返回数据类型
     */
-    public Class<? extends Object> getColumnClass(int col) {
+    @Override
+	public Class<? extends Object> getColumnClass(int col) {
 		if (content == null) {
 			return null;
 		}

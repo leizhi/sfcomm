@@ -2,8 +2,6 @@ package test;
 
 import java.io.UnsupportedEncodingException;
 
-import com.mooo.mycoz.common.StringUtils;
-
 import es.deusto.smartlab.rfid.iccrf.ImplementationIccrf;
 
 

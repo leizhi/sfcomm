@@ -71,7 +71,8 @@ public class AutoCompleteTextField {
 //
         SwingUtilities.invokeLater(new Runnable() {
 
-            public void run() {
+            @Override
+			public void run() {
                 someTextField.setText("-");
                 someComboBox.getEditor().setItem(0);
                 someComboBox.getEditor().selectAll();
@@ -86,7 +87,8 @@ public class AutoCompleteTextField {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
 //                AutoCompleteTextField aCTF = 
                 	new AutoCompleteTextField();
             }

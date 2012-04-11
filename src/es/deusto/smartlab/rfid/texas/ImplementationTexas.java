@@ -89,7 +89,8 @@ public class ImplementationTexas implements InterfaceRFID
     *Initializes the Texas Instruments's kit, testing the connection with the reader/interrogator and opening the serial port.
     *@return Returns success if a RFID kit was successfully initialized.
     */
-    public boolean init()        
+    @Override
+	public boolean init()        
     {
         boolean opened = false;
         if(port!=null) {
@@ -120,12 +121,14 @@ public class ImplementationTexas implements InterfaceRFID
         return opened;
     }
 
-    public void setPort(String port)
+    @Override
+	public void setPort(String port)
     {
         this.port = port;
     }    
         
-    public Tag[] findTokens()
+    @Override
+	public Tag[] findTokens()
     {
         Tag[] Tagit = null;
         Tag[] ISO15693 = null;
@@ -146,7 +149,8 @@ public class ImplementationTexas implements InterfaceRFID
         return allTags(Tagit, ISO15693);        
     }
 
-    public Tag readSingleBlockMemory(byte[] tagID, int blockNumber)
+    @Override
+	public Tag readSingleBlockMemory(byte[] tagID, int blockNumber)
         throws RFIDException
     {
         if(blockNumber < 0)
@@ -221,7 +225,8 @@ public class ImplementationTexas implements InterfaceRFID
         }        
     }            
     
-    public Tag readMultipleBlocksMemory(byte[] tagID, int startBlockNumber, int endBlockNumber) 
+    @Override
+	public Tag readMultipleBlocksMemory(byte[] tagID, int startBlockNumber, int endBlockNumber) 
         throws RFIDException
     {
         if(startBlockNumber > endBlockNumber)
@@ -294,7 +299,8 @@ public class ImplementationTexas implements InterfaceRFID
         }
     }
     
-    public Tag[] readAllBlocksMemory()
+    @Override
+	public Tag[] readAllBlocksMemory()
         throws RFIDException
     {
         Tag[] Tagit = null;
@@ -328,7 +334,8 @@ public class ImplementationTexas implements InterfaceRFID
         return allTags(Tagit, ISO15693);
     }    
     
-    public Tag readAllBlocksMemory(byte[] tagID)
+    @Override
+	public Tag readAllBlocksMemory(byte[] tagID)
         throws RFIDException
     {
         Tag[] Tagit = null;
@@ -397,7 +404,8 @@ public class ImplementationTexas implements InterfaceRFID
 
     }
 
-    public void writeTokens(byte [] tagID, int startBlockNumber, byte [] dataTemp)
+    @Override
+	public void writeTokens(byte [] tagID, int startBlockNumber, byte [] dataTemp)
         throws RFIDException
     {
         byte [] data = null;
@@ -515,7 +523,8 @@ public class ImplementationTexas implements InterfaceRFID
         }
     }
 
-    public void destroy()
+    @Override
+	public void destroy()
     {
         sm.closePort();
     }

@@ -53,12 +53,14 @@ public class Java2sAutoTextField extends JTextField {
 		 */
 		private static final long serialVersionUID = 159521942810830415L;
 
+		@Override
 		public void replace(int i, int j, String s, AttributeSet attributeset)
 				throws BadLocationException {
 			super.remove(i, j);
 			insertString(i, s, attributeset);
 		}
 
+		@Override
 		public void insertString(int i, String s, AttributeSet attributeset)
 				throws BadLocationException {
 			if (s == null || "".equals(s))
@@ -81,6 +83,7 @@ public class Java2sAutoTextField extends JTextField {
 			setSelectionEnd(getLength());
 		}
 
+		@Override
 		public void remove(int i, int j) throws BadLocationException {
 			int k = getSelectionStart();
 			if (k > 0)
@@ -151,6 +154,7 @@ public class Java2sAutoTextField extends JTextField {
 		return null;
 	}
 
+	@Override
 	public void replaceSelection(String s) {
 		AutoDocument _lb = (AutoDocument) getDocument();
 		if (_lb != null)

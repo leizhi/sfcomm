@@ -25,6 +25,7 @@ public class KeyEventDemo extends JFrame {
 		public Keyboardpanel() {
 
 			addKeyListener(new KeyAdapter() {
+				@Override
 				public void keyPressed(KeyEvent e) {
 					switch (e.getKeyCode()) {
 					case KeyEvent.VK_DOWN:
@@ -52,6 +53,7 @@ public class KeyEventDemo extends JFrame {
 
 		}
 
+		@Override
 		protected void paintComponent(Graphics g) {
 			super.paintComponent(g);
 

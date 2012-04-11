@@ -174,7 +174,7 @@ class CommandsMicrochip
     public byte[] getBytes()
     {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream(6 + getData().length);
-        bytes.write(this.sync_char);
+        bytes.write(CommandsMicrochip.sync_char);
         bytes.write(getCommand());
         if(getData().length!=0) 
         {
@@ -184,15 +184,15 @@ class CommandsMicrochip
         }            
         bytes.write(getChecksum1());
         bytes.write(getChecksum2());
-        bytes.write(this.CR);
-        bytes.write(this.LF);
+        bytes.write(CommandsMicrochip.CR);
+        bytes.write(CommandsMicrochip.LF);
         return bytes.toByteArray();
     }
     
     private void calcChecksum() 
     {                
         ByteArrayOutputStream bytes = new ByteArrayOutputStream(2 + getData().length);
-        bytes.write(this.sync_char);        
+        bytes.write(CommandsMicrochip.sync_char);        
         bytes.write(getCommand());
         if(getData().length!=0) 
         {
@@ -206,7 +206,7 @@ class CommandsMicrochip
         int checksum = 0;
         for(int i=0; i<data.length; i++) 
         {
-            checksum += (int) data[i] & 0xFF;
+            checksum += data[i] & 0xFF;
         }    
 
         checksum = (byte)(checksum ^ 0xFF) + 1 ;

@@ -10,7 +10,24 @@ public class User {
 	private String password;
 	private String alias;
 	private String active;
+	private Integer orgId;
+	private boolean allow;
 	
+	
+	
+	
+	public Integer getOrgId() {
+		return orgId;
+	}
+	public void setOrgId(Integer orgId) {
+		this.orgId = orgId;
+	}
+	public boolean isAllow() {
+		return allow;
+	}
+	public void setAllow(boolean allow) {
+		this.allow = allow;
+	}
 	public Long getId() {
 	return id;
 	}

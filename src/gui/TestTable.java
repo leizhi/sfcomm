@@ -33,7 +33,8 @@ public class TestTable extends JFrame {
 		setVisible(true);
 		split.setDividerLocation(0.7);
 		this.addComponentListener(new ComponentAdapter(){
-            public void componentResized(ComponentEvent e) {
+            @Override
+			public void componentResized(ComponentEvent e) {
             	split.setDividerLocation(0.7);
             }
         });

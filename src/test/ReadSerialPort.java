@@ -46,7 +46,8 @@ public class ReadSerialPort {
             this.reader = new BufferedReader(new InputStreamReader(in));
         }
         
-        public void run () {
+        @Override
+		public void run () {
             String line = null;
             try{
                while ((line = reader.readLine()) != null) {

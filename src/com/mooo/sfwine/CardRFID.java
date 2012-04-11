@@ -1,6 +1,5 @@
 package com.mooo.sfwine;
 
-
 import es.deusto.smartlab.rfid.iccrf.ImplementationIccrf;
 
 public class CardRFID {
@@ -35,7 +34,7 @@ public class CardRFID {
 	}
 	
 	public Long getCardId() {
-		return iccrf.findId();
+		return iccrf.findSerialNumber(iccrf.findCardType());
 	}
 	
 	public void beep() {
@@ -166,7 +165,4 @@ public class CardRFID {
 		}
 		return buffer;
 	}
-	
-	
-	
 }

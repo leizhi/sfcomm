@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.WindowConstants;
 
 public class Test7 implements ActionListener {
 
@@ -90,9 +91,10 @@ public class Test7 implements ActionListener {
 		dialog.setSize(390, 100);
 		dialog.setLocationRelativeTo(parent); // 设置此窗口相对于指定组件的位置
 
-		dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // 不允许关闭
+		dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE); // 不允许关闭
 
 		mainPane.addComponentListener(new ComponentAdapter() {
+			@Override
 			public void componentResized(ComponentEvent e) {
 				layout(mainPane.getWidth(), mainPane.getHeight());
 			}
@@ -101,6 +103,7 @@ public class Test7 implements ActionListener {
 
 	private void startThread() {
 		new Thread() {
+			@Override
 			public void run() {
 				try {
 					thread.start(); // 处理耗时任务
@@ -130,6 +133,7 @@ public class Test7 implements ActionListener {
 		btnCancel.setBounds(width - 85, height - 31, 75, 21);
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		resultInfo = cancelInfo;
 		thread.stop();
@@ -138,6 +142,7 @@ public class Test7 implements ActionListener {
 	public static void main(String[] args) throws Exception {
 
 		Thread thread = new Thread() {
+			@Override
 			public void run() {
 				int index = 0;
 

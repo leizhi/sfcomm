@@ -34,6 +34,7 @@ public void start() {
    splashThread.start(); // 开始运行线程
 }
 
+@Override
 public void run() {
    setVisible(true); // 显示窗口
    try {

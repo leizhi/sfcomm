@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
@@ -27,7 +28,7 @@ public class TestJPanel {
 		JFrame frame = new JFrame();
 		frame.setLayout(new GridLayout(4, 0)); // 用GridLayout布局实现
 		Label1 = new JLabel("To");
-		Label1.setAlignmentX(JLabel.LEFT_ALIGNMENT);
+		Label1.setAlignmentX(Component.LEFT_ALIGNMENT);
 		Label2 = new JLabel("CC");
 		Label3 = new JLabel("Bcc");
 

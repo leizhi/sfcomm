@@ -7,8 +7,10 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.net.UnknownHostException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -50,8 +52,8 @@ public class CardLoginWindow {
 		
 		int x, y,width,hight;
 
-		x = 340;
-		y = 100;
+		x = 400;
+		y = 250;
 		
 		width = 80;
 		hight = 20;
@@ -91,7 +93,12 @@ public class CardLoginWindow {
 		bodyPanel.setVisible(true);
 		bodyPanel.validate();//显示
 		bodyPanel.repaint();
-
+		//设置背景图片
+		  URL url = SFWine.class.getResource("bg.png");
+	        ImageIcon img = new ImageIcon(url);
+	        JLabel background = new JLabel(img);
+	        bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+	        background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
 		if(log.isDebugEnabled()) log.debug("initializeGUI end");
 		
 		Thread loopCard = new Thread(new CardLoginAction());
@@ -102,7 +109,7 @@ public class CardLoginWindow {
 	
 	public boolean isOpenNetwork(){
 		try{
-			Socket socket = new Socket("122.225.88.84", 3306);
+			Socket socket = new Socket("122.225.88.83", 1433);
 			socket.setSoTimeout(50);
 			socket.close();
 			
@@ -126,7 +133,8 @@ public class CardLoginWindow {
 	
 	 class CardLoginAction implements Runnable {
 
-		 public void run(){
+		 @Override
+		public void run(){
 				CardRFID cardRFID = new CardRFID();
 				try {
 					// 初始化检查

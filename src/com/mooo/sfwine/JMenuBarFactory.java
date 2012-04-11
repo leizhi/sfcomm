@@ -40,7 +40,8 @@ public class JMenuBarFactory {
             		loginSystem.setBackground(bg);
             		loginSystem.setForeground(fg);
             		loginSystem.addActionListener(new ActionListener() {
-            			public void actionPerformed(ActionEvent e) {
+            			@Override
+						public void actionPerformed(ActionEvent e) {
         					new CardLoginWindow(bodyPanel);
             			}
             		});
@@ -51,7 +52,8 @@ public class JMenuBarFactory {
             		admin.setForeground(fg);
 
             		admin.addActionListener(new ActionListener() {
-            			public void actionPerformed(ActionEvent e) {
+            			@Override
+						public void actionPerformed(ActionEvent e) {
             				userAction.promptLogin();
             			}
             		});
@@ -62,7 +64,8 @@ public class JMenuBarFactory {
             		menuFileExit.setForeground(fg);
 
             		menuFileExit.addActionListener(new ActionListener() {
-            			public void actionPerformed(ActionEvent e) {
+            			@Override
+						public void actionPerformed(ActionEvent e) {
             				System.exit(0);
             			}
             		});
@@ -80,7 +83,8 @@ public class JMenuBarFactory {
             		staff.setForeground(fg);
 
             		staff.addActionListener( new ActionListener() {
-        				public void actionPerformed(ActionEvent e) {
+        				@Override
+						public void actionPerformed(ActionEvent e) {
         					userAction.promptRegister();
         				}
         			});
@@ -91,7 +95,8 @@ public class JMenuBarFactory {
             		cardId.setForeground(fg);
 
             		cardId.addActionListener( new ActionListener() {
-        				public void actionPerformed(ActionEvent e) {
+        				@Override
+						public void actionPerformed(ActionEvent e) {
         					cardAction.promptNewWineCard();
         				}
         			});
@@ -107,7 +112,8 @@ public class JMenuBarFactory {
             		viewStaff.setBackground(bg);
             		viewStaff.setForeground(fg);
             		viewStaff.addActionListener( new ActionListener() {
-        				public void actionPerformed(ActionEvent e) {
+        				@Override
+						public void actionPerformed(ActionEvent e) {
         					cardAction.listCard();
         				}
         			});
@@ -117,7 +123,8 @@ public class JMenuBarFactory {
             		viewCardId.setBackground(bg);
             		viewCardId.setForeground(fg);
             		viewCardId.addActionListener( new ActionListener() {
-        				public void actionPerformed(ActionEvent e) {
+        				@Override
+						public void actionPerformed(ActionEvent e) {
         					cardAction.viewWineCard();
         				}
         			});
@@ -151,7 +158,8 @@ public class JMenuBarFactory {
             		menuHelpAbout.setBackground(bg);
             		menuHelpAbout.setForeground(fg);
             		menuHelpAbout.addActionListener(new ActionListener() {
-            			public void actionPerformed(ActionEvent e) {
+            			@Override
+						public void actionPerformed(ActionEvent e) {
             				JOptionPane.showMessageDialog(SFWine.frame, "发卡系统 V1.0");
             			}
             		});

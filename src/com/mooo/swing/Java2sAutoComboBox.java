@@ -35,6 +35,7 @@ public class Java2sAutoComboBox extends JComboBox {
 		 */
 			private static final long serialVersionUID = -4533278919714284150L;
 
+			@Override
 			protected void fireContentsChanged(Object obj, int i, int j) {
 				if (!isFired)
 					super.fireContentsChanged(obj, i, j);
@@ -82,6 +83,7 @@ public class Java2sAutoComboBox extends JComboBox {
 		}
 	}
 
+	@Override
 	protected void fireActionEvent() {
 		if (!isFired)
 			super.fireActionEvent();

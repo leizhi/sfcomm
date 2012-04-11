@@ -77,6 +77,7 @@ public class MainformFrame extends JFrame implements ActionListener {
 
 	@SuppressWarnings("unused")
 	private class MyPanel extends JPanel {
+		@Override
 		public void paintComponent(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
 			super.paintComponent(g);

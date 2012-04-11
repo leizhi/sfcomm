@@ -2,7 +2,6 @@ package com.mooo.swing;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 import javax.swing.*;
 import javax.swing.text.*;
 
@@ -12,6 +11,7 @@ public class AutoComplete extends JComboBox implements
 	private long lap;
 
 	public class CBDocument extends PlainDocument {
+		@Override
 		public void insertString(int offset, String str, AttributeSet a)
 				throws BadLocationException {
 			if (str == null)
@@ -32,6 +32,7 @@ public class AutoComplete extends JComboBox implements
 			if (tf != null) {
 				tf.setDocument(new CBDocument());
 				addActionListener(new ActionListener() {
+					@Override
 					public void actionPerformed(ActionEvent evt) {
 						JTextField tf = (JTextField) getEditor()
 								.getEditorComponent();
@@ -54,6 +55,7 @@ public class AutoComplete extends JComboBox implements
 		}
 	}
 
+	@Override
 	public int selectionForKey(char aKey, ComboBoxModel aModel) {
 		long now = new java.util.Date().getTime();
 		if (searchFor != null && aKey == KeyEvent.VK_BACK_SPACE
@@ -77,6 +79,7 @@ public class AutoComplete extends JComboBox implements
 		return -1;
 	}
 
+	@Override
 	public void fireActionEvent() {
 		super.fireActionEvent();
 	}

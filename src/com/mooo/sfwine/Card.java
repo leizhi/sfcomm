@@ -23,7 +23,32 @@ public class Card {
 	private String volumeUnit;//容积单位 2
 	
 	private String material;//原料 2
+	
+	private String wineName;//酒名
+	private long userId;//登陆用户ID
+	private Integer orgId;//机构
 
+	
+	
+	
+	public String getWineName() {
+		return wineName;
+	}
+	public void setWineName(String wineName) {
+		this.wineName = wineName;
+	}
+	public long getUserId() {
+		return userId;
+	}
+	public void setUserId(long userId) {
+		this.userId = userId;
+	}
+	public Integer getOrgId() {
+		return orgId;
+	}
+	public void setOrgId(Integer orgId) {
+		this.orgId = orgId;
+	}
 	public Long getId() {
 		return id;
 	}

@@ -7,8 +7,10 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.net.URL;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -62,12 +64,17 @@ public class SFWine {
 		Color fg = Color.WHITE;
 		
 		bodyPanel = new JPanel();
-		bodyPanel.setPreferredSize(new Dimension(1024, 600));
+		bodyPanel.setPreferredSize(new Dimension(1003, 568));
 		bodyPanel.setLayout(null);
 		bodyPanel.setBackground(bg);
 		bodyPanel.setForeground(fg);
 		bodyPanel.setBorder(BorderFactory.createLineBorder(bg));
-		
+		//设置背景图片
+        URL url = SFWine.class.getResource("bg.png");
+        ImageIcon img = new ImageIcon(url);
+        JLabel background = new JLabel(img);
+        bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+        background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
 		frame.getContentPane().add(bodyPanel,BorderLayout.NORTH);
 
 		//start Login
@@ -97,7 +104,7 @@ public class SFWine {
 //
 //		frame.setSize(block*WidthBlock, heightBlock*block);
 		
-		frame.setSize(1024, 680);
+		frame.setSize(1003, 600);
 //		frame.setBackground(bg);
 //		frame.setForeground(fg);
 
@@ -110,6 +117,7 @@ public class SFWine {
 //		frame.getRootPane().setDefaultButton(confirm);
 		
 		frame.addWindowListener(new WindowAdapter() {
+			@Override
 			public void windowClosing(WindowEvent e) {
 				int sCommand = JOptionPane.showConfirmDialog(null, "确定关闭吗？", "温馨提示",
 						JOptionPane.YES_NO_OPTION);

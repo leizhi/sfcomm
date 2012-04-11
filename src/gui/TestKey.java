@@ -23,12 +23,15 @@ public class TestKey extends JFrame implements KeyListener {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
+	@Override
 	public void keyPressed(KeyEvent e) {
 	}
 
+	@Override
 	public void keyReleased(KeyEvent e) {
 	}
 
+	@Override
 	public void keyTyped(KeyEvent e) {
 		JOptionPane.showMessageDialog(null, "succeed ", "Show ",
 				JOptionPane.INFORMATION_MESSAGE);

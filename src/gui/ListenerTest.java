@@ -23,7 +23,8 @@ public class ListenerTest {
         
         //为按钮添加行为监听器
         jbutton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent arg0) {
+            @Override
+			public void actionPerformed(ActionEvent arg0) {
                 if(!jtext.getText().equals("123456")){
                     //如果输入错误
                     JOptionPane.showMessageDialog(null, "输入错误",
@@ -45,7 +46,8 @@ public class ListenerTest {
         
         //为按钮添加键盘适配器
         jtext.addKeyListener(new KeyAdapter(){
-            public void keyPressed(KeyEvent e){
+            @Override
+			public void keyPressed(KeyEvent e){
                     if(e.getKeyCode() == KeyEvent.VK_ENTER){
                         //如果按下回车键
                         if(!jtext.getText().equals("123456")){

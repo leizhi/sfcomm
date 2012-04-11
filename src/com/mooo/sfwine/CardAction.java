@@ -6,13 +6,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -50,6 +53,7 @@ public class CardAction {
 	private JTextField zipCodeText;
 	private JTextField wineryName;
 	private JTextField wineJarKey;
+	private JTextField wineName;
 	private JTextField operator;
 	private JTextField alcohol;
 	private JTextField supervisorName;
@@ -79,10 +83,9 @@ public class CardAction {
 	public CardAction(JPanel bodyPanel,String message) {
 		this.bodyPanel = bodyPanel;
 		this.message = message;
-
 	}
 	
-	public void promptNewCardId() {
+	public void promptNewWineCard() {
 		try {
 			//isAllow
 			if(!LoginSession.isAllow())
@@ -99,7 +102,412 @@ public class CardAction {
 		int execWidth = 60;
 
 		x = 340;
-		y = 40;
+		y = 140;
+		
+		width = 80;
+		hight = 20;
+		width_1 = 160;
+		
+		x += 10;
+		y += 10;
+		
+		String display = "操作员:"+LoginSession.user.getName();
+		
+		disLabel = new JLabel(display);
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,20*display.length(),hight);
+		bodyPanel.add(disLabel);
+		
+		y += hight;
+
+		disLabel = new JLabel("操作:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		jobType = new JComboBox();
+		jobType.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		jobType.addItem("封酒");
+		jobType.addItem("加酒");
+		jobType.addItem("取酒");
+		jobType.addItem("加&取 酒");
+		jobType.addItem("取完酒");
+		jobType.addItem("巡检");
+		bodyPanel.add(jobType);
+		
+		y += hight;
+		
+		disLabel = new JLabel("酒厂邮编:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		zipCodeText = new JTextField();
+		zipCodeText.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		bodyPanel.add(zipCodeText);
+
+		y += hight;
+		disLabel = new JLabel("酒厂名:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		wineryName = new JTextField();
+		wineryName.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		bodyPanel.add(wineryName);
+		
+		y += hight;
+		
+		disLabel = new JLabel("酒名:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		wineName = new JTextField();
+		wineName.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		bodyPanel.add(wineName);
+		y += hight;
+		
+		disLabel = new JLabel("酒罐号:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		wineJarKey = new JTextField();
+		wineJarKey.setBounds(x+width,y,40,hight);//一个字符9 point
+		wineJarKey.setDocument(new LimitDocument(4));
+		bodyPanel.add(wineJarKey);
+
+		display = " * 4位数字编号";
+		disLabel = new JLabel(display);
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x+width+width_1,y,10*display.length(),hight);
+		disLabel.setForeground(Color.RED);
+		bodyPanel.add(disLabel);
+		
+		y += hight;
+
+		disLabel = new JLabel("酒香型:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		wineType = new JComboBox();
+		wineType.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		wineType.addItem("酱香型");
+		wineType.addItem("浓香型");
+		wineType.addItem("兼香型");
+		wineType.addItem("米香型");
+		wineType.addItem("凤香型");
+		wineType.addItem("芝麻香型");
+		wineType.addItem("豉香型");
+		wineType.addItem("清香型");
+		wineType.addItem("特香型");
+		wineType.addItem("药香型");
+		wineType.addItem("老白干香型");
+		wineType.addItem("馥郁香型白酒");
+		bodyPanel.add(wineType);
+
+		y += hight;
+
+		disLabel = new JLabel("品质:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		wineLevel = new JComboBox();
+		wineLevel.setBounds(x+width,y,width_1,hight);//一个字符9 point
+
+		wineLevel.addItem("特级");
+		wineLevel.addItem("特优");
+		wineLevel.addItem("优级");
+		wineLevel.addItem("一级");
+		wineLevel.addItem("二级");
+		bodyPanel.add(wineLevel);
+
+		y += hight;
+
+		disLabel = new JLabel("酒精度:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		alcohol = new JTextField();
+		alcohol.setBounds(x+width,y,40,hight);//一个字符9 point
+		alcohol.setDocument(new LimitDocument(5));
+		bodyPanel.add(alcohol);
+
+		display = " 度(%) 45.13";
+		disLabel = new JLabel(display);
+		disLabel.setBounds(x+width+width_1,y,10*display.length(),hight);
+		disLabel.setForeground(Color.RED);
+		bodyPanel.add(disLabel);
+		
+		y += hight;
+
+		disLabel = new JLabel("操作人:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		operator = new JTextField();
+		operator.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		bodyPanel.add(operator);
+
+		y += hight;
+
+		disLabel = new JLabel("监管公司:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		supervisorCompanyKey = new JTextField();
+		supervisorCompanyKey.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		bodyPanel.add(supervisorCompanyKey);
+
+		y += hight;
+
+		disLabel = new JLabel("监管人:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		supervisorName = new JTextField();
+		supervisorName.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		bodyPanel.add(supervisorName);
+
+		y += hight;
+
+		disLabel = new JLabel("酿造日期:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		brewingDate = new JTextField();
+		brewingDate.setBounds(x+width,y,100,hight);//一个字符9 point
+		brewingDate.setDocument(new LimitDocument(10));
+		bodyPanel.add(brewingDate);
+
+		brewingCalendar = new JCalendarButton();
+		brewingCalendar.setLocale(new Locale("zh","CN"));
+		
+		brewingCalendar.setBounds(x+width+100,y,20,hight);
+		brewingCalendar.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				dateOnlyPopupChanged(evt);
+			}
+		});
+		
+		bodyPanel.add(brewingCalendar);
+		
+		y += hight;
+
+		disLabel = new JLabel("罐体容量:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		wineJarVolume = new JTextField();
+		wineJarVolume.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		bodyPanel.add(wineJarVolume);
+
+		y += hight;
+
+		disLabel = new JLabel("源酒容量:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		wineVolume = new JTextField();
+		wineVolume.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		bodyPanel.add(wineVolume);
+
+		y += hight;
+
+		disLabel = new JLabel("原料:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+
+		material = new JTextField();
+		material.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		bodyPanel.add(material);
+		
+		if(!StringUtils.isNull(message)){
+			y += hight;
+			disLabel = new JLabel(message);
+			disLabel.setForeground(Color.RED);
+			disLabel.setBounds(x,y,message.length()*20,hight);
+			bodyPanel.add(disLabel);
+		}
+		
+		
+		y += hight;
+		
+		JButton confirm = new JButton("确定");
+		confirm.setBackground(new Color(105,177,35));
+		confirm.setForeground(fg);
+		confirm.requestFocus();
+		confirm.setBounds(x+width,y,execWidth,hight);//一个字符9 point
+
+		confirm.addActionListener( new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					processNewWineCard();
+				}
+			});
+		//为按钮添加键盘适配器
+		confirm.addKeyListener(new KeyAction());
+		
+		bodyPanel.add(confirm);
+
+		bodyPanel.setVisible(true);
+		bodyPanel.validate();//显示
+		bodyPanel.repaint();
+		//设置背景图片
+		  URL url = SFWine.class.getResource("bg1.png");
+	        ImageIcon img = new ImageIcon(url);
+	        JLabel background = new JLabel(img);
+	        bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+	        background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());	
+		if(log.isDebugEnabled()) log.debug("initializeGUI end");
+		} catch (Exception e) {
+			if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());
+			
+			new CardLoginWindow(bodyPanel);
+		}
+	}
+
+	public void processNewWineCard() {
+		CardRFID cardRFID = null;
+		
+		try {
+			fillCard();
+			
+			cardRFID = new CardRFID();
+
+			// 初始化检查
+			if (!cardRFID.getIccrf().isOpened())
+				throw new NullPointerException("请正确连接发卡器");
+
+			Long cardId = cardRFID.getCardId();
+			if (cardId == 0)
+				throw new NullPointerException("请放人电子标签或者电子卡");
+
+			card.setId(cardId);
+			card.setRfidcode(sixMD5(cardId.toString()));
+			CardDBObject dbObjcet = new CardDBObject();
+
+			if (dbObjcet.isRegistr(card))
+				throw new NullPointerException("卡片已经使用,请换新卡!");
+
+			cardRFID.saveType((byte)0xB5, 1);//
+
+//			cardRFID.save(card.getZipCode(), 1, 0, 6);
+
+			cardRFID.save(card.getRfidcode(), 1, 0, 16);
+			
+			/*cardRFID.saveGBK(card.getWineryName(), 1, 1, 16);
+
+			cardRFID.saveGBK(card.getWineJarKey(), 1, 2, 16);
+
+			cardRFID.saveGBK(card.getWineType(), 2, 0, 16);
+
+			cardRFID.saveGBK(card.getWineLevel(), 2, 1, 16);
+
+			cardRFID.saveGBK(card.getAlcohol(), 2, 2, 16);
+
+			cardRFID.saveGBK(card.getOperator(), 3, 0, 16);
+
+			cardRFID.saveGBK(card.getSupervisorCompanyKey(), 3, 1, 16);
+
+			cardRFID.saveGBK(card.getSupervisorName(), 3, 2, 16);
+
+			cardRFID.saveGBK(card.getBrewingDate(), 4, 0, 16);
+
+			Calendar rightNow = Calendar.getInstance();
+			String value = dformat.format(rightNow.getTime());
+
+			cardRFID.saveGBK(value, 4, 1, 16);
+
+			cardRFID.saveGBK(card.getWineJarVolume(), 4, 2, 16);
+
+			cardRFID.saveGBK(card.getWineVolume(), 5, 0, 16);
+
+			cardRFID.saveGBK(card.getMaterial(), 6, 0, 16);
+*/
+			cardRFID.beep();
+
+			dbObjcet.save(card);
+
+			JOptionPane.showMessageDialog(null, "发卡成功", "系统提示",
+					JOptionPane.INFORMATION_MESSAGE);
+		} catch (NullPointerException e) {
+			if (log.isErrorEnabled())
+				log.error("NullPointerException:" + e.getMessage());
+			message = e.getMessage();
+			
+			promptNewWineCard();
+		} catch (Exception se) {
+			if (log.isErrorEnabled())
+				log.error("Exception:" + se.getMessage());
+			se.printStackTrace();
+		} finally {
+			cardRFID.destroy();
+		}
+
+		if (log.isDebugEnabled()) log.debug("flinsh");
+	}
+	
+	
+	public String sixMD5(String plainText){
+		
+		 String sixteen="";
+		 try {
+			   MessageDigest md = MessageDigest.getInstance("MD5");   
+			   md.update(plainText.getBytes());
+			   byte b[] = md.digest();
+
+			   int i;
+			   
+			   StringBuffer buf = new StringBuffer(""); 
+			   for (int offset = 0; offset < b.length; offset++) {
+			    i = b[offset];
+			    if(i<0) i+= 256;
+			    if(i<16)
+			     buf.append("0");
+			    buf.append(Integer.toHexString(i));
+			   }
+			   sixteen= buf.toString().substring(8,24);//16位的加密
+			  // System.out.println("result: " + buf.toString());//32位的加密
+			  // System.out.println("result: " + buf.toString().substring(8,24));//16位的加密
+
+			  } catch (NoSuchAlgorithmException e) {
+			   // TODO Auto-generated catch block
+			   e.printStackTrace();
+			  }
+
+		 return sixteen;
+	}
+	public void viewWineCard() {
+		try {
+			//isAllow
+			if(!LoginSession.isAllow())
+				throw new Exception("请先登录!");
+			
+		card = new Card();
+		
+		//clean view
+		if (bodyPanel.isShowing()) {
+			bodyPanel.removeAll();
+		}
+		
+		int x, y,width,hight,width_1;
+		int execWidth = 60;
+
+		x = 340;
+		y = 140;
 		
 		width = 80;
 		hight = 20;
@@ -280,6 +688,7 @@ public class CardAction {
 		
 		brewingCalendar.setBounds(x+width+100,y,20,hight);
 		brewingCalendar.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
 				dateOnlyPopupChanged(evt);
 			}
@@ -338,8 +747,9 @@ public class CardAction {
 		confirm.setBounds(x+width,y,execWidth,hight);//一个字符9 point
 
 		confirm.addActionListener( new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
-					processNewCardId();
+					processNewWineCard();
 				}
 			});
 		//为按钮添加键盘适配器
@@ -350,7 +760,12 @@ public class CardAction {
 		bodyPanel.setVisible(true);
 		bodyPanel.validate();//显示
 		bodyPanel.repaint();
-		
+		//设置背景图片
+		  URL url = SFWine.class.getResource("bg1.png");
+	        ImageIcon img = new ImageIcon(url);
+	        JLabel background = new JLabel(img);
+	        bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+	        background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
 		if(log.isDebugEnabled()) log.debug("initializeGUI end");
 		} catch (Exception e) {
 			if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());
@@ -358,86 +773,6 @@ public class CardAction {
 			new CardLoginWindow(bodyPanel);
 		}
 	}
-
-	public void processNewCardId() {
-		CardRFID cardRFID = null;
-		
-		try {
-			fillCard();
-			
-			cardRFID = new CardRFID();
-
-			// 初始化检查
-			if (!cardRFID.getIccrf().isOpened())
-				throw new NullPointerException("请正确连接发卡器");
-
-			Long cardId = cardRFID.getCardId();
-			if (cardId == 0)
-				throw new NullPointerException("请放人电子标签或者电子卡");
-
-			card.setId(cardId);
-
-			CardDBObject dbObjcet = new CardDBObject();
-
-			if (dbObjcet.isRegistr(card))
-				throw new NullPointerException("卡片已经使用,请换新卡!");
-
-			cardRFID.saveType((byte)0xB5, 1);//
-
-//			cardRFID.save(card.getZipCode(), 1, 0, 6);
-
-			cardRFID.saveGBK(card.getWineryName(), 1, 1, 16);
-
-			cardRFID.saveGBK(card.getWineJarKey(), 1, 2, 16);
-
-			cardRFID.saveGBK(card.getWineType(), 2, 0, 16);
-
-			cardRFID.saveGBK(card.getWineLevel(), 2, 1, 16);
-
-			cardRFID.saveGBK(card.getAlcohol(), 2, 2, 16);
-
-			cardRFID.saveGBK(card.getOperator(), 3, 0, 16);
-
-			cardRFID.saveGBK(card.getSupervisorCompanyKey(), 3, 1, 16);
-
-			cardRFID.saveGBK(card.getSupervisorName(), 3, 2, 16);
-
-			cardRFID.saveGBK(card.getBrewingDate(), 4, 0, 16);
-
-			Calendar rightNow = Calendar.getInstance();
-			String value = dformat.format(rightNow.getTime());
-
-			cardRFID.saveGBK(value, 4, 1, 16);
-
-			cardRFID.saveGBK(card.getWineJarVolume(), 4, 2, 16);
-
-			cardRFID.saveGBK(card.getWineVolume(), 5, 0, 16);
-
-			cardRFID.saveGBK(card.getMaterial(), 6, 0, 16);
-
-			cardRFID.beep();
-
-			dbObjcet.save(card);
-
-			JOptionPane.showMessageDialog(null, "发卡成功", "系统提示",
-					JOptionPane.INFORMATION_MESSAGE);
-		} catch (NullPointerException e) {
-			if (log.isErrorEnabled())
-				log.error("NullPointerException:" + e.getMessage());
-			message = e.getMessage();
-			
-			promptNewCardId();
-		} catch (Exception se) {
-			if (log.isErrorEnabled())
-				log.error("Exception:" + se.getMessage());
-			se.printStackTrace();
-		} finally {
-			cardRFID.destroy();
-		}
-
-		if (log.isDebugEnabled()) log.debug("flinsh");
-	}
-	
 	/**
 	 * Validate and set the datetime field on the screen given a date.
 	 * 
@@ -476,6 +811,9 @@ public class CardAction {
 		card.setWineVolume(wineVolume.getText());
 		
 		card.setMaterial(material.getText());
+		card.setOrgId(LoginSession.user.getOrgId());
+		card.setUserId(LoginSession.user.getId());
+		card.setWineName(wineName.getText());
 	}
 	
 	public void listCard() {
@@ -521,18 +859,12 @@ public class CardAction {
 		bodyPanel.setVisible(true);
 		bodyPanel.validate();//显示
 		bodyPanel.repaint();
-		
+		//设置背景图片
+		  URL url = SFWine.class.getResource("bg1.png");
+	        ImageIcon img = new ImageIcon(url);
+	        JLabel background = new JLabel(img);
+	        bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+	        background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
 		if(log.isDebugEnabled()) log.debug("listCard end");
 	}
-	
-	
-	public static void main(String[] a){
-		
-		
-		
-		
-		
-	}
-	
-	
 }

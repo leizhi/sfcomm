@@ -18,7 +18,8 @@ public class CardDBObject {
 	private static Log log = LogFactory.getLog(CardDBObject.class);
 	
 	//Card
-	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId,supervisorId,rfidcode) VALUES(?,?,?,?,?,?)";
+	//private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId,supervisorId,rfidcode) VALUES(?,?,?,?,?,?)";
+	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId,supervisorId,rfidcode,operatorId,org_id,mode) VALUES(?,?,?,?,?,?,?,?,'有效')";
 	
 	//JobType
 	private static final String ADD_JOB_TYPE="INSERT INTO JobType(id,definition) VALUES(?,?)";
@@ -39,7 +40,8 @@ public class CardDBObject {
 	private static final String ADD_SUPERVISOR="INSERT INTO Supervisor(id,companyId,definition) VALUES(?,?,?)";
 	
 	//WineJar
-	private static final String ADD_WINEJAR="INSERT INTO WineJar(id,wineryId,abbreviation,volume,brewingDate,material,wineTypeId,wineLevelId,alcohol,volumeUnit) VALUES(?,?,?,?,?,?,?,?,?,?)";
+	//private static final String ADD_WINEJAR="INSERT INTO WineJar(id,wineryId,abbreviation,volume,brewingDate,material,wineTypeId,wineLevelId,alcohol,volumeUnit) VALUES(?,?,?,?,?,?,?,?,?,?)";
+	private static final String ADD_WINEJAR="INSERT INTO WineJar(id,wineryId,abbreviation,volume,brewingDate,material,wineTypeId,wineLevelId,alcohol,volumeUnit,wineName) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 	
 	private static final String FIND_CARD="SELECT count(*) FROM Card WHERE id=?";
 
@@ -303,6 +305,7 @@ public class CardDBObject {
 				pstmt.setInt(8, wineLevelId);
 				pstmt.setString(9, card.getAlcohol());
 				pstmt.setString(10, card.getVolumeUnit());
+				pstmt.setString(11, card.getWineName());
 				
 				pstmt.execute();
 			}
@@ -314,6 +317,8 @@ public class CardDBObject {
 			pstmt.setInt(4, wineJarId);
 			pstmt.setInt(5, supervisorId);
 			pstmt.setString(6, sixMD5(card.getId().toString()));
+			pstmt.setLong(7, card.getUserId());
+			pstmt.setInt(8, card.getOrgId());
 			pstmt.execute();
 			
 			conn.commit();
@@ -342,6 +347,7 @@ public class CardDBObject {
 			}
 
 		}
+		
 		
 	}
 	

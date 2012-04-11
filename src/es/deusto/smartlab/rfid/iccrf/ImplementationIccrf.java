@@ -97,6 +97,7 @@ public class ImplementationIccrf implements InterfaceRFID {
 	 * 
 	 * @return Returns success if a RFID kit was successfully initialized.
 	 */
+	@Override
 	public boolean init() {
 //		boolean opened = false;
 		if (port != null) {
@@ -123,10 +124,12 @@ public class ImplementationIccrf implements InterfaceRFID {
 		return opened;
 	}
 
+	@Override
 	public void setPort(String port) {
 		this.port = port;
 	}
 	
+	@Override
 	public void destroy() {
 		if(sm!=null)
 			sm.closePort();

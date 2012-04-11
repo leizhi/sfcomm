@@ -9,12 +9,14 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -34,13 +36,15 @@ public class UserAction {
 	 */
 	private static Log log = LogFactory.getLog(UserAction.class);
 	
-	private static final String LOGIN_USER="SELECT count(*) FROM T_User WHERE name=? AND password=?";
-	
-	private static final String REISTER_USER="INSERT INTO T_User(name,password) VALUES(?,?)";
+	private static final String LOGIN_USER="select USER_ID,MANAGEMENT_ORGANIZATION_ID  from  T_User where   name=? AND password=?";
+
+	private static final String REISTER_USER="INSERT INTO T_User(CREATE_USER_ID,name,password,MANAGEMENT_ORGANIZATION_ID,USER_STATUS,INPUT_DATE,SYSTEM_FLAG) VALUES(?,?,?,?,'有效',getDate(),0)";
 
 	private static final String EXISTS_USER="SELECT count(*) FROM T_User WHERE name=?";
 
 	private static final String EXISTS_CARD="SELECT count(*) FROM T_User WHERE user_id=?";
+
+	private static final String LOGIN="select USER_ID,MANAGEMENT_ORGANIZATION_ID  from  T_User where   name=? AND password=?";
 
 	
 	private JLabel disLabel;
@@ -72,7 +76,7 @@ public class UserAction {
 		int execWidth = 60;
 
 		x = 340;
-		y = 100;
+		y = 250;
 		
 		width = 80;
 		hight = 20;
@@ -129,6 +133,7 @@ public class UserAction {
 		confirm.setForeground(Color.WHITE);
 
 		confirm.addActionListener( new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					if(log.isDebugEnabled()) log.debug("getName->:"+userNameText.getText());	
 					if(log.isDebugEnabled()) log.debug("getPassword->:"+String.valueOf(passwordText.getPassword()));	
@@ -150,7 +155,12 @@ public class UserAction {
 		bodyPanel.setVisible(true);
 		bodyPanel.validate();//显示
 		bodyPanel.repaint();
-
+		//设置背景图片
+		  URL url = SFWine.class.getResource("bg.png");
+	        ImageIcon img = new ImageIcon(url);
+	        JLabel background = new JLabel(img);
+	        bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+	        background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
 		if(log.isDebugEnabled()) log.debug("initializeGUI end");
 	}
 	public boolean processLogin(){
@@ -181,20 +191,24 @@ public class UserAction {
             if(count < 1)
     			throw new NullPointerException("无此用户");
             
-            pstmt = connection.prepareStatement(LOGIN_USER);
+            pstmt = connection.prepareStatement(LOGIN);
             pstmt.setString(1, LoginSession.user.getName());
             pstmt.setString(2, StringUtils.hash(LoginSession.user.getPassword()));
 
             rs = pstmt.executeQuery();
             while (rs.next()) {
-            	count = rs.getInt(1);
+            	LoginSession.user.setId(rs.getLong(1));
+            	count=1;
+            	LoginSession.user.setOrgId(rs.getInt(2));
+            	 
             }
             
-            if(count == 1)
+            if(count == 1){
+            	LoginSession.allow = true;
             	return true;
-            else
+            }else{
     			throw new NullPointerException("用户和密码不匹配");
-
+            }
 		}catch (NullPointerException e) {
 			message = e.getMessage();
 			if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());	
@@ -231,7 +245,7 @@ public class UserAction {
 		int execWidth = 60;
 
 		x = 340;
-		y = 40;
+		y = 240;
 		
 		width = 80;
 		hight = 20;
@@ -303,14 +317,15 @@ public class UserAction {
 		confirm.requestFocus();
 		confirm.setBounds(x+width,y,execWidth,hight);
 		confirm.addActionListener( new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent e) {
 					if(log.isDebugEnabled()) log.debug("getName->:"+userNameText.getText());	
 					if(log.isDebugEnabled()) log.debug("getPassword->:"+String.valueOf(passwordText.getPassword()));	
 					
-					LoginSession.user.setName(userNameText.getText());
-					LoginSession.user.setPassword(String.valueOf(passwordText.getPassword()));
+//					LoginSession.user.setName(userNameText.getText());
+//					LoginSession.user.setPassword(String.valueOf(passwordText.getPassword()));
 					
-					new UserAction(bodyPanel).processRegister();
+					processRegister();
 				}
 			});
 		//为按钮添加键盘适配器
@@ -322,6 +337,13 @@ public class UserAction {
 		bodyPanel.validate();//显示
 		bodyPanel.repaint();
 
+		//设置背景图片
+		URL url = SFWine.class.getResource("bg.png");
+        ImageIcon img = new ImageIcon(url);
+        JLabel background = new JLabel(img);
+        bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+        background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
+        
 		if(log.isDebugEnabled()) log.debug("initializeGUI end");
 		} catch (Exception e) {
 			if(log.isErrorEnabled()) log.error("Exception:"+e.getMessage());
@@ -338,8 +360,8 @@ public class UserAction {
         long count=0;
 		CardRFID cardRFID = new CardRFID();
         try {
-    		if(log.isDebugEnabled()) log.debug("processLogin getName:"+LoginSession.user.getName());	
-    		if(log.isDebugEnabled()) log.debug("processLogin getPassword:"+LoginSession.user.getPassword());	
+    		if(log.isDebugEnabled()) log.debug("processLogin getName:"+userNameText.getText());	
+    		if(log.isDebugEnabled()) log.debug("processLogin getPassword:"+String.valueOf(passwordText.getPassword()));	
 
 			// 初始化检查
 			if (!cardRFID.getIccrf().isOpened())
@@ -349,26 +371,26 @@ public class UserAction {
 			if (cardId == 0)
 				throw new NullPointerException("请放人电子标签或者电子卡");
 
-			LoginSession.user.setId(cardId);
+			//LoginSession.user.setId(cardId);
 			
-    		if(StringUtils.isNull(LoginSession.user.getName()))
+    		if(StringUtils.isNull(String.valueOf(userNameText.getText())))
     			throw new NullPointerException("请输入用户名");
     		
-    		if(StringUtils.isNull(LoginSession.user.getPassword()))
+    		if(StringUtils.isNull(String.valueOf(passwordText.getPassword())))
     			throw new NullPointerException("请输入密码");
     		
     		cardRFID.cleanAll();
     		
 			cardRFID.saveType(CardAction.CARD_STAFF, 1);//
 			
-			cardRFID.saveGBK(LoginSession.user.getName(), 1, 1, 16);
-			cardRFID.saveGBK(LoginSession.user.getPassword(), 1, 2, 16);
+			cardRFID.saveGBK(String.valueOf(userNameText.getText()), 1, 1, 16);
+			cardRFID.saveGBK(String.valueOf(passwordText.getPassword()), 1, 2, 16);
 
 			connection = DbConnectionManager.getConnection();
 			connection.setAutoCommit(false);
 			
 			pstmt = connection.prepareStatement(EXISTS_USER);
-            pstmt.setString(1, LoginSession.user.getName());
+            pstmt.setString(1, String.valueOf(userNameText.getText()));
             
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -379,7 +401,7 @@ public class UserAction {
 
             if(count > 0)
     			throw new NullPointerException("此用户已注册");
-            
+            /*
             pstmt = connection.prepareStatement(EXISTS_CARD);
             pstmt.setLong(1, LoginSession.user.getId());
             
@@ -392,11 +414,12 @@ public class UserAction {
 
             if(count > 0)
     			throw new NullPointerException("此卡已注册");
-            
+            */
             pstmt = connection.prepareStatement(REISTER_USER);
             pstmt.setLong(1, LoginSession.user.getId());
-            pstmt.setString(2, LoginSession.user.getName());
-            pstmt.setString(3, StringUtils.hash(LoginSession.user.getPassword()));
+            pstmt.setString(2, String.valueOf(userNameText.getText()));
+            pstmt.setString(3, StringUtils.hash(String.valueOf(passwordText.getPassword())));
+            pstmt.setInt(4, LoginSession.user.getOrgId());
             pstmt.execute();
 
             connection.commit();
@@ -433,6 +456,7 @@ public class UserAction {
 			cardRFID.beep();
 			cardRFID.destroy();
 		}
+        promptRegister();
 	}
 	
 	public boolean isOpenNetwork(){

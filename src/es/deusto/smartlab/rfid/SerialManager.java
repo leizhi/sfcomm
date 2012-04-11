@@ -126,7 +126,7 @@ public class SerialManager {
 
 		byte[] response = new byte[temporal.size()];
 		for (int i = 0; i < temporal.size(); i++)
-			response[i] = ((Byte) temporal.get(i)).byteValue();
+			response[i] = temporal.get(i).byteValue();
 		return response;
 	}
 

@@ -17,6 +17,7 @@ public class KeyAction extends KeyAdapter {
 	
 	private static Log log = LogFactory.getLog(KeyAction.class);
 
+	@Override
 	public void keyPressed(KeyEvent e) {
     	System.out.println("KeyEvent:"+e.getKeyCode());
     	

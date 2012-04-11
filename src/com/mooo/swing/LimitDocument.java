@@ -23,6 +23,7 @@ public class LimitDocument extends PlainDocument {
 	}
 	private static final long serialVersionUID = 1L;
  
+	@Override
 	public void insertString(int offset, String s, AttributeSet a)
 			throws BadLocationException {
 		if (s == null || offset < 0) {  

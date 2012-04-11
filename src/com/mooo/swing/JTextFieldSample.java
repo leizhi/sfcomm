@@ -54,7 +54,8 @@ public class JTextFieldSample {
     content.add(cityPanel, BorderLayout.SOUTH);
 
     ActionListener actionListener = new ActionListener() {
-      public void actionPerformed(ActionEvent actionEvent) {
+      @Override
+	public void actionPerformed(ActionEvent actionEvent) {
         System.out
             .println("Command: " + actionEvent.getActionCommand());
       }
@@ -64,15 +65,18 @@ public class JTextFieldSample {
     cityTextField.addActionListener(actionListener);
 
     KeyListener keyListener = new KeyListener() {
-      public void keyPressed(KeyEvent keyEvent) {
+      @Override
+	public void keyPressed(KeyEvent keyEvent) {
         printIt("Pressed", keyEvent);
       }
 
-      public void keyReleased(KeyEvent keyEvent) {
+      @Override
+	public void keyReleased(KeyEvent keyEvent) {
         printIt("Released", keyEvent);
       }
 
-      public void keyTyped(KeyEvent keyEvent) {
+      @Override
+	public void keyTyped(KeyEvent keyEvent) {
         printIt("Typed", keyEvent);
       }
 
@@ -87,12 +91,14 @@ public class JTextFieldSample {
     cityTextField.addKeyListener(keyListener);
 
     InputVerifier verifier = new InputVerifier() {
-      public boolean verify(JComponent input) {
+      @Override
+	public boolean verify(JComponent input) {
         final JTextComponent source = (JTextComponent) input;
         String text = source.getText();
         if ((text.length() != 0) && !(text.equals("Exit"))) {
           Runnable runnable = new Runnable() {
-            public void run() {
+            @Override
+			public void run() {
               JOptionPane.showMessageDialog(source,
                   "Can't leave.", "Error Dialog",
                   JOptionPane.ERROR_MESSAGE);
@@ -109,15 +115,18 @@ public class JTextFieldSample {
     cityTextField.setInputVerifier(verifier);
 
     DocumentListener documentListener = new DocumentListener() {
-      public void changedUpdate(DocumentEvent documentEvent) {
+      @Override
+	public void changedUpdate(DocumentEvent documentEvent) {
         printIt(documentEvent);
       }
 
-      public void insertUpdate(DocumentEvent documentEvent) {
+      @Override
+	public void insertUpdate(DocumentEvent documentEvent) {
         printIt(documentEvent);
       }
 
-      public void removeUpdate(DocumentEvent documentEvent) {
+      @Override
+	public void removeUpdate(DocumentEvent documentEvent) {
         printIt(documentEvent);
       }
 

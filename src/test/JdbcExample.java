@@ -3,15 +3,11 @@ package test;
 
 import java.sql.ResultSet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import com.mooo.mycoz.db.pool.DbConnectionManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.DriverManager;
 import java.sql.ResultSetMetaData;
 
 public class JdbcExample {

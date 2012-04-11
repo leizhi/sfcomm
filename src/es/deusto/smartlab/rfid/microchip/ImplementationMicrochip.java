@@ -24,7 +24,8 @@ public class ImplementationMicrochip implements InterfaceRFID
     *Initializes the Microchip's kit, testing the connection with the reader/interrogator and opening the serial port.
     *@return Returns success if a RFID kit was successfully initialized.
     */
-    public boolean init()
+    @Override
+	public boolean init()
     {
         boolean opened = false;
         if(port!=null) {
@@ -55,12 +56,14 @@ public class ImplementationMicrochip implements InterfaceRFID
         return opened;
     }
         
-    public void setPort(String port)
+    @Override
+	public void setPort(String port)
     {
         this.port = port;
     }    
 
-    public Tag[] findTokens()
+    @Override
+	public Tag[] findTokens()
     {
         Tag[] tags = null;
         try {
@@ -76,7 +79,8 @@ public class ImplementationMicrochip implements InterfaceRFID
         return tags;
     }    
     
-    public Tag readSingleBlockMemory(byte[] tagID, int blockNumber)
+    @Override
+	public Tag readSingleBlockMemory(byte[] tagID, int blockNumber)
         throws RFIDException
     {                
         boolean present = false;
@@ -101,7 +105,8 @@ public class ImplementationMicrochip implements InterfaceRFID
         }
     }
     
-    public Tag readAllBlocksMemory(byte[] tagID)
+    @Override
+	public Tag readAllBlocksMemory(byte[] tagID)
         throws RFIDException
     {
         boolean present = false;
@@ -126,13 +131,15 @@ public class ImplementationMicrochip implements InterfaceRFID
         }
     }
     
-    public Tag[] readAllBlocksMemory()
+    @Override
+	public Tag[] readAllBlocksMemory()
         throws RFIDException
     {
         return readTokens(null,0,25);
     }
     
-    public Tag readMultipleBlocksMemory(byte[] tagID, int startBlockNumber, int endBlockNumber)
+    @Override
+	public Tag readMultipleBlocksMemory(byte[] tagID, int startBlockNumber, int endBlockNumber)
         throws RFIDException
     {
         if(startBlockNumber > endBlockNumber)
@@ -162,7 +169,8 @@ public class ImplementationMicrochip implements InterfaceRFID
         }
     }
     
-    public void writeTokens(byte [] id, int startBlockNumber, byte [] dataTemp)
+    @Override
+	public void writeTokens(byte [] id, int startBlockNumber, byte [] dataTemp)
         throws RFIDException
     {
         byte[] data = null;
@@ -207,7 +215,8 @@ public class ImplementationMicrochip implements InterfaceRFID
         byte [] response = sm.read();        
     }
 
-    public void destroy()
+    @Override
+	public void destroy()
     {
         byte [] command = CommandsMicrochip.resetMessage().getBytes();
         sm.send(CommandsMicrochip.resetMessage().getBytes());       

@@ -1,9 +1,7 @@
 package gui;
 
 import javax.swing.*;
-import javax.swing.event.*;
 import java.awt.event.*;
-import java.awt.*;
 /**
 * swing基础实例
 * @author HZ20232
@@ -154,7 +152,8 @@ private JComboBox getBox(){
     return box;
 }
 private class comboxListener implements ActionListener{
-    public void actionPerformed(ActionEvent e){
+    @Override
+	public void actionPerformed(ActionEvent e){
         Object o = e.getSource();
         System.out.println(o.toString());
     }
@@ -193,7 +192,8 @@ private JButton getButton(){
  *
  */
 private class HelloButton implements ActionListener{
-    public void actionPerformed(ActionEvent e){
+    @Override
+	public void actionPerformed(ActionEvent e){
         System.out.println("Hello world!");
     }
 }
