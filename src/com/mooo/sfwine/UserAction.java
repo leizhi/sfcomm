@@ -44,7 +44,7 @@ public class UserAction {
 
 	private static final String EXISTS_USER="SELECT count(*) FROM T_User WHERE name=?";
 
-//	private static final String EXISTS_CARD="SELECT count(*) FROM T_User WHERE user_id=?";
+	private static final String EXISTS_CARD="SELECT count(*) FROM T_User WHERE uuid=?";
 
 	private static final String LOGIN="select USER_ID,MANAGEMENT_ORGANIZATION_ID  from  T_User where   name=? AND password=?";
 
@@ -409,9 +409,9 @@ public class UserAction {
 
             if(count > 0)
     			throw new NullPointerException("此用户已注册");
-            /*
+            
             pstmt = connection.prepareStatement(EXISTS_CARD);
-            pstmt.setLong(1, LoginSession.user.getId());
+            pstmt.setString(1, serialNumber);
             
             rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -422,7 +422,7 @@ public class UserAction {
 
             if(count > 0)
     			throw new NullPointerException("此卡已注册");
-            */
+            
             pstmt = connection.prepareStatement(REISTER_USER);
     		if(log.isDebugEnabled()) log.debug("user.getId:"+LoginSession.user.getId());	
 
