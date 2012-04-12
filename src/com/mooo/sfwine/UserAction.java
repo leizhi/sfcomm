@@ -362,7 +362,7 @@ public class UserAction {
         long count=0;
 		ISO14443AAction cardRFID = new ISO14443AAction();
         try {
-    		cardRFID.init();
+    		cardRFID.initialize();
     		
     		if(log.isDebugEnabled()) log.debug("processLogin getName:"+userNameText.getText());	
     		if(log.isDebugEnabled()) log.debug("processLogin getPassword:"+String.valueOf(passwordText.getPassword()));	

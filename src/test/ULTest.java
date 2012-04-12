@@ -13,7 +13,7 @@ public class ULTest {
 	public void test(){
 		ImplementationISO14443A iccrf = new ImplementationISO14443A();
 		try {
-			iccrf.init();
+			iccrf.initialize();
 			
 			while(true){
 				iccrf.findSerialNumber();
@@ -35,7 +35,7 @@ public class ULTest {
 	}
 	public static void main(String args[]) throws InterruptedException {
 		ISO14443AAction iccrf = new ISO14443AAction();
-		iccrf.init();
+		iccrf.initialize();
 		
 //		int page = 4;//0x00->0x0F:0x04
 //		int offset = 0;
@@ -79,7 +79,7 @@ public class ULTest {
 			//write UL
 //			iccrf.write((byte)0x04,buffer);
 //			iccrf.saveUL(buf1,4,32);
-			byte[] response = iccrf.read((byte)0x04);
+//			byte[] response = iccrf.read((byte)0x04);
 			
 			//write M1
 //			iccrf.loadKey((byte)0x01, password);
@@ -90,8 +90,10 @@ public class ULTest {
 //			iccrf.saveM1(buf, 1, 1, 16);
 //			iccrf.saveM1(buf, 1, 2, 16);
 //			
+			iccrf.findSerialNumber();
 //			byte[] response = iccrf.read((byte)(1*4 + 1));
-//			System.out.println(new String(response,4,16,"GBK"));
+			String reponse = iccrf.read(1,1);
+			System.out.println(reponse);
 
 //			String str = iccrf.read(1,1);
 //			System.out.println("readM1:"+str);
@@ -102,7 +104,7 @@ public class ULTest {
 
 //			response = iccrf.read((byte)0x08);
 			
-			System.out.println(new String(response,4,16,"GBK"));
+//			System.out.println(new String(response,4,16,"GBK"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

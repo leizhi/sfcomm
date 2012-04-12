@@ -31,7 +31,7 @@ public class ImplementationISO14443A implements ISO14443A{
 	 * 
 	 * @return Returns success if a RFID kit was successfully initialized.
 	 */
-	public boolean init() {
+	public boolean initialize() {
 //		boolean opened = false;
 		if (port != null) {
 			if (serialManager.openPort(port, 9600)) {
@@ -254,7 +254,7 @@ public class ImplementationISO14443A implements ISO14443A{
 		return false;
 	}
 	
-	public String write(byte address,byte[] data){
+	public boolean write(byte address,byte[] data){
 		byte[] command = CommandsISO14443A.write(address,data).getBytes();
 		
 		System.out.println("write:");
@@ -268,11 +268,12 @@ public class ImplementationISO14443A implements ISO14443A{
 		System.out.println("write response:"+StringUtils.toHex(response));
 		
 		if (response==null || response.length == 0) {
-			return null;
+			return false;
 		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
-	    	 return StringUtils.toHex(response);
+//	    	  StringUtils.toHex(response);
+	    	  return true;
 		}
-		return null;
+		return false;
 	}
 	
 	public byte[] read(byte address){
@@ -325,46 +326,4 @@ public class ImplementationISO14443A implements ISO14443A{
             System.out.printf("\t 0x%02X 0d%d \n", bt,bt);
         }
     }
-
-	@Override
-	public long findSerialNumber(short cardType) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void initialize() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public byte[] readBytes(byte address) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String read(byte address, String uc) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean writeBytes(byte address, byte[] buffer) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean write(byte address, String buffer) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean shakeHands() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 }

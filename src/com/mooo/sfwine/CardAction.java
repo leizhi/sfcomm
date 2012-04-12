@@ -380,7 +380,7 @@ public class CardAction {
 		
 		try {
 			fillCard();
-			cardRFID.init();
+			cardRFID.initialize();
 
 			// 初始化检查
 			if (!cardRFID.isOpened())

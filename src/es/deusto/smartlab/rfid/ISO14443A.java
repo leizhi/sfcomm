@@ -4,27 +4,23 @@ public interface ISO14443A {
 	
 	boolean driveVersion();
 	
-	long findSerialNumber(short cardType);
+	String findSerialNumber();
 	
 	short findCardType();
 	
-	void initialize();
+	boolean initialize();
 	
 	void destroy();
 	
 	boolean loadKey(byte address,byte[] password);
 	
-	byte[] readBytes(byte address);
+	byte[] read(byte address);
 	
-	String read(byte address,String uc);
-	
-	boolean writeBytes(byte address,byte[] buffer);
-	
-	boolean write(byte address,String buffer);
+	boolean write(byte address,byte[] buffer);
 	
 	boolean authentication(byte address);
 	
-	boolean shakeHands();
+//	boolean shakeHands();
 	
 	boolean halt();
 }

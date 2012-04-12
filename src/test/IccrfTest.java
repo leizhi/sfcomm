@@ -12,7 +12,7 @@ public class IccrfTest {
 
 	public static void main(String args[]) throws InterruptedException {
 		ImplementationISO14443A iccrf = new ImplementationISO14443A();
-		iccrf.init();
+		iccrf.initialize();
 		
 //		byte[] value = new byte[4];
 //		value[0] = (byte) 0xFF;

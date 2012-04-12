@@ -140,7 +140,7 @@ public class CardLoginAction {
 				ISO14443AAction cardRFID = new ISO14443AAction();
 				try {
 					//初始化
-					cardRFID.init();
+					cardRFID.initialize();
 					//初始化检查
 					LoginSession.staffSignal = true;
 					

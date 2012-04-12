@@ -22,8 +22,11 @@ public class ISO14443AAction extends ImplementationISO14443A{
 				loadKey((byte)i, password);
 				authentication((byte)i);
 				
+				findSerialNumber();
 				write((byte)(i*BLOCK_SIZE+0),buffer);
+				findSerialNumber();
 				write((byte)(i*BLOCK_SIZE+1),buffer);
+				findSerialNumber();
 				write((byte)(i*BLOCK_SIZE+2),buffer);
 			}
 		}catch (Exception e) {
@@ -178,6 +181,7 @@ public class ISO14443AAction extends ImplementationISO14443A{
 		}
 		return null;
 	}
+	
 	public String readM1(int page,int block) {
 		String buffer=null;
 		try {
