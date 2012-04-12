@@ -115,7 +115,7 @@ public class SerialManager {
 					for (int i = 0; i < newData; i++)
 						temporal.addElement(newDatas[i]);
 					
-//					Thread.sleep(250);
+					Thread.sleep(37);
 				} catch (IOException ex) {
 					System.out.println("Error:"+ex.getMessage());
 				}

@@ -13,9 +13,6 @@ public class User {
 	private Integer orgId;
 	private boolean allow;
 	
-	
-	
-	
 	public Integer getOrgId() {
 		return orgId;
 	}

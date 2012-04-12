@@ -2,7 +2,7 @@ package test;
 
 import java.io.UnsupportedEncodingException;
 
-import es.deusto.smartlab.rfid.iccrf.ImplementationIccrf;
+import es.deusto.smartlab.rfid.iso14443a.ImplementationISO14443A;
 
 
 /**
@@ -11,7 +11,7 @@ import es.deusto.smartlab.rfid.iccrf.ImplementationIccrf;
 public class IccrfTest {
 
 	public static void main(String args[]) throws InterruptedException {
-		ImplementationIccrf iccrf = new ImplementationIccrf();
+		ImplementationISO14443A iccrf = new ImplementationISO14443A();
 		iccrf.init();
 		
 //		byte[] value = new byte[4];
@@ -37,10 +37,10 @@ public class IccrfTest {
 //		
 //		iccrf.beep(100);
 		
-		long id = iccrf.findSerialNumber(iccrf.findCardType());
+		String serialNumber = iccrf.findSerialNumber();
 //		long id = iccrf.();
 
-		System.out.println("findId:"+id);
+		System.out.println("serialNumber:"+serialNumber);
 		int cardType = iccrf.findCardType();
 
 		System.out.println("findCardType:"+iccrf.findCardType());
@@ -113,7 +113,7 @@ public class IccrfTest {
 
 //		System.out.println(StringUtils.toHex(respnse));
 		
-		System.out.println(iccrf.getGBK(respnse));
+		System.out.println(new String(respnse));
 
 		iccrf.beep(10);
 		iccrf.destroy();

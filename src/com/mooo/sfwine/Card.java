@@ -2,6 +2,7 @@ package com.mooo.sfwine;
 
 public class Card {
 	private Long id; // 主键 卡唯一ID
+	private String uuid;//UUID
 	private String rfidcode;//序列号
 	private String jobTypeName;
 	private String zipCode;//邮编 6
@@ -164,6 +165,12 @@ public class Card {
 	}
 	public void setMaterial(String material) {
 		this.material = material;
+	}
+	public String getUuid() {
+		return uuid;
+	}
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 }

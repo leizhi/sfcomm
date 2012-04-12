@@ -29,7 +29,8 @@ public class JMenuBarFactory {
 
             		final CardAction cardAction = new CardAction(bodyPanel);
             		final UserAction userAction = new UserAction(bodyPanel);
-            		
+            		final CardLoginAction cardLoginAction = new CardLoginAction(bodyPanel);
+
                 	//开始
             		JMenu menuFile = new JMenu("开始");
             		menuFile.setBackground(bg);
@@ -42,7 +43,7 @@ public class JMenuBarFactory {
             		loginSystem.addActionListener(new ActionListener() {
             			@Override
 						public void actionPerformed(ActionEvent e) {
-        					new CardLoginWindow(bodyPanel);
+            				cardLoginAction.promptCardLogin();
             			}
             		});
             		menuFile.add(loginSystem);

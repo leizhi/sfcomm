@@ -21,10 +21,10 @@ import org.apache.commons.logging.LogFactory;
 
 import com.mooo.mycoz.common.StringUtils;
 
-import es.deusto.smartlab.rfid.iccrf.ImplementationIccrf;
+import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 
-public class CardLoginWindow {
-	private static Log log = LogFactory.getLog(CardLoginWindow.class);
+public class CardLoginAction {
+	private static Log log = LogFactory.getLog(CardLoginAction.class);
 
 	private JLabel disLabel;
 	private JProgressBar progressBar;
@@ -32,18 +32,20 @@ public class CardLoginWindow {
 	private boolean forever = true;
 	
 	private JPanel bodyPanel;
+	private String message;
 
-	public CardLoginWindow(final JPanel bodyPanel) {
-		initializeGUI(bodyPanel,null);
-	}
-	
-	public CardLoginWindow(final JPanel bodyPanel,String error) {
-		initializeGUI(bodyPanel,error);
-	}
-	
-	public void initializeGUI(final JPanel bodyPanel,String error) {
-		LoginSession.staffSignal = false;
+	public CardLoginAction(JPanel bodyPanel) {
 		this.bodyPanel = bodyPanel;
+	}
+	
+	public CardLoginAction(JPanel bodyPanel,String message) {
+		this.bodyPanel = bodyPanel;
+		this.message = message;
+
+	}
+	
+	public void promptCardLogin() {
+		LoginSession.staffSignal = false;
 
 		//clean view
 		if (bodyPanel!=null && bodyPanel.isShowing()) {
@@ -80,9 +82,9 @@ public class CardLoginWindow {
 		disLabel.setBounds(x,y,width,hight);
 		bodyPanel.add(disLabel);
 		
-		if(!StringUtils.isNull(error)){
+		if(!StringUtils.isNull(message)){
 			y += hight;
-			disLabel = new JLabel(error);
+			disLabel = new JLabel(message);
 			disLabel.setForeground(Color.RED);
 			disLabel.setBounds(x,y,width,hight);
 			bodyPanel.add(disLabel);
@@ -94,14 +96,14 @@ public class CardLoginWindow {
 		bodyPanel.validate();//显示
 		bodyPanel.repaint();
 		//设置背景图片
-		  URL url = SFWine.class.getResource("bg.png");
-	        ImageIcon img = new ImageIcon(url);
-	        JLabel background = new JLabel(img);
-	        bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
-	        background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
+		URL url = SFWine.class.getResource("bg.png");
+        ImageIcon img = new ImageIcon(url);
+        JLabel background = new JLabel(img);
+        bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+        background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
 		if(log.isDebugEnabled()) log.debug("initializeGUI end");
 		
-		Thread loopCard = new Thread(new CardLoginAction());
+		Thread loopCard = new Thread(new CardProcessLogin());
 		loopCard.start();
 		
 		if(log.isDebugEnabled()) log.debug("unLock end");
@@ -131,13 +133,15 @@ public class CardLoginWindow {
 		return false;
 	}
 	
-	 class CardLoginAction implements Runnable {
+	 class CardProcessLogin implements Runnable {
 
 		 @Override
 		public void run(){
-				CardRFID cardRFID = new CardRFID();
+				ISO14443AAction cardRFID = new ISO14443AAction();
 				try {
-					// 初始化检查
+					//初始化
+					cardRFID.init();
+					//初始化检查
 					LoginSession.staffSignal = true;
 					
 					//do while
@@ -150,7 +154,7 @@ public class CardLoginWindow {
 							continue;
 						}
 						//请正确连接发卡器
-						if(!cardRFID.getIccrf().isOpened()){
+						if(!cardRFID.isOpened()){
 							Thread.sleep(100);
 							continue;
 						}
@@ -158,54 +162,50 @@ public class CardLoginWindow {
 						if (log.isDebugEnabled()) log.debug("连接发卡器 okay:");
 
 						//请放人电子标签或者电子卡
-						if(cardRFID.getCardId()==0){
+						String serialNumber = cardRFID.findSerialNumber();
+						if(serialNumber == null){
+							if (log.isDebugEnabled()) log.debug("请放人电子标签或者电子卡");
 							Thread.sleep(37);
 							continue;
 						}
-						
 						if (log.isDebugEnabled()) log.debug("卡片 okay:");
-
-						cardRFID.beep();
 						
-						byte[] buffer = cardRFID.read(1, 0);
-
-						if (log.isDebugEnabled()) log.debug("falt card:"+buffer[0]);
-						ImplementationIccrf.testCommand(buffer);
-						
-						if (log.isDebugEnabled()) log.debug("falt card:"+CardAction.CARD_STAFF);
-
-						if(buffer[0]!=CardAction.CARD_STAFF){
+						int cardType = cardRFID.findCardType();
+						if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
+						if (log.isDebugEnabled()) log.debug("falt card:"+CommandsISO14443A.CARD_14443A_M1);
+						if(cardType!=CommandsISO14443A.CARD_14443A_M1){
             				JOptionPane.showMessageDialog(SFWine.frame, "此卡非员工卡");
             				
 							Thread.sleep(100);
 							continue;
 						}
 						
-						String userName = cardRFID.readGBK(1, 1);
+						String userName = cardRFID.read(1, 1);
 						if (log.isDebugEnabled()) log.debug("userName:"+userName);
 						LoginSession.user.setName(userName);
 						
-						String password = cardRFID.readGBK(1, 2);
+						String password = cardRFID.read(1, 2);
 						if (log.isDebugEnabled()) log.debug("password:"+password);
 						LoginSession.user.setPassword(password);
 
 						if(LoginSession.isAllow())
 							forever = false;
+						
+						Thread.sleep(500);
 //						break;
 					}
 				} catch (Exception e) {
 					if (log.isErrorEnabled()) log.error("Exception:" + e.getMessage());
 					e.printStackTrace();
-				} finally {
-					cardRFID.beep();
-					cardRFID.destroy();
-				}
-				
+				}				
 				//check database
 				if(LoginSession.staffSignal){
 					if(LoginSession.allow)
 						new CardAction(bodyPanel).promptNewWineCard();
 				}
+				
+				cardRFID.beep(10);
+				cardRFID.destroy();
 				if (log.isDebugEnabled()) log.debug("run finlsh!"+LoginSession.staffSignal);
 			}
 		}

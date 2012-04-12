@@ -29,6 +29,8 @@ import org.apache.commons.logging.LogFactory;
 import com.mooo.mycoz.common.StringUtils;
 import com.mooo.mycoz.db.pool.DbConnectionManager;
 
+import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
+
 public class UserAction {
 	
 	/**
@@ -36,13 +38,13 @@ public class UserAction {
 	 */
 	private static Log log = LogFactory.getLog(UserAction.class);
 	
-	private static final String LOGIN_USER="select USER_ID,MANAGEMENT_ORGANIZATION_ID  from  T_User where   name=? AND password=?";
+//	private static final String LOGIN_USER="select USER_ID,MANAGEMENT_ORGANIZATION_ID  from  T_User where   name=? AND password=?";
 
-	private static final String REISTER_USER="INSERT INTO T_User(CREATE_USER_ID,name,password,MANAGEMENT_ORGANIZATION_ID,USER_STATUS,INPUT_DATE,SYSTEM_FLAG) VALUES(?,?,?,?,'有效',getDate(),0)";
+	private static final String REISTER_USER="INSERT INTO T_User(CREATE_USER_ID,name,password,MANAGEMENT_ORGANIZATION_ID,USER_STATUS,INPUT_DATE,SYSTEM_FLAG,UUID) VALUES(?,?,?,?,'有效',getDate(),0,?)";
 
 	private static final String EXISTS_USER="SELECT count(*) FROM T_User WHERE name=?";
 
-	private static final String EXISTS_CARD="SELECT count(*) FROM T_User WHERE user_id=?";
+//	private static final String EXISTS_CARD="SELECT count(*) FROM T_User WHERE user_id=?";
 
 	private static final String LOGIN="select USER_ID,MANAGEMENT_ORGANIZATION_ID  from  T_User where   name=? AND password=?";
 
@@ -348,7 +350,7 @@ public class UserAction {
 		} catch (Exception e) {
 			if(log.isErrorEnabled()) log.error("Exception:"+e.getMessage());
 			
-			new CardLoginWindow(bodyPanel);
+			new CardLoginAction(bodyPanel);
 		}
 	}
 	
@@ -358,20 +360,28 @@ public class UserAction {
 		Connection connection=null;
         PreparedStatement pstmt = null;
         long count=0;
-		CardRFID cardRFID = new CardRFID();
+		ISO14443AAction cardRFID = new ISO14443AAction();
         try {
+    		cardRFID.init();
+    		
     		if(log.isDebugEnabled()) log.debug("processLogin getName:"+userNameText.getText());	
     		if(log.isDebugEnabled()) log.debug("processLogin getPassword:"+String.valueOf(passwordText.getPassword()));	
-
+    		
 			// 初始化检查
-			if (!cardRFID.getIccrf().isOpened())
+			if (!cardRFID.isOpened())
 				throw new NullPointerException("请正确连接发卡器");
 
-			Long cardId = cardRFID.getCardId();
-			if (cardId == 0)
+			String serialNumber = cardRFID.findSerialNumber();
+			
+			if (serialNumber == null)
 				throw new NullPointerException("请放人电子标签或者电子卡");
-
-			//LoginSession.user.setId(cardId);
+			
+			int cardType = cardRFID.findCardType();
+			if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
+			if (log.isDebugEnabled()) log.debug("falt card:"+CommandsISO14443A.CARD_14443A_M1);
+			
+			if(cardType!=CommandsISO14443A.CARD_14443A_M1)
+				throw new NullPointerException("此卡非员工卡");
 			
     		if(StringUtils.isNull(String.valueOf(userNameText.getText())))
     			throw new NullPointerException("请输入用户名");
@@ -381,10 +391,8 @@ public class UserAction {
     		
     		cardRFID.cleanAll();
     		
-			cardRFID.saveType(CardAction.CARD_STAFF, 1);//
-			
-			cardRFID.saveGBK(String.valueOf(userNameText.getText()), 1, 1, 16);
-			cardRFID.saveGBK(String.valueOf(passwordText.getPassword()), 1, 2, 16);
+			cardRFID.saveM1(String.valueOf(userNameText.getText()), 1, 1, 16);
+			cardRFID.saveM1(String.valueOf(passwordText.getPassword()), 1, 2, 16);
 
 			connection = DbConnectionManager.getConnection();
 			connection.setAutoCommit(false);
@@ -416,10 +424,21 @@ public class UserAction {
     			throw new NullPointerException("此卡已注册");
             */
             pstmt = connection.prepareStatement(REISTER_USER);
+    		if(log.isDebugEnabled()) log.debug("user.getId:"+LoginSession.user.getId());	
+
             pstmt.setLong(1, LoginSession.user.getId());
+    		if(log.isDebugEnabled()) log.debug("userNameText:"+String.valueOf(userNameText.getText()));	
+
             pstmt.setString(2, String.valueOf(userNameText.getText()));
+    		if(log.isDebugEnabled()) log.debug("passwordText:"+String.valueOf(passwordText.getPassword()));	
+
             pstmt.setString(3, StringUtils.hash(String.valueOf(passwordText.getPassword())));
+    		if(log.isDebugEnabled()) log.debug("getOrgId:"+LoginSession.user.getOrgId());	
+
             pstmt.setInt(4, LoginSession.user.getOrgId());
+            
+            pstmt.setString(5, serialNumber);
+            
             pstmt.execute();
 
             connection.commit();
@@ -453,7 +472,7 @@ public class UserAction {
 				e.printStackTrace();
 			}
 			
-			cardRFID.beep();
+			cardRFID.beep(10);
 			cardRFID.destroy();
 		}
         promptRegister();

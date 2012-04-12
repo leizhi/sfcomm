@@ -311,12 +311,13 @@ public class CardDBObject {
 			}
 			
 			pstmt = conn.prepareStatement(ADD_CARD);
-			pstmt.setLong(1, card.getId());
+			long cardId = getNextID("Card");
+			pstmt.setLong(1, cardId);
 			pstmt.setTimestamp(2,new Timestamp(new Date().getTime()));
 			pstmt.setInt(3, jobTypeId);
 			pstmt.setInt(4, wineJarId);
 			pstmt.setInt(5, supervisorId);
-			pstmt.setString(6, sixMD5(card.getId().toString()));
+			pstmt.setString(6, sixMD5(card.getUuid()));
 			pstmt.setLong(7, card.getUserId());
 			pstmt.setInt(8, card.getOrgId());
 			pstmt.execute();

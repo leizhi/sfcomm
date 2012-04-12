@@ -40,10 +40,6 @@ public class CardAction {
 //	public static DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM);
 	public static SimpleDateFormat dformat = new SimpleDateFormat("yyyy-MM-dd");
 	
-	public static final byte CARD_STAFF=(byte)0xa5;
-	
-	public static final byte CARD_WINE=(byte)0xb5;
-
 	private Color fg = Color.WHITE;
 	
 	private Color bg = Color.GREEN;
@@ -375,70 +371,36 @@ public class CardAction {
 		} catch (Exception e) {
 			if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());
 			
-			new CardLoginWindow(bodyPanel);
+			new CardLoginAction(bodyPanel);
 		}
 	}
 
 	public void processNewWineCard() {
-		CardRFID cardRFID = null;
+		ISO14443AAction cardRFID = new ISO14443AAction();
 		
 		try {
 			fillCard();
-			
-			cardRFID = new CardRFID();
+			cardRFID.init();
 
 			// 初始化检查
-			if (!cardRFID.getIccrf().isOpened())
+			if (!cardRFID.isOpened())
 				throw new NullPointerException("请正确连接发卡器");
 
-			Long cardId = cardRFID.getCardId();
-			if (cardId == 0)
+			String serialNumber = cardRFID.findSerialNumber();
+			
+			if (serialNumber == null)
 				throw new NullPointerException("请放人电子标签或者电子卡");
 
-			card.setId(cardId);
-			card.setRfidcode(sixMD5(cardId.toString()));
+			card.setUuid(serialNumber);
+			card.setRfidcode(sixMD5(serialNumber));
+			
 			CardDBObject dbObjcet = new CardDBObject();
 
 			if (dbObjcet.isRegistr(card))
 				throw new NullPointerException("卡片已经使用,请换新卡!");
 
-			cardRFID.saveType((byte)0xB5, 1);//
-
-//			cardRFID.save(card.getZipCode(), 1, 0, 6);
-
-			cardRFID.save(card.getRfidcode(), 1, 0, 16);
+			cardRFID.save(card);
 			
-			/*cardRFID.saveGBK(card.getWineryName(), 1, 1, 16);
-
-			cardRFID.saveGBK(card.getWineJarKey(), 1, 2, 16);
-
-			cardRFID.saveGBK(card.getWineType(), 2, 0, 16);
-
-			cardRFID.saveGBK(card.getWineLevel(), 2, 1, 16);
-
-			cardRFID.saveGBK(card.getAlcohol(), 2, 2, 16);
-
-			cardRFID.saveGBK(card.getOperator(), 3, 0, 16);
-
-			cardRFID.saveGBK(card.getSupervisorCompanyKey(), 3, 1, 16);
-
-			cardRFID.saveGBK(card.getSupervisorName(), 3, 2, 16);
-
-			cardRFID.saveGBK(card.getBrewingDate(), 4, 0, 16);
-
-			Calendar rightNow = Calendar.getInstance();
-			String value = dformat.format(rightNow.getTime());
-
-			cardRFID.saveGBK(value, 4, 1, 16);
-
-			cardRFID.saveGBK(card.getWineJarVolume(), 4, 2, 16);
-
-			cardRFID.saveGBK(card.getWineVolume(), 5, 0, 16);
-
-			cardRFID.saveGBK(card.getMaterial(), 6, 0, 16);
-*/
-			cardRFID.beep();
-
 			dbObjcet.save(card);
 
 			JOptionPane.showMessageDialog(null, "发卡成功", "系统提示",
@@ -452,11 +414,13 @@ public class CardAction {
 		} catch (Exception se) {
 			if (log.isErrorEnabled())
 				log.error("Exception:" + se.getMessage());
+			message = se.getMessage();
+			promptNewWineCard();
 			se.printStackTrace();
 		} finally {
+			cardRFID.beep(10);
 			cardRFID.destroy();
 		}
-
 		if (log.isDebugEnabled()) log.debug("flinsh");
 	}
 	
@@ -484,7 +448,6 @@ public class CardAction {
 			  // System.out.println("result: " + buf.toString().substring(8,24));//16位的加密
 
 			  } catch (NoSuchAlgorithmException e) {
-			   // TODO Auto-generated catch block
 			   e.printStackTrace();
 			  }
 
@@ -770,7 +733,7 @@ public class CardAction {
 		} catch (Exception e) {
 			if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());
 			
-			new CardLoginWindow(bodyPanel);
+			new CardLoginAction(bodyPanel);
 		}
 	}
 	/**
