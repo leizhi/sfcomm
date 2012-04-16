@@ -76,7 +76,7 @@ public class ISO14443AAction extends ImplementationISO14443A{
 			cardRFID.saveGBK(card.getMaterial(), 6, 0, 16);
 */
 		}else if(choseCard==CommandsISO14443A.CARD_14443A_UL){
-			saveUL(card.getWineryName(), 4, 16);
+			saveUL(card.getRfidcode(), 4, 16);
 		}
 	}
 
