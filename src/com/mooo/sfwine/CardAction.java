@@ -371,7 +371,7 @@ public class CardAction {
 		} catch (Exception e) {
 			if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());
 			
-			new CardLoginAction(bodyPanel);
+			new UserAction(bodyPanel).promptLogin();
 		}
 	}
 
@@ -733,7 +733,7 @@ public class CardAction {
 		} catch (Exception e) {
 			if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());
 			
-			new CardLoginAction(bodyPanel);
+			new UserAction(bodyPanel).promptLogin();
 		}
 	}
 	/**

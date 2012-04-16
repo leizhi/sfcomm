@@ -350,7 +350,7 @@ public class UserAction {
 		} catch (Exception e) {
 			if(log.isErrorEnabled()) log.error("Exception:"+e.getMessage());
 			
-			new CardLoginAction(bodyPanel);
+			promptLogin();
 		}
 	}
 	
