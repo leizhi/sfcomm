@@ -67,6 +67,7 @@ public class ImplementationISO14443A implements ISO14443A{
 	}
 	
 	private boolean testConnection() {
+		
     	byte [] command = CommandsISO14443A.shakeHands().getBytes();
 		
 		System.out.println("testConnection:");
@@ -270,7 +271,6 @@ public class ImplementationISO14443A implements ISO14443A{
 		if (response==null || response.length == 0) {
 			return false;
 		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
-//	    	  StringUtils.toHex(response);
 	    	  return true;
 		}
 		return false;

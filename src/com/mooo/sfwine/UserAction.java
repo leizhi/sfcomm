@@ -193,6 +193,8 @@ public class UserAction {
             if(count < 1)
     			throw new NullPointerException("无此用户");
             
+            count=0;
+            
             pstmt = connection.prepareStatement(LOGIN);
             pstmt.setString(1, LoginSession.user.getName());
             pstmt.setString(2, StringUtils.hash(LoginSession.user.getPassword()));
@@ -200,11 +202,13 @@ public class UserAction {
             rs = pstmt.executeQuery();
             while (rs.next()) {
             	LoginSession.user.setId(rs.getLong(1));
-            	count=1;
             	LoginSession.user.setOrgId(rs.getInt(2));
-            	 
+            	
+            	count=1;
             }
             
+    		if (log.isDebugEnabled()) log.debug("count:"+count);
+
             if(count == 1){
             	LoginSession.allow = true;
             	return true;
@@ -215,6 +219,7 @@ public class UserAction {
 			message = e.getMessage();
 			if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());	
 		}catch (SQLException e) {
+			message = e.getMessage();
 			if(log.isErrorEnabled()) log.error("SQLException:"+e.getMessage());	
 	   }finally {
 			try {
@@ -391,7 +396,11 @@ public class UserAction {
     		
     		cardRFID.cleanAll();
     		
+			if (log.isDebugEnabled()) log.debug("userNameText:"+String.valueOf(userNameText.getText()));
+			if (log.isDebugEnabled()) log.debug("passwordText:"+String.valueOf(passwordText.getPassword()));
+
 			cardRFID.saveM1(String.valueOf(userNameText.getText()), 1, 1, 16);
+			
 			cardRFID.saveM1(String.valueOf(passwordText.getPassword()), 1, 2, 16);
 
 			connection = DbConnectionManager.getConnection();
@@ -425,16 +434,15 @@ public class UserAction {
             
             pstmt = connection.prepareStatement(REISTER_USER);
     		if(log.isDebugEnabled()) log.debug("user.getId:"+LoginSession.user.getId());	
-
             pstmt.setLong(1, LoginSession.user.getId());
+            
     		if(log.isDebugEnabled()) log.debug("userNameText:"+String.valueOf(userNameText.getText()));	
-
             pstmt.setString(2, String.valueOf(userNameText.getText()));
+            
     		if(log.isDebugEnabled()) log.debug("passwordText:"+String.valueOf(passwordText.getPassword()));	
-
             pstmt.setString(3, StringUtils.hash(String.valueOf(passwordText.getPassword())));
+            
     		if(log.isDebugEnabled()) log.debug("getOrgId:"+LoginSession.user.getOrgId());	
-
             pstmt.setInt(4, LoginSession.user.getOrgId());
             
             pstmt.setString(5, serialNumber);

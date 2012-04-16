@@ -70,12 +70,8 @@ public class ULTest {
 //		iccrf.findSerialNumber(iccrf.findCardType());
 		
 		String buf = "幸福中国共同富裕";
-		buf = "老子不相信";
-		buf = "12345678";
-		try {
-			//
-			iccrf.findSerialNumber();
 
+		try {
 			//write UL
 //			iccrf.write((byte)0x04,buffer);
 //			iccrf.saveUL(buf1,4,32);
@@ -86,15 +82,22 @@ public class ULTest {
 //			iccrf.authentication((byte)0x01);
 //			
 //			iccrf.write((byte)(1*4 + 1),buf.getBytes("gb2312"));
+					
+			buf = "12345678";
+			iccrf.saveM1(buf, 1, 1, 16);
+			buf = "老子不相信";
+			iccrf.saveM1(buf, 1, 2, 16);
 //			
-//			iccrf.saveM1(buf, 1, 1, 16);
-//			iccrf.saveM1(buf, 1, 2, 16);
-//			
-			iccrf.findSerialNumber();
+//			iccrf.findSerialNumber();
 //			byte[] response = iccrf.read((byte)(1*4 + 1));
 			String reponse = iccrf.read(1,1);
-			System.out.println(reponse);
+			System.out.println("1,1"+reponse);
 
+//			iccrf.findSerialNumber();
+//			byte[] response = iccrf.read((byte)(1*4 + 1));
+			reponse = iccrf.read(1,2);
+			System.out.println("1,2"+reponse);
+			
 //			String str = iccrf.read(1,1);
 //			System.out.println("readM1:"+str);
 //			str = iccrf.read(1,2);

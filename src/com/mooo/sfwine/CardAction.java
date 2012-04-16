@@ -87,8 +87,6 @@ public class CardAction {
 			if(!LoginSession.isAllow())
 				throw new Exception("请先登录!");
 			
-		card = new Card();
-		
 		//clean view
 		if (bodyPanel.isShowing()) {
 			bodyPanel.removeAll();
@@ -362,11 +360,12 @@ public class CardAction {
 		bodyPanel.validate();//显示
 		bodyPanel.repaint();
 		//设置背景图片
-		  URL url = SFWine.class.getResource("bg1.png");
-	        ImageIcon img = new ImageIcon(url);
-	        JLabel background = new JLabel(img);
-	        bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
-	        background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());	
+		URL url = SFWine.class.getResource("bg1.png");
+		ImageIcon img = new ImageIcon(url);
+		JLabel background = new JLabel(img);
+		bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+		background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
+		
 		if(log.isDebugEnabled()) log.debug("initializeGUI end");
 		} catch (Exception e) {
 			if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());
@@ -379,7 +378,9 @@ public class CardAction {
 		ISO14443AAction cardRFID = new ISO14443AAction();
 		
 		try {
+			card = new Card();
 			fillCard();
+			
 			cardRFID.initialize();
 
 			// 初始化检查
@@ -459,8 +460,6 @@ public class CardAction {
 			if(!LoginSession.isAllow())
 				throw new Exception("请先登录!");
 			
-		card = new Card();
-		
 		//clean view
 		if (bodyPanel.isShowing()) {
 			bodyPanel.removeAll();
@@ -757,7 +756,6 @@ public class CardAction {
 	}
 
 	public void fillCard() {
-		
 		card.setJobTypeName(jobType.getSelectedItem().toString());
 		card.setWineType(wineType.getSelectedItem().toString());
 		card.setWineLevel(wineLevel.getSelectedItem().toString());

@@ -24,8 +24,10 @@ public class ISO14443AAction extends ImplementationISO14443A{
 				
 				findSerialNumber();
 				write((byte)(i*BLOCK_SIZE+0),buffer);
+				
 				findSerialNumber();
 				write((byte)(i*BLOCK_SIZE+1),buffer);
+				
 				findSerialNumber();
 				write((byte)(i*BLOCK_SIZE+2),buffer);
 			}
@@ -112,6 +114,7 @@ public class ISO14443AAction extends ImplementationISO14443A{
 			
 			loadKey((byte)page, password);
 			authentication((byte)page);
+			
 			write((byte)(page*BLOCK_SIZE + offset),wbuf);//default 16bits
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -191,8 +194,6 @@ public class ISO14443AAction extends ImplementationISO14443A{
 			authentication((byte)page);
 			
 			byte[] response = read((byte)(page*BLOCK_SIZE + block));
-			
-			response = read((byte)(1*4 + 1));
 			
 			buffer = new String(response,4,16,"GBK");
 		} catch (Exception e) {

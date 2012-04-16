@@ -180,10 +180,12 @@ public class CardLoginAction {
 							continue;
 						}
 						
+						cardRFID.findSerialNumber();
 						String userName = cardRFID.read(1, 1);
 						if (log.isDebugEnabled()) log.debug("userName:"+userName);
 						LoginSession.user.setName(userName);
 						
+						cardRFID.findSerialNumber();
 						String password = cardRFID.read(1, 2);
 						if (log.isDebugEnabled()) log.debug("password:"+password);
 						LoginSession.user.setPassword(password);

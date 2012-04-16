@@ -15,6 +15,7 @@ public class LoginSession {
 
 		if(!StringUtils.isNull(user.getName()))
 			user.setName(user.getName().trim());
+		
 		if(!StringUtils.isNull(user.getPassword()))
 			user.setPassword(user.getPassword().trim());
 
