@@ -15,7 +15,7 @@ public class Test {
 		
 		System.out.printf("orderByDESC:0x%x\n",obytes[1]);
 
-		//System.out.println("orderByDESC:"+obytes[0]);
+		System.out.println("orderByDESC:"+obytes[0]);
 		
 	}
 }
