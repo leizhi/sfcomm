@@ -46,6 +46,8 @@ public class ISO14443AAction extends ImplementationISO14443A{
 
 			saveM1(card.getRfidcode(), 1, 0, 16);
 			
+			saveM1(card.getWineJarKey(), 2, 0, 4);
+			
 			/*cardRFID.saveGBK(card.getWineryName(), 1, 1, 16);
 
 			cardRFID.saveGBK(card.getWineJarKey(), 1, 2, 16);
@@ -77,6 +79,7 @@ public class ISO14443AAction extends ImplementationISO14443A{
 */
 		}else if(choseCard==CommandsISO14443A.CARD_14443A_UL){
 			saveUL(card.getRfidcode(), 4, 16);
+			saveUL(card.getWineJarKey(), 8, 4);
 		}
 	}
 

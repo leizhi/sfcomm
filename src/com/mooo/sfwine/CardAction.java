@@ -392,7 +392,6 @@ public class CardAction {
 			if (serialNumber == null)
 				throw new NullPointerException("请放人电子标签或者电子卡");
 
-			card.setUuid(serialNumber);
 			card.setRfidcode(sixMD5(serialNumber));
 			
 			CardDBObject dbObjcet = new CardDBObject();

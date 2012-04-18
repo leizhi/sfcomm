@@ -317,7 +317,7 @@ public class CardDBObject {
 			pstmt.setInt(3, jobTypeId);
 			pstmt.setInt(4, wineJarId);
 			pstmt.setInt(5, supervisorId);
-			pstmt.setString(6, sixMD5(card.getUuid()));
+			pstmt.setString(6, card.getRfidcode());
 			pstmt.setLong(7, card.getUserId());
 			pstmt.setInt(8, card.getOrgId());
 			pstmt.execute();
@@ -375,7 +375,6 @@ public class CardDBObject {
 			  // System.out.println("result: " + buf.toString().substring(8,24));//16位的加密
 
 			  } catch (NoSuchAlgorithmException e) {
-			   // TODO Auto-generated catch block
 			   e.printStackTrace();
 			  }
 
