@@ -764,7 +764,7 @@ public class CardAction {
 		card.setWineryName(wineryName.getText());
 		card.setWineJarKey(wineJarKey.getText());
 		card.setAlcohol(alcohol.getText());
-		card.setOperator(operator.getText());
+//		card.setOperator(operator.getText());
 		//card.setSupervisorCompanyKey(supervisorCompanyKey.getText());
 		//card.setSupervisorName(supervisorName.getText());
 		//card.setBrewingDate(brewingDate.getText());
@@ -773,7 +773,6 @@ public class CardAction {
 		
 		card.setMaterial(material.getText());
 		card.setOrgId(LoginSession.user.getOrgId());
-		card.setUserId(LoginSession.user.getId());
 		//card.setWineName(wineName.getText());
 	}
 	

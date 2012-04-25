@@ -19,8 +19,9 @@ public class CardDBObject {
 	
 	//Card
 	//private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId,supervisorId,rfidcode) VALUES(?,?,?,?,?,?)";
-	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId,supervisorId,rfidcode,operatorId,org_id,mode) VALUES(?,?,?,?,?,?,?,?,'有效')";
-	
+//	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId,supervisorId,rfidcode,operatorId,org_id,mode) VALUES(?,?,?,?,?,?,?,?,'有效')";
+	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId,rfidcode,operatorId,org_id,mode) VALUES(?,?,?,?,?,?,?,'有效')";
+
 	//JobType
 	private static final String ADD_JOB_TYPE="INSERT INTO JobType(id,definition) VALUES(?,?)";
 	
@@ -317,10 +318,9 @@ public class CardDBObject {
 			pstmt.setTimestamp(2,new Timestamp(new Date().getTime()));
 			pstmt.setInt(3, jobTypeId);
 			pstmt.setInt(4, wineJarId);
-			pstmt.setInt(5, (int)card.getUserId());
-			pstmt.setString(6, card.getRfidcode());
-			pstmt.setLong(7, card.getUserId());
-			pstmt.setInt(8, card.getOrgId());
+			pstmt.setString(5, card.getRfidcode());
+			pstmt.setLong(6, LoginSession.user.getId());
+			pstmt.setInt(7, card.getOrgId());
 			pstmt.execute();
 			
 			conn.commit();

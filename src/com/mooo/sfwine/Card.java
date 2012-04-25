@@ -13,7 +13,7 @@ public class Card {
 	
 	private String wineLevel;//酒的品质 2
 	private String alcohol;//酒精度 3
-	private String operator;//操作人名称 3
+//	private String operator;//操作人名称 3
 	private String supervisorCompanyKey;//监管公司代码 2
 	private String supervisorName;//监管人名称 3
 	private String brewingDate;//酿造日期 10
@@ -25,7 +25,7 @@ public class Card {
 	private String material;//原料 2
 	
 	private String wineName;//酒名
-	private long userId;//登陆用户ID
+//	private long userId;//登陆用户ID
 	private Integer orgId;//机构
 
 	
@@ -37,12 +37,12 @@ public class Card {
 	public void setWineName(String wineName) {
 		this.wineName = wineName;
 	}
-	public long getUserId() {
-		return userId;
-	}
-	public void setUserId(long userId) {
-		this.userId = userId;
-	}
+//	public long getUserId() {
+//		return userId;
+//	}
+//	public void setUserId(long userId) {
+//		this.userId = userId;
+//	}
 	public Integer getOrgId() {
 		return orgId;
 	}
@@ -111,12 +111,12 @@ public class Card {
 	public void setAlcohol(String alcohol) {
 		this.alcohol = alcohol;
 	}
-	public String getOperator() {
-		return operator;
-	}
-	public void setOperator(String operator) {
-		this.operator = operator;
-	}
+//	public String getOperator() {
+//		return operator;
+//	}
+//	public void setOperator(String operator) {
+//		this.operator = operator;
+//	}
 	public String getSupervisorCompanyKey() {
 		return supervisorCompanyKey;
 	}
