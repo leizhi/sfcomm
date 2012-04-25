@@ -209,6 +209,7 @@ public class CardDBObject {
 				pstmt.setString(2, card.getJobTypeName());
 				pstmt.execute();
 			}
+			/*
 			//SupervisorCompany
 			exists = find("SupervisorCompany","definition",card.getSupervisorCompanyKey());
 			
@@ -236,7 +237,7 @@ public class CardDBObject {
 				pstmt.setInt(2, companyId);
 				pstmt.setString(3, card.getSupervisorName());
 				pstmt.execute();
-			}
+			}*/
 			//WineJar
 			exists = find("WineJar","abbreviation",card.getWineJarKey());
 
@@ -316,7 +317,7 @@ public class CardDBObject {
 			pstmt.setTimestamp(2,new Timestamp(new Date().getTime()));
 			pstmt.setInt(3, jobTypeId);
 			pstmt.setInt(4, wineJarId);
-			pstmt.setInt(5, supervisorId);
+			pstmt.setInt(5, (int)card.getUserId());
 			pstmt.setString(6, card.getRfidcode());
 			pstmt.setLong(7, card.getUserId());
 			pstmt.setInt(8, card.getOrgId());

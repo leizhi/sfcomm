@@ -150,7 +150,7 @@ public class CardAction {
 		wineryName.setBounds(x+width,y,width_1,hight);//一个字符9 point
 		bodyPanel.add(wineryName);
 		
-		y += hight;
+		/*y += hight;
 		
 		disLabel = new JLabel("酒名:");
 		disLabel.setForeground(fg);
@@ -159,7 +159,8 @@ public class CardAction {
 
 		wineName = new JTextField();
 		wineName.setBounds(x+width,y,width_1,hight);//一个字符9 point
-		bodyPanel.add(wineName);
+		bodyPanel.add(wineName);*/
+		
 		y += hight;
 		
 		disLabel = new JLabel("酒罐号:");
@@ -237,7 +238,7 @@ public class CardAction {
 		disLabel.setForeground(Color.RED);
 		bodyPanel.add(disLabel);
 		
-		y += hight;
+		/*y += hight;
 
 		disLabel = new JLabel("操作人:");
 		disLabel.setForeground(fg);
@@ -247,7 +248,7 @@ public class CardAction {
 		operator = new JTextField();
 		operator.setBounds(x+width,y,width_1,hight);//一个字符9 point
 		bodyPanel.add(operator);
-
+         
 		y += hight;
 
 		disLabel = new JLabel("监管公司:");
@@ -269,7 +270,7 @@ public class CardAction {
 		supervisorName = new JTextField();
 		supervisorName.setBounds(x+width,y,width_1,hight);//一个字符9 point
 		bodyPanel.add(supervisorName);
-
+        
 		y += hight;
 
 		disLabel = new JLabel("酿造日期:");
@@ -294,7 +295,7 @@ public class CardAction {
 		});
 		
 		bodyPanel.add(brewingCalendar);
-		
+		*/
 		y += hight;
 
 		disLabel = new JLabel("罐体容量:");
@@ -610,7 +611,7 @@ public class CardAction {
 		operator.setBounds(x+width,y,width_1,hight);//一个字符9 point
 		bodyPanel.add(operator);
 
-		y += hight;
+		/*y += hight;
 
 		disLabel = new JLabel("监管公司:");
 		disLabel.setForeground(fg);
@@ -656,7 +657,7 @@ public class CardAction {
 		});
 		
 		bodyPanel.add(brewingCalendar);
-		
+		*/
 		y += hight;
 
 		disLabel = new JLabel("罐体容量:");
@@ -764,16 +765,16 @@ public class CardAction {
 		card.setWineJarKey(wineJarKey.getText());
 		card.setAlcohol(alcohol.getText());
 		card.setOperator(operator.getText());
-		card.setSupervisorCompanyKey(supervisorCompanyKey.getText());
-		card.setSupervisorName(supervisorName.getText());
-		card.setBrewingDate(brewingDate.getText());
+		//card.setSupervisorCompanyKey(supervisorCompanyKey.getText());
+		//card.setSupervisorName(supervisorName.getText());
+		//card.setBrewingDate(brewingDate.getText());
 		card.setWineJarVolume(wineJarVolume.getText());
 		card.setWineVolume(wineVolume.getText());
 		
 		card.setMaterial(material.getText());
 		card.setOrgId(LoginSession.user.getOrgId());
 		card.setUserId(LoginSession.user.getId());
-		card.setWineName(wineName.getText());
+		//card.setWineName(wineName.getText());
 	}
 	
 	public void listCard() {
