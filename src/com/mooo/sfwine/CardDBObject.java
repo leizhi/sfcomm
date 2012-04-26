@@ -300,7 +300,7 @@ public class CardDBObject {
 				pstmt.setString(3, card.getWineJarKey());
 				
 				pstmt.setString(4, card.getWineJarVolume());
-				pstmt.setTimestamp(5,new Timestamp(dformat.parse(card.getBrewingDate()).getTime()));
+				pstmt.setTimestamp(5,new Timestamp(new Date().getTime()));
 				pstmt.setString(6, card.getMaterial());
 				
 				pstmt.setInt(7, wineTypeId);
