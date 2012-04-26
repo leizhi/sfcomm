@@ -158,13 +158,14 @@ public class UserAction {
 		bodyPanel.validate();//显示
 		bodyPanel.repaint();
 		//设置背景图片
-		  URL url = SFWine.class.getResource("bg.png");
-	        ImageIcon img = new ImageIcon(url);
-	        JLabel background = new JLabel(img);
-	        bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
-	        background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
+		URL url = SFWine.class.getResource("bg.png");
+		ImageIcon img = new ImageIcon(url);
+		JLabel background = new JLabel(img);
+		bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+		background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
 		if(log.isDebugEnabled()) log.debug("initializeGUI end");
 	}
+
 	public boolean processLogin(){
 		if(log.isDebugEnabled()) log.debug("processLogin");	
 

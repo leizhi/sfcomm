@@ -80,7 +80,7 @@ public class SFWine {
 		//start Login
 //		new LoginWindow(bodyPanel);
 
-		frame.setJMenuBar(JMenuBarFactory.buildJMenuBar(bodyPanel));
+		frame.setJMenuBar(new SFMenuBar(bodyPanel));
 		
 		bottomPanel = new JPanel();
 //		bodyPanel.setPreferredSize(new Dimension(1024, 60));
