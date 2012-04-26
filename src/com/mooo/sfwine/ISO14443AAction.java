@@ -36,54 +36,19 @@ public class ISO14443AAction extends ImplementationISO14443A{
 		}
 	}
 	
-	public void save(Card card) {
+	public void save(Card card) throws Exception{
 		int choseCard=findCardType();
 		
 		if(choseCard==CommandsISO14443A.CARD_14443A_M1){
-//			cardRFID.saveType((byte)0xB5, 1);
-
-//			cardRFID.save(card.getZipCode(), 1, 0, 6);
-
 			saveM1(card.getRfidcode(), 1, 0, 16);
-			
 			saveM1(card.getWineJarKey(), 2, 0, 4);
-			
-			/*cardRFID.saveGBK(card.getWineryName(), 1, 1, 16);
-
-			cardRFID.saveGBK(card.getWineJarKey(), 1, 2, 16);
-
-			cardRFID.saveGBK(card.getWineType(), 2, 0, 16);
-
-			cardRFID.saveGBK(card.getWineLevel(), 2, 1, 16);
-
-			cardRFID.saveGBK(card.getAlcohol(), 2, 2, 16);
-
-			cardRFID.saveGBK(card.getOperator(), 3, 0, 16);
-
-			cardRFID.saveGBK(card.getSupervisorCompanyKey(), 3, 1, 16);
-
-			cardRFID.saveGBK(card.getSupervisorName(), 3, 2, 16);
-
-			cardRFID.saveGBK(card.getBrewingDate(), 4, 0, 16);
-
-			Calendar rightNow = Calendar.getInstance();
-			String value = dformat.format(rightNow.getTime());
-
-			cardRFID.saveGBK(value, 4, 1, 16);
-
-			cardRFID.saveGBK(card.getWineJarVolume(), 4, 2, 16);
-
-			cardRFID.saveGBK(card.getWineVolume(), 5, 0, 16);
-
-			cardRFID.saveGBK(card.getMaterial(), 6, 0, 16);
-*/
 		}else if(choseCard==CommandsISO14443A.CARD_14443A_UL){
 			saveUL(card.getRfidcode(), 4, 16);
 			saveUL(card.getWineJarKey(), 8, 4);
 		}
 	}
 
-	public void save(User user) {
+	public void save(User user) throws Exception{
 		int choseCard=findCardType();
 		
 		if(choseCard==CommandsISO14443A.CARD_14443A_M1){
@@ -93,8 +58,7 @@ public class ISO14443AAction extends ImplementationISO14443A{
 			saveUL(user.getName(), 4, 16);
 		}
 	}
-	public void saveM1(String buf,int page,int offset,int maxLength) {
-		try {
+	public void saveM1(String buf,int page,int offset,int maxLength) throws Exception{
 			findSerialNumber();
 			
 			byte[] bytes = buf.getBytes("gb2312");
@@ -119,13 +83,9 @@ public class ISO14443AAction extends ImplementationISO14443A{
 			authentication((byte)page);
 			
 			write((byte)(page*BLOCK_SIZE + offset),wbuf);//default 16bits
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 	
-	public void saveUL(String buf,int page,int maxLength) {
-		try {
+	public void saveUL(String buf,int page,int maxLength) throws Exception{
 			findSerialNumber();
 			
 			byte[] bbuf = buf.getBytes("gb2312");
@@ -170,9 +130,6 @@ public class ISO14443AAction extends ImplementationISO14443A{
 				
 				page++;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 	
 	

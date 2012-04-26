@@ -13,8 +13,6 @@ public class KeyAction extends KeyAdapter {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 7168200530660156025L;
-	
 	private static Log log = LogFactory.getLog(KeyAction.class);
 
 	@Override

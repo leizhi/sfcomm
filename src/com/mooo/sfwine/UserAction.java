@@ -470,7 +470,16 @@ public class UserAction {
 					}
 				message = e.getMessage();
 			if(log.isErrorEnabled()) log.error("SQLException:"+e.getMessage());	
-	   }finally {
+		}catch (Exception e) {
+				if(connection != null)
+					try {
+						connection.rollback();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+				message = e.getMessage();
+			if(log.isErrorEnabled()) log.error("SQLException:"+e.getMessage());	
+		}finally {
 			try {
 				if(pstmt != null)
 					pstmt.close();

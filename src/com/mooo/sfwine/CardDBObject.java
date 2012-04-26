@@ -7,7 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,40 +16,23 @@ import com.mooo.mycoz.db.pool.DbConnectionManager;
 public class CardDBObject {
 	private static Log log = LogFactory.getLog(CardDBObject.class);
 	
+	//commons SQL
+	private static final String FIND_CARD="SELECT count(*) FROM Card WHERE id=?";
+
+	private static final String SELECT_MAX_BY_TABLE="SELECT MAX(ID) maxid FROM ";
+	
 	//Card
-	//private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId,supervisorId,rfidcode) VALUES(?,?,?,?,?,?)";
-//	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId,supervisorId,rfidcode,operatorId,org_id,mode) VALUES(?,?,?,?,?,?,?,?,'有效')";
 	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,jobTypeId,wineJarId,rfidcode,operatorId,org_id,mode) VALUES(?,?,?,?,?,?,?,'有效')";
 
 	//JobType
 	private static final String ADD_JOB_TYPE="INSERT INTO JobType(id,definition) VALUES(?,?)";
 	
 	//Winery
-	private static final String ADD_WINERY="INSERT INTO Winery(id,definition) VALUES(?,?)";
-	
-	//WineType
-	private static final String ADD_WINE_TYPE="INSERT INTO WineType(id,definition) VALUES(?,?)";
-
-	//WineLevel
-	private static final String ADD_WINE_LEVEL="INSERT INTO WineLevel(id,definition) VALUES(?,?)";
-
-	//SupervisorCompany
-	private static final String ADD_SUPERVISOR_COMPANY="INSERT INTO SupervisorCompany(id,definition) VALUES(?,?)";
-
-	//Supervisor
-	private static final String ADD_SUPERVISOR="INSERT INTO Supervisor(id,companyId,definition) VALUES(?,?,?)";
+	private static final String ADD_WINERY="INSERT INTO Winery(id,definition,address) VALUES(?,?,?)";
 	
 	//WineJar
-	//private static final String ADD_WINEJAR="INSERT INTO WineJar(id,wineryId,abbreviation,volume,brewingDate,material,wineTypeId,wineLevelId,alcohol,volumeUnit) VALUES(?,?,?,?,?,?,?,?,?,?)";
-	private static final String ADD_WINEJAR="INSERT INTO WineJar(id,wineryId,abbreviation,volume,brewingDate,material,wineTypeId,wineLevelId,alcohol,volumeUnit,wineName) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+	private static final String ADD_WINEJAR="INSERT INTO WineJar(id,wineryId,abbreviation,volume,volumeUnit) VALUES(?,?,?,?,?)";
 	
-	private static final String FIND_CARD="SELECT count(*) FROM Card WHERE id=?";
-
-	private static final String SELECT_MAX_BY_TABLE="SELECT MAX(ID) maxid FROM ";
-
-	private static final SimpleDateFormat dformat = new SimpleDateFormat("yyy-MM-dd");
-
-//	public boolean find(String table,String category,String fieldName,String fieldValue){
 	public static int getNextID(String table) {
 		
 		Connection connection=null;
@@ -189,7 +171,7 @@ public class CardDBObject {
 		return false;
 	}
 	
-	public void save(Card card){
+	public void save(Card card) throws CardException{
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try{
@@ -210,35 +192,6 @@ public class CardDBObject {
 				pstmt.setString(2, card.getJobTypeName());
 				pstmt.execute();
 			}
-			/*
-			//SupervisorCompany
-			exists = find("SupervisorCompany","definition",card.getSupervisorCompanyKey());
-			
-			int companyId = 0;
-			if(exists){
-				companyId = getId("SupervisorCompany","definition",card.getSupervisorCompanyKey());
-			}else{
-				pstmt = conn.prepareStatement(ADD_SUPERVISOR_COMPANY);
-				companyId = getNextID("SupervisorCompany");
-				pstmt.setInt(1, companyId);
-				pstmt.setString(2, card.getSupervisorCompanyKey());
-				pstmt.execute();
-			}
-			
-			//Supervisor
-			exists = find("Supervisor","definition",card.getSupervisorName());
-			
-			int supervisorId = 0;
-			if(exists){
-				supervisorId = getId("Supervisor","definition",card.getSupervisorName());
-			}else{
-				pstmt = conn.prepareStatement(ADD_SUPERVISOR);
-				supervisorId = getNextID("Supervisor");
-				pstmt.setInt(1, supervisorId);
-				pstmt.setInt(2, companyId);
-				pstmt.setString(3, card.getSupervisorName());
-				pstmt.execute();
-			}*/
 			//WineJar
 			exists = find("WineJar","abbreviation",card.getWineJarKey());
 
@@ -258,39 +211,9 @@ public class CardDBObject {
 					wineryId = getNextID("Winery");
 					pstmt.setInt(1, wineryId);
 					pstmt.setString(2, card.getWineryName());
+					pstmt.setString(2, card.getWineryAddress());
 					pstmt.execute();
 				}
-				
-				//WineType
-				exists = find("WineType","definition",card.getWineType());
-				
-				int wineTypeId = 0;
-				if(exists){
-					wineTypeId = getId("WineType","definition",card.getWineType());
-				}else{
-					pstmt = conn.prepareStatement(ADD_WINE_TYPE);
-					wineTypeId = getNextID("WineType");
-					pstmt.setInt(1, wineTypeId);
-					pstmt.setString(2, card.getWineType());
-					pstmt.execute();
-				}
-				
-				//WineLevel
-				exists = find("WineLevel","definition",card.getWineLevel());
-				
-				int wineLevelId = 0;
-				if(exists){
-					wineLevelId = getId("WineLevel","definition",card.getWineLevel());
-				}else{
-					pstmt = conn.prepareStatement(ADD_WINE_LEVEL);
-					wineLevelId = getNextID("WineLevel");
-					pstmt.setInt(1, wineLevelId);
-					pstmt.setString(2, card.getWineLevel());
-					pstmt.execute();
-				}
-				
-				
-				
 				
 				//WineJar
 				pstmt = conn.prepareStatement(ADD_WINEJAR);
@@ -298,17 +221,8 @@ public class CardDBObject {
 				pstmt.setInt(1, wineJarId);
 				pstmt.setInt(2, wineryId);
 				pstmt.setString(3, card.getWineJarKey());
-				
 				pstmt.setString(4, card.getWineJarVolume());
-				pstmt.setTimestamp(5,new Timestamp(new Date().getTime()));
-				pstmt.setString(6, card.getMaterial());
-				
-				pstmt.setInt(7, wineTypeId);
-				pstmt.setInt(8, wineLevelId);
-				pstmt.setString(9, card.getAlcohol());
-				pstmt.setString(10, card.getVolumeUnit());
-				pstmt.setString(11, card.getWineName());
-				
+				pstmt.setString(5, card.getVolumeUnit());
 				pstmt.execute();
 			}
 			
@@ -334,6 +248,8 @@ public class CardDBObject {
 				e1.printStackTrace();
 			}
 			e.printStackTrace();
+			
+			throw new CardException(e.getMessage());
 		}finally{
 
 			try {
@@ -349,8 +265,6 @@ public class CardDBObject {
 			}
 
 		}
-		
-		
 	}
 	
 	public String sixMD5(String plainText){
