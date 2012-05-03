@@ -302,6 +302,8 @@ public class CardDBObject {
 				pstmt.setString(4, card.getWineJarVolume());
 				pstmt.setString(5, card.getVolumeUnit());
 				pstmt.execute();
+				
+				wineJarId = getNextID("WINE_JAR");
 			}
 			
 			pstmt = conn.prepareStatement(ADD_CARD);
