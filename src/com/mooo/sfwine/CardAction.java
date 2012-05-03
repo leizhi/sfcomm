@@ -415,9 +415,9 @@ public class CardAction {
 	public void fillCard() {
 		card.setJobTypeName(jobType.getSelectedItem().toString());
 
-		card.setZipCode(zipCodeText.getText());
+		//card.setZipCode(zipCodeText.getText());
 		//card.setWineryName(wineryName.getText());
-		card.setWineryAddress(wineryAddress.getText());
+		//card.setWineryAddress(wineryAddress.getText());
 		card.setWineJarKey(wineJarKey.getText());
 		card.setWineJarVolume(wineJarVolume.getText());
 		card.setWineVolume(wineVolume.getText());
