@@ -8,6 +8,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -48,6 +49,8 @@ public class CardAction {
 	private JTextField wineVolume;
 	
 	private JComboBox jobType;
+	private JComboBox org;
+	private JComboBox unit;
 	
 	private Card card;
 
@@ -117,7 +120,7 @@ public class CardAction {
 		jobType.addItem("取完酒");
 		jobType.addItem("巡检");
 		bodyPanel.add(jobType);
-		
+		/*
 		y += hight;
 		
 		disLabel = new JLabel("酒厂邮编:");
@@ -138,21 +141,33 @@ public class CardAction {
 		disLabel.setBounds(x+width+width_1,y,10*display.length(),hight);
 		disLabel.setForeground(Color.RED);
 		bodyPanel.add(disLabel);
-		
+		*/
 		y += hight;
 		disLabel = new JLabel("酒厂名:");
 		disLabel.setForeground(fg);
 		disLabel.setBounds(x,y,width,hight);
 		bodyPanel.add(disLabel);
 
+		org= new JComboBox();
+		org.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		CardDBObject dbObjcet = new CardDBObject();
+		List orgList=dbObjcet.findOrgList(LoginSession.user.getOrgId());
+		for(int i=0;i<orgList.size();i++){
+			Card car=(Card)orgList.get(i);
+			org.addItem(car.getOrgName());
+		}
+		
+		bodyPanel.add(org);
+		/*
 		if(wineryName==null){
 			wineryName = new JTextField();
 			wineryName.setBounds(x+width,y,width_1,hight);//一个字符9 point
 		}
 		bodyPanel.add(wineryName);
-		
-		
+		*/
+		/*
 		y += hight;
+
 		disLabel = new JLabel("酒厂地址:");
 		disLabel.setForeground(fg);
 		disLabel.setBounds(x,y,width,hight);
@@ -163,7 +178,7 @@ public class CardAction {
 			wineryAddress.setBounds(x+width,y,width_1,hight);//一个字符9 point
 		}
 		bodyPanel.add(wineryAddress);
-		
+		*/
 		y += hight;
 		
 		disLabel = new JLabel("酒罐号:");
@@ -200,13 +215,25 @@ public class CardAction {
 			wineJarVolume.setDocument(new LimitDocument(8));
 		}
 		bodyPanel.add(wineJarVolume);
-
+		
+		unit= new JComboBox();
+		unit.setBounds(x+width+p,y,8*display.length(),hight);
+		
+		List list=dbObjcet.findUnitList();
+		for(int i=0;i<list.size();i++){
+			Card car=(Card)list.get(i);
+			unit.addItem(car.getVolumeUnit());
+		}
+		
+		bodyPanel.add(unit);
+		
+/*
 		display = "(吨)";
 		disLabel = new JLabel(display);
 		disLabel.setForeground(fg);
 		disLabel.setBounds(x+width+p,y,8*display.length(),hight);
 		disLabel.setForeground(Color.WHITE);
-		bodyPanel.add(disLabel);
+		bodyPanel.add(disLabel);*/
 		
 		display = " 例: 10000.00";
 		disLabel = new JLabel(display);
@@ -231,13 +258,13 @@ public class CardAction {
 		}
 		bodyPanel.add(wineVolume);
 
-		display = "(吨)";
+		/*display = "(吨)";
 		disLabel = new JLabel(display);
 		disLabel.setForeground(fg);
 		disLabel.setBounds(x+width+p,y,8*display.length(),hight);
 		disLabel.setForeground(Color.WHITE);
 		bodyPanel.add(disLabel);
-		
+		*/
 		display = " 例: 10000.00";
 		disLabel = new JLabel(display);
 		disLabel.setForeground(fg);
@@ -389,13 +416,15 @@ public class CardAction {
 		card.setJobTypeName(jobType.getSelectedItem().toString());
 
 		card.setZipCode(zipCodeText.getText());
-		card.setWineryName(wineryName.getText());
+		//card.setWineryName(wineryName.getText());
 		card.setWineryAddress(wineryAddress.getText());
 		card.setWineJarKey(wineJarKey.getText());
 		card.setWineJarVolume(wineJarVolume.getText());
 		card.setWineVolume(wineVolume.getText());
 		
 		card.setOrgId(LoginSession.user.getOrgId());
+		card.setWineryName(org.getSelectedItem().toString());
+		card.setVolumeUnit(unit.getSelectedItem().toString());
 	}
 	
 	public void listCard() {

@@ -2,12 +2,16 @@ package com.mooo.sfwine;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,6 +36,12 @@ public class CardDBObject {
 	
 	//WineJar
 	private static final String ADD_WINEJAR="INSERT INTO WineJar(id,wineryId,abbreviation,volume,volumeUnit) VALUES(?,?,?,?,?)";
+	private static final String ADD_WINE_JAR="INSERT INTO WINE_JAR(orgId,wineJarKey,volume,wineJarVolume,volumeUnitCode) VALUES(?,?,?,?,?)";
+	
+	//volumeUnit
+	private static final String  SELECT_UNIT="SELECT * FROM T_PUBLIC_CODE WHERE KIND='3'";
+	
+	private static final String FIND_UNIT ="SELECT *FROM T_PUBLIC_CODE  WHERE KIND='3' AND NAME=?";
 	
 	public static int getNextID(String table) {
 		
@@ -97,7 +107,39 @@ public class CardDBObject {
 		
 		return id;
 	}
-	
+	public int getOrgId(String table,String fieldName,String fieldValue){
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		int id = 0;
+		String sql = "SELECT ORG_ID FROM "+table+" WHERE "+fieldName+"=?";
+		try{
+			conn = DbConnectionManager.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, fieldValue);
+			
+			ResultSet result = pstmt.executeQuery();
+			if(result.next()){
+				id = result.getInt(1);
+			}
+		} catch (Exception e) {
+			System.out.println("Exception="+e.getMessage());
+		}finally{
+
+			try {
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return id;
+	}
 	public boolean find(String table,String fieldName,String fieldValue){
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -192,8 +234,14 @@ public class CardDBObject {
 				pstmt.setString(2, card.getJobTypeName());
 				pstmt.execute();
 			}
+			//volumeUnit  名字转编码
+			Card c= findUnit(card.getVolumeUnit());
+			if(c.getVolumeUnit()!=null){
+				card.setVolumeUnit(c.getVolumeUnit());
+			}
+			
 			//WineJar
-			exists = find("WineJar","abbreviation",card.getWineJarKey());
+			/*exists = find("WineJar","abbreviation",card.getWineJarKey());
 
 			int wineJarId = 0;
 
@@ -221,6 +269,36 @@ public class CardDBObject {
 				pstmt.setInt(1, wineJarId);
 				pstmt.setInt(2, wineryId);
 				pstmt.setString(3, card.getWineJarKey());
+				pstmt.setString(4, card.getWineJarVolume());
+				pstmt.setString(5, card.getVolumeUnit());
+				pstmt.execute();
+				
+				}*/
+			
+			
+			//WineJar
+			exists = find("WINE_JAR","wineJarKey",card.getWineJarKey());
+
+			int wineJarId = 0;
+
+			if(exists){
+				wineJarId = getId("WINE_JAR","wineJarKey",card.getWineJarKey());
+			}else{
+				//T_ORGANIZATION
+				exists = find("T_ORGANIZATION","name",card.getWineryName());
+				
+				int orgId = 0;
+				if(exists){
+					orgId = getOrgId("T_ORGANIZATION","name",card.getWineryName());
+				}
+
+				//WineJar
+			
+				pstmt = conn.prepareStatement(ADD_WINE_JAR);
+	
+				pstmt.setInt(1, orgId);
+				pstmt.setString(2, card.getWineJarKey());
+				pstmt.setString(3, card.getWineVolume());
 				pstmt.setString(4, card.getWineJarVolume());
 				pstmt.setString(5, card.getVolumeUnit());
 				pstmt.execute();
@@ -294,5 +372,107 @@ public class CardDBObject {
 			  }
 
 		 return sixteen;
+	}
+	
+	
+	
+	public List findUnitList(){
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		List list=new ArrayList();
+		try{
+			conn = DbConnectionManager.getConnection();
+			pstmt = conn.prepareStatement(SELECT_UNIT); 
+			ResultSet result = pstmt.executeQuery();
+			Card car=null;
+			while(result.next()){
+				car=new Card();
+				car.setVolumeUnit(result.getString(4));
+				list.add(car);
+			}
+		} catch (Exception e) {
+			System.out.println("Exception="+e.getMessage());
+		}finally{
+
+			try {
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		
+		return list;
+	}
+	public Card findUnit(String name){
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		Card car=new Card();
+		try{
+			conn = DbConnectionManager.getConnection();
+			pstmt = conn.prepareStatement(FIND_UNIT); 
+			pstmt.setString(1, name);
+			ResultSet result = pstmt.executeQuery();
+			if(result.next()){
+				car.setVolumeUnit(result.getString(3));
+			}
+		} catch (Exception e) {
+			System.out.println("Exception="+e.getMessage());
+		}finally{
+
+			try {
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return car;
+	}
+	public List findOrgList(int orgId){
+		Connection conn = null;
+		CallableStatement cs = null;
+		List orgList=new ArrayList();
+		try{
+			conn = DbConnectionManager.getConnection();
+			cs = conn.prepareCall("{call dt_organizationTree(?)}"); 
+			cs.setInt(1, orgId);
+		
+			ResultSet result = cs.executeQuery();
+			Card car=null;
+			while(result.next()){
+				car=new Card();
+				car.setOrgId(result.getInt(1));
+				car.setOrgName(result.getString(3));
+				orgList.add(car);
+			}
+		} catch (Exception e) {
+			System.out.println("Exception="+e.getMessage());
+		}finally{
+
+			try {
+				cs.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return orgList;
 	}
 }

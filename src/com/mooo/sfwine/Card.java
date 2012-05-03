@@ -17,6 +17,7 @@ public class Card {
 	private String volumeUnit;//容积单位 2
 	
 	private Integer orgId;//机构
+	private String orgName;//机构名
 	
 	public Long getId() {
 		return id;
@@ -95,6 +96,12 @@ public class Card {
 	}
 	public void setOrgId(Integer orgId) {
 		this.orgId = orgId;
+	}
+	public String getOrgName() {
+		return orgName;
+	}
+	public void setOrgName(String orgName) {
+		this.orgName = orgName;
 	}
 
 }
