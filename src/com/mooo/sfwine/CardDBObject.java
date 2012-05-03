@@ -275,22 +275,22 @@ public class CardDBObject {
 				
 				}*/
 			
+			//T_ORGANIZATION
+			exists = find("T_ORGANIZATION","name",card.getWineryName());
 			
+			int orgId = 0;
+			if(exists){
+				orgId = getOrgId("T_ORGANIZATION","name",card.getWineryName());
+				
+			}
 			//WineJar
 			exists = find("WINE_JAR","wineJarKey",card.getWineJarKey());
 
 			int wineJarId = 0;
-
 			if(exists){
 				wineJarId = getId("WINE_JAR","wineJarKey",card.getWineJarKey());
 			}else{
-				//T_ORGANIZATION
-				exists = find("T_ORGANIZATION","name",card.getWineryName());
 				
-				int orgId = 0;
-				if(exists){
-					orgId = getOrgId("T_ORGANIZATION","name",card.getWineryName());
-				}
 
 				//WineJar
 			
@@ -312,7 +312,7 @@ public class CardDBObject {
 			pstmt.setInt(4, wineJarId);
 			pstmt.setString(5, card.getRfidcode());
 			pstmt.setLong(6, LoginSession.user.getId());
-			pstmt.setInt(7, card.getOrgId());
+			pstmt.setInt(7, orgId);
 			pstmt.execute();
 			
 			conn.commit();
