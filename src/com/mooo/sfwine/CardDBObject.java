@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -294,18 +295,21 @@ public class CardDBObject {
 
 				//WineJar
 			
-				pstmt = conn.prepareStatement(ADD_WINE_JAR);
-	
+				pstmt = conn.prepareStatement(ADD_WINE_JAR,Statement.RETURN_GENERATED_KEYS);   
 				pstmt.setInt(1, orgId);
 				pstmt.setString(2, card.getWineJarKey());
 				pstmt.setString(3, card.getWineVolume());
 				pstmt.setString(4, card.getWineJarVolume());
 				pstmt.setString(5, card.getVolumeUnit());
-				pstmt.execute();
+				pstmt.execute(); 
+				ResultSet rs = pstmt.getGeneratedKeys();   
 				
-				wineJarId = getNextID("WINE_JAR");
+				if (rs != null&&rs.next()) {   
+					wineJarId=rs.getInt(1);  
+				}  
+
 			}
-			
+
 			pstmt = conn.prepareStatement(ADD_CARD);
 			long cardId = getNextID("Card");
 			pstmt.setLong(1, cardId);
