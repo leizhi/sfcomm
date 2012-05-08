@@ -9,7 +9,7 @@ public class Test {
 		bytes[0] = 0x00;
 		bytes[1] = 0x44;
 		
-		byte[] obytes = StringUtils.orderByDESC(bytes);
+		byte[] obytes = StringUtils.swapBytes(bytes);
 		
 		System.out.printf("orderByDESC:0x%x\n",obytes[0]);
 		

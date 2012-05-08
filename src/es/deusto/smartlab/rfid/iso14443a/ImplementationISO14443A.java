@@ -184,7 +184,7 @@ public class ImplementationISO14443A implements ISO14443A{
 		if (response ==null || response.length == 0) {
 			return -1;
 		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
-			return StringUtils.toShort(StringUtils.orderByDESC(StringUtils.subBytes(response,4,2)));
+			return StringUtils.toShort(StringUtils.swapBytes(StringUtils.subBytes(response,4,2)));
 		} else {
 			return -2;
 		}
