@@ -83,11 +83,11 @@ public class ULTest {
 //			
 //			iccrf.write((byte)(1*4 + 1),buf.getBytes("gb2312"));
 					
-			buf = "12345678";
+			buf = "sa51";
 			iccrf.saveM1(buf, 1, 1, 16);
-			buf = "老子不相信";
+			buf = "root";
 			iccrf.saveM1(buf, 1, 2, 16);
-//			
+
 //			iccrf.findSerialNumber();
 //			byte[] response = iccrf.read((byte)(1*4 + 1));
 			String reponse = iccrf.read(1,1);
