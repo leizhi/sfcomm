@@ -41,10 +41,8 @@ public class ISO14443AAction extends ImplementationISO14443A{
 		
 		if(choseCard==CommandsISO14443A.CARD_14443A_M1){
 			saveM1(card.getRfidcode(), 1, 0, 16);
-			saveM1(card.getWineJarKey(), 2, 0, 4);
 		}else if(choseCard==CommandsISO14443A.CARD_14443A_UL){
 			saveUL(card.getRfidcode(), 4, 16);
-			saveUL(card.getWineJarKey(), 8, 4);
 		}
 	}
 

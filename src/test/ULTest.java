@@ -69,13 +69,14 @@ public class ULTest {
 //		iccrf.findSerialNumber(iccrf.findCardType());
 //		iccrf.findSerialNumber(iccrf.findCardType());
 		
-		String buf = "幸福中国共同富裕";
-
+		String buf = "7879";
+		String reponse;
 		try {
 			//write UL
 //			iccrf.write((byte)0x04,buffer);
-//			iccrf.saveUL(buf1,4,32);
-//			byte[] response = iccrf.read((byte)0x04);
+			iccrf.saveUL(buf,4,32);
+			reponse = iccrf.read(4,0);
+			System.out.println("1,1"+reponse);
 			
 			//write M1
 //			iccrf.loadKey((byte)0x01, password);
@@ -83,31 +84,16 @@ public class ULTest {
 //			
 //			iccrf.write((byte)(1*4 + 1),buf.getBytes("gb2312"));
 					
-			buf = "sa51";
-			iccrf.saveM1(buf, 1, 1, 16);
-			buf = "root";
-			iccrf.saveM1(buf, 1, 2, 16);
+//			buf = "sa51";
+//			iccrf.saveM1(buf, 1, 1, 16);
+//			buf = "root";
+//			iccrf.saveM1(buf, 1, 2, 16);
 
-//			iccrf.findSerialNumber();
-//			byte[] response = iccrf.read((byte)(1*4 + 1));
-			String reponse = iccrf.read(1,1);
-			System.out.println("1,1"+reponse);
-
-//			iccrf.findSerialNumber();
-//			byte[] response = iccrf.read((byte)(1*4 + 1));
-			reponse = iccrf.read(1,2);
-			System.out.println("1,2"+reponse);
-			
-//			String str = iccrf.read(1,1);
-//			System.out.println("readM1:"+str);
-//			str = iccrf.read(1,2);
-//			System.out.println("readM1:"+str);
-//			response = iccrf.read((byte)(1*4 + 2));
-//			System.out.println(new String(response,4,16,"GBK"));
-
-//			response = iccrf.read((byte)0x08);
-			
-//			System.out.println(new String(response,4,16,"GBK"));
+//			reponse = iccrf.read(1,1);
+//			System.out.println("1,1"+reponse);
+//
+//			reponse = iccrf.read(1,2);
+//			System.out.println("1,2"+reponse);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
