@@ -330,6 +330,7 @@ public class CardAction {
 						
 						card = new Card();
 						fillCard();
+						card.setUuid(StringUtils.hash(serialNumber));
 						
 						CardDBObject dbObjcet = new CardDBObject();
 

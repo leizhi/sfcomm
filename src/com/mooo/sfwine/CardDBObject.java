@@ -20,14 +20,14 @@ public class CardDBObject {
 	private static SimpleDateFormat dformat = new SimpleDateFormat("yyMMdd");
 
 	//commons SQL
-	private static final String FIND_CARD="SELECT count(*) FROM Card WHERE id=?";
+	private static final String FIND_CARD="SELECT count(*) FROM Card WHERE uuid=?";
 
 	private static final String SELECT_MAX_BY_TABLE="SELECT MAX(ID) maxid FROM ";
 	
 	private static final String SELECT_MAX_BY_LIKE="SELECT MAX(rfidcode) nowCode FROM Card WHERE rfidcode LIKE ?";
 	
 	//Card
-	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,rfidcode,operatorId,mode,jobTypeId) VALUES(?,?,?,?,'有效',1)";
+	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,rfidcode,operatorId,uuid,org_id,jobTypeId,mode) VALUES(?,?,?,?,?,?,1,'未激活')";
 
 	public static int getNextID(String table) {
 		
@@ -200,7 +200,7 @@ public class CardDBObject {
 		try{
 			conn = DbConnectionManager.getConnection();
 			pstmt = conn.prepareStatement(FIND_CARD);
-			pstmt.setLong(1, card.getId());
+			pstmt.setString(1, card.getUuid());
 			
 			ResultSet result = pstmt.executeQuery();
 			if(result.next()){
@@ -242,6 +242,8 @@ public class CardDBObject {
 			pstmt.setTimestamp(2,new Timestamp(new Date().getTime()));
 			pstmt.setString(3, card.getRfidcode());
 			pstmt.setLong(4, LoginSession.user.getId());
+			pstmt.setString(5, card.getUuid());
+			pstmt.setLong(6, LoginSession.user.getOrgId());
 			pstmt.execute();
 			
 			conn.commit();

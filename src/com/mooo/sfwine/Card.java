@@ -3,6 +3,7 @@ package com.mooo.sfwine;
 public class Card {
 	private Long id; // 主键 卡唯一ID
 	
+	private String uuid;//序列号
 	private String rfidcode;//序列号
 	private String zipCode;//邮编 6
 	private Integer orgId;//机构
@@ -38,4 +39,11 @@ public class Card {
 	public void setCardType(String cardType) {
 		this.cardType = cardType;
 	}
+	public String getUuid() {
+		return uuid;
+	}
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
+	}
+	
 }
