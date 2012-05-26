@@ -38,11 +38,14 @@ public class UserAction {
 	 */
 	private static Log log = LogFactory.getLog(UserAction.class);
 	
-	private static final String REISTER_USER="INSERT INTO User() VALUES()";
+
+	private static final String ADD_USER_INFO="INSERT INTO UserInfo(id,uuid) VALUES(?,?)";
+
+	private static final String ADD_USER="INSERT INTO User(id,name,password,userInfoId) VALUES(?,?,?,?)";
 
 	private static final String EXISTS_USER="SELECT count(*) FROM User WHERE name=?";
 
-	private static final String EXISTS_CARD="SELECT count(*) FROM User WHERE uuid=?";
+	private static final String EXISTS_CARD="SELECT count(*) FROM UserInfo WHERE uuid=?";
 
 	private static final String LOGIN="SELECT id  FROM  User where   name=? AND password=?";
 	
@@ -397,7 +400,6 @@ public class UserAction {
 			if (log.isDebugEnabled()) log.debug("passwordText:"+String.valueOf(passwordText.getPassword()));
 
 			cardRFID.saveM1(String.valueOf(userNameText.getText()), 1, 1, 16);
-			
 			cardRFID.saveM1(String.valueOf(passwordText.getPassword()), 1, 2, 16);
 
 			connection = DbConnectionManager.getConnection();
@@ -429,18 +431,19 @@ public class UserAction {
             if(count > 0)
     			throw new NullPointerException("此卡已注册");
             
-            pstmt = connection.prepareStatement(REISTER_USER);
-    		if(log.isDebugEnabled()) log.debug("user.getId:"+LoginSession.user.getId());	
+            
+            
+            pstmt = connection.prepareStatement(ADD_USER_INFO);
+            int userInfoId = IDGenerator.getNextID(connection,"UserInfo");
+            pstmt.setLong(1, userInfoId);
+            pstmt.setString(2, StringUtils.hash(serialNumber));
+            pstmt.execute();
+            
+            pstmt = connection.prepareStatement(ADD_USER);
             pstmt.setLong(1, LoginSession.user.getId());
-            
-    		if(log.isDebugEnabled()) log.debug("userNameText:"+String.valueOf(userNameText.getText()));	
             pstmt.setString(2, String.valueOf(userNameText.getText()));
-            
-    		if(log.isDebugEnabled()) log.debug("passwordText:"+String.valueOf(passwordText.getPassword()));	
             pstmt.setString(3, StringUtils.hash(String.valueOf(passwordText.getPassword())));
-            
-            pstmt.setString(5, serialNumber);
-            
+            pstmt.setInt(4, userInfoId);
             pstmt.execute();
 
             connection.commit();

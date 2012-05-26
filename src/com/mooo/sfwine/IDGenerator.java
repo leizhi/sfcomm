@@ -57,7 +57,7 @@ public class IDGenerator {
 		return nextId;
 	} // getNextID(String table)
 	
-	public synchronized static int getNextID(String table) {
+	public static int getNextID(String table) {
 		return getNextID(null,table);
 	}
 	
@@ -101,7 +101,7 @@ public class IDGenerator {
 		return id;
 	}
 	
-	public synchronized static int getId(String table,String fieldName,String fieldValue){
+	public static int getId(String table,String fieldName,String fieldValue){
 		return getId( table, fieldName, fieldValue);
 	}
 	
