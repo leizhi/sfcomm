@@ -440,7 +440,7 @@ public class UserAction {
             pstmt.execute();
             
             pstmt = connection.prepareStatement(ADD_USER);
-            pstmt.setLong(1, LoginSession.user.getId());
+            pstmt.setLong(1, IDGenerator.getNextID(connection,"UserInfo"));
             pstmt.setString(2, String.valueOf(userNameText.getText()));
             pstmt.setString(3, StringUtils.hash(String.valueOf(passwordText.getPassword())));
             pstmt.setInt(4, userInfoId);
