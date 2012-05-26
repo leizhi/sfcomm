@@ -5,54 +5,54 @@ package com.mooo.sfwine;
  */
 public class User {
 
-	private Long id;
+	private Integer id;
 	private String name;
 	private String password;
 	private String alias;
 	private String active;
-	private Integer orgId;
-	private boolean allow;
-	
-	public Integer getOrgId() {
-		return orgId;
+	private Integer userInfoId;
+	private Integer branchId;
+	public Integer getId() {
+		return id;
 	}
-	public void setOrgId(Integer orgId) {
-		this.orgId = orgId;
-	}
-	public boolean isAllow() {
-		return allow;
-	}
-	public void setAllow(boolean allow) {
-		this.allow = allow;
-	}
-	public Long getId() {
-	return id;
-	}
-	public void setId(Long cardId) {
-	 this.id = cardId;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 	public String getName() {
-	return name;
+		return name;
 	}
 	public void setName(String name) {
-	 this.name = name;
+		this.name = name;
 	}
 	public String getPassword() {
-	return password;
+		return password;
 	}
 	public void setPassword(String password) {
-	 this.password = password;
+		this.password = password;
 	}
 	public String getAlias() {
-	return alias;
+		return alias;
 	}
 	public void setAlias(String alias) {
-	 this.alias = alias;
+		this.alias = alias;
 	}
 	public String getActive() {
-	return active;
+		return active;
 	}
 	public void setActive(String active) {
-	 this.active = active;
+		this.active = active;
 	}
+	public Integer getUserInfoId() {
+		return userInfoId;
+	}
+	public void setUserInfoId(Integer userInfoId) {
+		this.userInfoId = userInfoId;
+	}
+	public Integer getBranchId() {
+		return branchId;
+	}
+	public void setBranchId(Integer branchId) {
+		this.branchId = branchId;
+	}
+	
 }

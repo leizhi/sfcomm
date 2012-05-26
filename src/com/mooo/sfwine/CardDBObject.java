@@ -19,47 +19,13 @@ public class CardDBObject {
 	
 	private static SimpleDateFormat dformat = new SimpleDateFormat("yyMMdd");
 
-	//commons SQL
 	private static final String FIND_CARD="SELECT count(*) FROM Card WHERE uuid=?";
 
-	private static final String SELECT_MAX_BY_TABLE="SELECT MAX(ID) maxid FROM ";
-	
 	private static final String SELECT_MAX_BY_LIKE="SELECT MAX(rfidcode) nowCode FROM Card WHERE rfidcode LIKE ?";
 	
 	//Card
-	private static final String ADD_CARD="INSERT INTO Card(id,operationDate,rfidcode,operatorId,uuid,org_id,jobTypeId,mode) VALUES(?,?,?,?,?,?,1,'未激活')";
+	private static final String ADD_CARD="INSERT INTO Card(id,operatorId,cardDate,rfidcode,uuid) VALUES(?,?,?,?,?)";
 
-	public static int getNextID(String table) {
-		
-		Connection connection=null;
-        PreparedStatement pstmt = null;
-        int nextId=0;
-        try {
-			connection = DbConnectionManager.getConnection();
-            pstmt = connection.prepareStatement(SELECT_MAX_BY_TABLE+table);
-            
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-            	nextId = rs.getInt("maxid");
-            }
-            
-            nextId ++;
-		}catch (SQLException e) {
-			e.printStackTrace();
-	   }finally {
-			try {
-				if(pstmt != null)
-					pstmt.close();
-				if(connection != null)
-					connection.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			
-		}
-		return nextId;
-	}
-	
 	public String nextId(String zipCode) {
 		String nextCode=null;
 		
@@ -123,76 +89,6 @@ public class CardDBObject {
 		return nextCode;
 	}
 	
-	public int getId(String table,String fieldName,String fieldValue){
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		int id = 0;
-		String sql = "SELECT id FROM "+table+" WHERE "+fieldName+"=?";
-		try{
-			conn = DbConnectionManager.getConnection();
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, fieldValue);
-			
-			ResultSet result = pstmt.executeQuery();
-			if(result.next()){
-				id = result.getInt(1);
-			}
-		} catch (Exception e) {
-			System.out.println("Exception="+e.getMessage());
-		}finally{
-
-			try {
-				pstmt.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-
-			try {
-				conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		return id;
-	}
-	public boolean find(String table,String fieldName,String fieldValue){
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		int count = 0;
-		String sql = "SELECT count(*) FROM "+table+" WHERE "+fieldName+"=?";
-		try{
-			conn = DbConnectionManager.getConnection();
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, fieldValue);
-			
-			ResultSet result = pstmt.executeQuery();
-			if(result.next()){
-				count = result.getInt(1);
-			}
-		} catch (Exception e) {
-			System.out.println("Exception="+e.getMessage());
-		}finally{
-
-			try {
-				pstmt.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-
-			try {
-				conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		if(count > 0)
-			return true;
-		
-		return false;
-	}
-	
 	public boolean isRegistr(Card card){
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -237,13 +133,12 @@ public class CardDBObject {
 			conn.setAutoCommit(false);
 			
 			pstmt = conn.prepareStatement(ADD_CARD);
-			long cardId = getNextID("Card");
+			long cardId = IDGenerator.getNextID(conn,"Card");
 			pstmt.setLong(1, cardId);
-			pstmt.setTimestamp(2,new Timestamp(new Date().getTime()));
-			pstmt.setString(3, card.getRfidcode());
-			pstmt.setLong(4, LoginSession.user.getId());
+			pstmt.setLong(2, LoginSession.user.getId());
+			pstmt.setTimestamp(3,new Timestamp(new Date().getTime()));
+			pstmt.setString(4, card.getRfidcode());
 			pstmt.setString(5, card.getUuid());
-			pstmt.setLong(6, LoginSession.user.getOrgId());
 			pstmt.execute();
 			
 			conn.commit();

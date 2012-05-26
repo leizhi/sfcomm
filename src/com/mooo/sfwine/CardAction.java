@@ -214,7 +214,6 @@ public class CardAction {
 	}
 
 	public void fillCard() {
-		card.setOrgId(LoginSession.user.getOrgId());
 		card.setCardType(cardType.getSelectedItem().toString());
 		card.setZipCode(zipCodeText.getText().trim());
 	}

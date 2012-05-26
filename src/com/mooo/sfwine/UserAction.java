@@ -38,16 +38,13 @@ public class UserAction {
 	 */
 	private static Log log = LogFactory.getLog(UserAction.class);
 	
-//	private static final String LOGIN_USER="select USER_ID,MANAGEMENT_ORGANIZATION_ID  from  T_User where   name=? AND password=?";
+	private static final String REISTER_USER="INSERT INTO User() VALUES()";
 
-	private static final String REISTER_USER="INSERT INTO T_User(CREATE_USER_ID,name,password,MANAGEMENT_ORGANIZATION_ID,USER_STATUS,INPUT_DATE,SYSTEM_FLAG,UUID) VALUES(?,?,?,?,'有效',getDate(),0,?)";
+	private static final String EXISTS_USER="SELECT count(*) FROM User WHERE name=?";
 
-	private static final String EXISTS_USER="SELECT count(*) FROM T_User WHERE name=?";
+	private static final String EXISTS_CARD="SELECT count(*) FROM User WHERE uuid=?";
 
-	private static final String EXISTS_CARD="SELECT count(*) FROM T_User WHERE uuid=?";
-
-	private static final String LOGIN="select USER_ID,MANAGEMENT_ORGANIZATION_ID  from  T_User where   name=? AND password=?";
-
+	private static final String LOGIN="SELECT id  FROM  User where   name=? AND password=?";
 	
 	private JLabel disLabel;
 	private JTextField userNameText;
@@ -202,8 +199,7 @@ public class UserAction {
 
             rs = pstmt.executeQuery();
             while (rs.next()) {
-            	LoginSession.user.setId(rs.getLong(1));
-            	LoginSession.user.setOrgId(rs.getInt(2));
+            	LoginSession.user.setId(rs.getInt(1));
             	
             	count=1;
             }
@@ -442,9 +438,6 @@ public class UserAction {
             
     		if(log.isDebugEnabled()) log.debug("passwordText:"+String.valueOf(passwordText.getPassword()));	
             pstmt.setString(3, StringUtils.hash(String.valueOf(passwordText.getPassword())));
-            
-    		if(log.isDebugEnabled()) log.debug("getOrgId:"+LoginSession.user.getOrgId());	
-            pstmt.setInt(4, LoginSession.user.getOrgId());
             
             pstmt.setString(5, serialNumber);
             
