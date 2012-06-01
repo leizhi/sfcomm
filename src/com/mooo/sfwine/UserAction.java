@@ -3,14 +3,7 @@ package com.mooo.sfwine;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.BindException;
-import java.net.ConnectException;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -107,7 +100,7 @@ public class UserAction {
 		bodyPanel.add(passwordText);
 		
 		y += hight;
-		if(isOpenNetwork()){
+		if(LoginSession.isOpenNetwork()){
 			disLabel = new JLabel("网络正常");
 			disLabel.setForeground(Color.GREEN);
 		}else{
@@ -300,7 +293,7 @@ public class UserAction {
 		
 		y += hight;
 		
-		if(isOpenNetwork()){
+		if(LoginSession.isOpenNetwork()){
 			disLabel = new JLabel("网络正常");
 			disLabel.setForeground(Color.GREEN);
 		}else{
@@ -490,29 +483,5 @@ public class UserAction {
 			cardRFID.destroy();
 		}
         promptRegister();
-	}
-	
-	public boolean isOpenNetwork(){
-		try{
-			Socket socket = new Socket("122.225.88.83", 1433);
-			socket.setSoTimeout(50);
-			socket.close();
-			
-			return true;
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (SocketTimeoutException e) {
-			e.printStackTrace();
-		}catch (BindException e) {
-			e.printStackTrace();
-		}catch (ConnectException e) {
-			e.printStackTrace();
-		}catch (SocketException e) {
-			e.printStackTrace();
-		}catch (IOException e) {
-			e.printStackTrace();
-
-		}
-		return false;
 	}
 }

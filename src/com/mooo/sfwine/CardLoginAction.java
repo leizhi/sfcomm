@@ -1,14 +1,7 @@
 package com.mooo.sfwine;
 
 import java.awt.Color;
-import java.io.IOException;
-import java.net.BindException;
-import java.net.ConnectException;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.net.UnknownHostException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -72,7 +65,7 @@ public class CardLoginAction {
 		bodyPanel.add(progressBar);
 		
 		y += hight;
-		if(isOpenNetwork()){
+		if(LoginSession.isOpenNetwork()){
 			disLabel = new JLabel("网络正常");
 			disLabel.setForeground(Color.GREEN);
 		}else{
@@ -107,30 +100,6 @@ public class CardLoginAction {
 		loopCard.start();
 		
 		if(log.isDebugEnabled()) log.debug("unLock end");
-	}
-	
-	public boolean isOpenNetwork(){
-		try{
-			Socket socket = new Socket("122.225.88.83", 1433);
-			socket.setSoTimeout(50);
-			socket.close();
-			
-			return true;
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (SocketTimeoutException e) {
-			e.printStackTrace();
-		}catch (BindException e) {
-			e.printStackTrace();
-		}catch (ConnectException e) {
-			e.printStackTrace();
-		}catch (SocketException e) {
-			e.printStackTrace();
-		}catch (IOException e) {
-			e.printStackTrace();
-
-		}
-		return false;
 	}
 	
 	 class CardProcessLogin implements Runnable {

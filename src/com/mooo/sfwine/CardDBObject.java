@@ -26,18 +26,20 @@ public class CardDBObject {
 	//Card
 	private static final String ADD_CARD="INSERT INTO Card(id,operatorId,cardDate,rfidcode,uuid) VALUES(?,?,?,?,?)";
 
-	public String nextId(String zipCode) {
+	public String nextId(String wineryCode) {
 		String nextCode=null;
 		
-		if(zipCode==null || zipCode.length()!=6)
-			zipCode="000000";
+		if(wineryCode==null || wineryCode.length()!=6)
+			wineryCode="000000";
 		
+		wineryCode = IDGenerator.getKey(wineryCode);
+				
 		String nowDate = dformat.format(Calendar.getInstance().getTime());
 		
 		if(nowDate==null || nowDate.length()!=6)
 			nowDate="000000";
 		
-		String prefix = zipCode+nowDate;
+		String prefix = wineryCode+nowDate;
 		
 		String nextNumber = "0000";
 		

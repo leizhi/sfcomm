@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -15,7 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.RowSorter;
 import javax.swing.table.TableRowSorter;
 
@@ -23,8 +23,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.mooo.mycoz.common.StringUtils;
-import com.mooo.swing.LimitDocument;
-
 import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 
 public class CardAction {
@@ -38,7 +36,7 @@ public class CardAction {
 
 	private JLabel disLabel;
 	
-	private JTextField zipCodeText;
+	private JComboBox winery;
 	private JComboBox cardType;
 	
 	private Card card;
@@ -100,7 +98,29 @@ public class CardAction {
 		
 		y += hight;
 		
-		disLabel = new JLabel("酒厂邮编:");
+		disLabel = new JLabel("酒厂:");
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(disLabel);
+		
+		winery = new JComboBox();
+		winery.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		List<String> items = IDGenerator.getWineryValues();
+		for(String value:items){
+			winery.addItem(value);
+		}
+		bodyPanel.add(winery);
+		
+		display = " * 发标签到酒厂";
+		disLabel = new JLabel(display);
+		disLabel.setForeground(fg);
+		disLabel.setBounds(x+width+width_1,y,10*display.length(),hight);
+		disLabel.setForeground(Color.RED);
+		bodyPanel.add(disLabel);
+		
+		y += hight;
+		
+		disLabel = new JLabel("标签类型:");
 		disLabel.setForeground(fg);
 		disLabel.setBounds(x,y,width,hight);
 		bodyPanel.add(disLabel);
@@ -110,27 +130,6 @@ public class CardAction {
 		cardType.addItem("铅封标签");
 		cardType.addItem("纸质标签");
 		bodyPanel.add(cardType);
-
-		y += hight;
-		
-		disLabel = new JLabel("酒厂邮编:");
-		disLabel.setForeground(fg);
-		disLabel.setBounds(x,y,width,hight);
-		bodyPanel.add(disLabel);
-		
-		if(zipCodeText==null){
-			zipCodeText = new JTextField();
-			zipCodeText.setBounds(x+width,y,48,hight);//一个字符9 point
-			zipCodeText.setDocument(new LimitDocument(6));
-		}
-		bodyPanel.add(zipCodeText);
-
-		display = " * 6位数字编号";
-		disLabel = new JLabel(display);
-		disLabel.setForeground(fg);
-		disLabel.setBounds(x+width+width_1,y,10*display.length(),hight);
-		disLabel.setForeground(Color.RED);
-		bodyPanel.add(disLabel);
 		
 		if(!StringUtils.isNull(message)){
 			y += hight;
@@ -215,7 +214,7 @@ public class CardAction {
 
 	public void fillCard() {
 		card.setCardType(cardType.getSelectedItem().toString());
-		card.setZipCode(zipCodeText.getText().trim());
+		card.setWinery(winery.getSelectedItem().toString());
 	}
 	
 	public void listCard() {
@@ -341,7 +340,7 @@ public class CardAction {
 							continue;
 						}
 						
-						card.setRfidcode(dbObjcet.nextId(card.getZipCode()));
+						card.setRfidcode(dbObjcet.nextId(card.getWinery()));
 						
 						try{
 						cardRFID.save(card);

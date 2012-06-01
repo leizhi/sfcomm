@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.mooo.mycoz.db.pool.DbConnectionManager;
 
@@ -142,4 +144,72 @@ public class IDGenerator {
 		return false;
 	}
 
+	/*
+	 * getValues
+	 */
+	public synchronized static List<String> getWineryValues() {
+		
+		Connection connection=null;
+        PreparedStatement pstmt = null;
+        List<String> values = new ArrayList<String>();
+        try {
+        	String sql = "SELECT definition FROM Winery ORDER BY id";
+        	
+			connection = DbConnectionManager.getConnection();
+            pstmt = connection.prepareStatement(sql);
+            
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+            	values.add(rs.getString(1));
+            }
+		}catch (SQLException e) {
+			e.printStackTrace();
+	   }finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(connection != null)
+					connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+		}
+        return values;
+	}
+	
+	/*
+	 * getValues
+	 */
+	public synchronized static String getKey(String value) {
+		
+		Connection connection=null;
+        PreparedStatement pstmt = null;
+        String result = null;
+        try {
+        	String sql = "SELECT abbreviation FROM Winery WHERE definition=?";
+        	
+			connection = DbConnectionManager.getConnection();
+            pstmt = connection.prepareStatement(sql);
+            pstmt.setString(1, value);
+            
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+            	result = rs.getString(1);
+            }
+		}catch (SQLException e) {
+			e.printStackTrace();
+	   }finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(connection != null)
+					connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+		}
+        return result;
+	}
 }
