@@ -3,6 +3,8 @@ package es.deusto.smartlab.rfid.iso14443a;
 import java.util.ArrayList;
 
 import com.mooo.mycoz.common.StringUtils;
+import com.mooo.sfwine.ISO14443AAction;
+
 import es.deusto.smartlab.rfid.SerialManager;
 import es.deusto.smartlab.rfid.ISO14443A;
 /**
@@ -19,6 +21,7 @@ public class ImplementationISO14443A implements ISO14443A{
 	 */
 	public ImplementationISO14443A() {
 		serialManager = new SerialManager();
+		serialManager.openPort(ISO14443AAction.whichPort, ISO14443AAction.whichSpeed);
 	}
 
 	public boolean isOpened() {

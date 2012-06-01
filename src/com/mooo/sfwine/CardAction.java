@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.net.URL;
 import java.util.List;
 import java.util.Vector;
@@ -23,6 +25,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.mooo.mycoz.common.StringUtils;
+
+import es.deusto.smartlab.rfid.SerialManager;
 import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 
 public class CardAction {
@@ -38,7 +42,8 @@ public class CardAction {
 	
 	private JComboBox winery;
 	private JComboBox cardType;
-	
+	private JComboBox whichPort;
+
 	private Card card;
 
 	private JPanel bodyPanel;
@@ -130,6 +135,31 @@ public class CardAction {
 		cardType.addItem("铅封标签");
 		cardType.addItem("纸质标签");
 		bodyPanel.add(cardType);
+		
+		y += hight;
+		
+		disLabel = new JLabel("串口端口:");
+		disLabel.setBounds(x,y,width,hight);
+		disLabel.setForeground(Color.WHITE);
+		bodyPanel.add(disLabel);
+		
+		whichPort = new JComboBox();
+		whichPort.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		List<String> ports = new SerialManager().getPorts();
+		for(String value:ports){
+			whichPort.addItem(value);
+		}
+		bodyPanel.add(whichPort);
+		
+		whichPort.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				System.out.println("Item=" + e.getItem());
+				System.out.println("StateChange=" + e.getStateChange());
+				ISO14443AAction.whichPort=e.getItem().toString();
+			}
+		});
 		
 		if(!StringUtils.isNull(message)){
 			y += hight;
@@ -274,6 +304,8 @@ public class CardAction {
 		 @Override
 		public void run(){
 				ISO14443AAction cardRFID = new ISO14443AAction();
+				ISO14443AAction.whichPort=whichPort.getSelectedItem().toString();
+
 				try {
 					//初始化
 					cardRFID.initialize();

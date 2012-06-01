@@ -4,6 +4,10 @@ import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 import es.deusto.smartlab.rfid.iso14443a.ImplementationISO14443A;
 
 public class ISO14443AAction extends ImplementationISO14443A{
+	public static String whichPort="/dev/ttyUSB0";
+	
+	public static int whichSpeed=9600;
+	
 	private final int BLOCK_SIZE = 4;
 
 	private byte[] password = {(byte) 0xFF,(byte) 0xFF,(byte) 0xFF,(byte) 0xFF,(byte) 0xFF,(byte) 0xFF};
