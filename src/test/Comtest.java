@@ -12,10 +12,10 @@ public class Comtest {
 			CommPortIdentifier portId = null;
 			while (en.hasMoreElements()) {
 				portId = (CommPortIdentifier) en.nextElement();
-				System.out.println("coms :" + portId.getName());
+//				System.out.println("coms :" + portId.getName());
 				
 				if (portId.getPortType() == CommPortIdentifier.PORT_SERIAL) {
-					System.out.println(portId.getName());
+					System.out.println("PORT_SERIAL coms :" + portId.getName());
 				}
 			}
 		} catch (Exception e) {

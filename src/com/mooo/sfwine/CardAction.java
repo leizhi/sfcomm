@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.List;
 import java.util.Vector;
@@ -19,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.RowSorter;
+import javax.swing.SwingUtilities;
 import javax.swing.table.TableRowSorter;
 
 import org.apache.commons.logging.Log;
@@ -32,7 +34,7 @@ import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 public class CardAction {
 	private static Log log = LogFactory.getLog(CardAction.class);
 
-	private boolean forever = false;
+	private boolean runEnable = false;
 	
 	private Color fg = Color.WHITE;
 	
@@ -40,6 +42,8 @@ public class CardAction {
 
 	private JLabel disLabel;
 	
+	private JLabel messageLabel;
+
 	private JComboBox winery;
 	private JComboBox cardType;
 	private JComboBox whichPort;
@@ -49,20 +53,14 @@ public class CardAction {
 	private JPanel bodyPanel;
 	private String message;
 	
-	private Thread loopCard;
-
 	public CardAction(JPanel bodyPanel) {
 		this.bodyPanel = bodyPanel;
 		this.message = null;
-		
-		loopCard = new Thread(new CardProcessRegister());
 	}
 	
 	public CardAction(JPanel bodyPanel,String message) {
 		this.bodyPanel = bodyPanel;
 		this.message = message;
-		
-		loopCard = new Thread(new CardProcessRegister());
 	}
 	
 	public void promptNewWineCard() {
@@ -145,6 +143,8 @@ public class CardAction {
 		
 		whichPort = new JComboBox();
 		whichPort.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		whichPort.setSelectedItem(whichPort.getSelectedItem());
+		
 		List<String> ports = new SerialManager().getPorts();
 		for(String value:ports){
 			whichPort.addItem(value);
@@ -161,14 +161,13 @@ public class CardAction {
 			}
 		});
 		
-		if(!StringUtils.isNull(message)){
-			y += hight;
-			
-			disLabel = new JLabel(message);
-			disLabel.setForeground(Color.RED);
-			disLabel.setBounds(x,y,message.length()*20,hight);
-			bodyPanel.add(disLabel);
-		}
+		y += hight;
+		
+		messageLabel= new JLabel();
+		messageLabel.setText("请启动发卡");
+		messageLabel.setForeground(Color.RED);
+		messageLabel.setBounds(x,y,20*20,hight);
+		bodyPanel.add(messageLabel);
 		
 		y += hight;
 		
@@ -180,9 +179,8 @@ public class CardAction {
 
 		start.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					if(!loopCard.isAlive() && forever==false){
-						forever = true;
-						loopCard.start();
+					if(!runEnable){
+						new Thread (new CardProcessRegister(messageLabel)).start();
 					}
 				}
 			});
@@ -201,7 +199,10 @@ public class CardAction {
 
 		stop.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					forever=false;
+					runEnable=false;
+					
+					message = "发卡停止..";
+					messageLabel.setText(message);
 				}
 			});
 		bodyPanel.add(stop);
@@ -209,6 +210,7 @@ public class CardAction {
 		bodyPanel.setVisible(true);
 		bodyPanel.validate();//显示
 		bodyPanel.repaint();
+		
 		//设置背景图片
 		URL url = SFWine.class.getResource("bg1.png");
 		ImageIcon img = new ImageIcon(url);
@@ -291,128 +293,138 @@ public class CardAction {
 		bodyPanel.validate();//显示
 		bodyPanel.repaint();
 		//设置背景图片
-		  URL url = SFWine.class.getResource("bg1.png");
-	        ImageIcon img = new ImageIcon(url);
-	        JLabel background = new JLabel(img);
-	        bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
-	        background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
+		URL url = SFWine.class.getResource("bg1.png");
+		ImageIcon img = new ImageIcon(url);
+		JLabel background = new JLabel(img);
+		bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+		background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
 		if(log.isDebugEnabled()) log.debug("listCard end");
 	}
 	
 	 class CardProcessRegister implements Runnable {
+		 
+			private JLabel messageLabel;
+			
+			CardProcessRegister(JLabel messageLabel){
+				this.messageLabel=messageLabel;
+				ISO14443AAction.whichPort = whichPort.getSelectedItem().toString();
+			}		
+			
+			public void run(){
+				Runnable runner = new Runnable() {
+						public void run() {
+							ISO14443AAction cardRFID = new ISO14443AAction();
+							try {
+								//初始化
+								cardRFID.initialize();
+								
+								//请正确连接发卡器
+								if(!cardRFID.isOpened()){
+									throw new NullPointerException("发卡器未连接或者端口选择错误!");
+								}
+									
+								if (log.isDebugEnabled()) log.debug("连接发卡器 okay:");
 
-		 @Override
-		public void run(){
-				ISO14443AAction cardRFID = new ISO14443AAction();
-				ISO14443AAction.whichPort=whichPort.getSelectedItem().toString();
+								//请放人电子标签或者电子卡
+								String serialNumber = cardRFID.findSerialNumber();
+								if(serialNumber == null){
+//									Thread.sleep(37);
+									throw new NullPointerException("请放人电子标签或者电子卡!");
+								}
+								if (log.isDebugEnabled()) log.debug("卡片 okay:");
+								
+								int cardType = cardRFID.findCardType();
+								if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
+								if (log.isDebugEnabled()) log.debug("M1 Card is:"+CommandsISO14443A.CARD_14443A_M1);
+								if (log.isDebugEnabled()) log.debug("UL Card is:"+CommandsISO14443A.CARD_14443A_UL);
 
-				try {
-					//初始化
-					cardRFID.initialize();
-					
-					//初始化检查
-					LoginSession.staffSignal = true;
+								if(cardType!=CommandsISO14443A.CARD_14443A_UL){
+//									Thread.sleep(100);
+									throw new NullPointerException("此卡非标签卡!");
+								}
+									
+								card = new Card();
+								fillCard();
+								card.setUuid(StringUtils.hash(serialNumber));
+								
+								if (log.isDebugEnabled()) log.debug("uuid:"+card.getUuid());
+
+								CardDBObject dbObjcet = new CardDBObject();
+
+								if (dbObjcet.isRegistr(card)){
+									throw new NullPointerException("卡片已经使用,请换新卡!");
+								}
+								
+								if (log.isDebugEnabled()) log.debug("Winery:"+card.getWinery());
+
+								if (log.isDebugEnabled()) log.debug("Rfidcode:"+dbObjcet.nextId(card.getWinery()));
+
+								card.setRfidcode(dbObjcet.nextId(card.getWinery()));
+									
+								cardRFID.save(card);
+								
+								if (log.isDebugEnabled()) log.debug("RFID save card");
+
+								dbObjcet.save(card);
+								
+								if (log.isDebugEnabled()) log.debug("DB save card");
+
+								message = "发卡成功";
+								messageLabel.setText(message);
+								
+							}  catch (NullPointerException e){
+								if (log.isErrorEnabled()) log.error("NullPointerException:" + e.getMessage());
+
+								message = e.getMessage();
+								messageLabel.setText(message);
+								
+								e.printStackTrace();
+							}  catch (CardException e){
+								if (log.isErrorEnabled()) log.error("CardException:" + e.getMessage());
+
+								message = e.getMessage();
+								messageLabel.setText(message);
+								
+								e.printStackTrace();
+							} catch (Exception e) {
+								if (log.isErrorEnabled()) log.error("Exception:" + e.getMessage());
+								message = e.getMessage();
+								messageLabel.setText(message);
+								
+								e.printStackTrace();
+							} finally {
+								cardRFID.beep(10);
+								cardRFID.destroy();
+							}
+						}
+					};
 					
 					//do while
-					forever = true;
-					while(forever){
-						if (log.isDebugEnabled()) log.debug("staffSignal:"+LoginSession.staffSignal);
-
-						if(LoginSession.staffSignal==false){
-							forever = false;
-							continue;
-						}
-						
-						//请正确连接发卡器
-						if(!cardRFID.isOpened()){
-							message = "请正确连接发卡器!";
-							promptNewWineCard();
+					runEnable = true;
+					while(runEnable){
+						try {
+							message = "发卡处理";
+							messageLabel.setText(message);
 							
-							Thread.sleep(100);
-							continue;
-						}
-						
-						if (log.isDebugEnabled()) log.debug("连接发卡器 okay:");
-
-						//请放人电子标签或者电子卡
-						String serialNumber = cardRFID.findSerialNumber();
-						if(serialNumber == null){
-							if (log.isDebugEnabled()) log.debug("请放人电子标签或者电子卡");
-							message = "请放人电子标签或者电子卡!";
-							promptNewWineCard();
-							
-							Thread.sleep(37);
-							continue;
-						}
-						if (log.isDebugEnabled()) log.debug("卡片 okay:");
-						
-						int cardType = cardRFID.findCardType();
-						if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
-						if (log.isDebugEnabled()) log.debug("falt card:"+CommandsISO14443A.CARD_14443A_M1);
-						
-						if(cardType!=CommandsISO14443A.CARD_14443A_UL){
-            				message = "此卡非标签卡!";
-							promptNewWineCard();
-							
-							Thread.sleep(100);
-							continue;
-						}
-						
-						card = new Card();
-						fillCard();
-						card.setUuid(StringUtils.hash(serialNumber));
-						
-						CardDBObject dbObjcet = new CardDBObject();
-
-						if (dbObjcet.isRegistr(card)){
-							message = "卡片已经使用,请换新卡!";
-							promptNewWineCard();
-							
-							Thread.sleep(100);
-							continue;
-						}
-						
-						card.setRfidcode(dbObjcet.nextId(card.getWinery()));
-						
-						try{
-						cardRFID.save(card);
-						
-						dbObjcet.save(card);
-						
-						cardRFID.beep(10);
-						} catch (CardException e) {
-							if (log.isErrorEnabled()) log.error("Exception:" + e.getMessage());
+							SwingUtilities.invokeAndWait(runner);
+							// Our task for each step is to just sleep
+							//Sleep 500 ms
+							Thread.sleep(500);
+						} catch (InterruptedException e) {
 							e.printStackTrace();
-							
-							message = e.getMessage();
-							promptNewWineCard();
-							
-							Thread.sleep(100);
-							continue;
+						} catch (InvocationTargetException e) {
+							e.printStackTrace();
 						}
-						
-						message = "发卡成功";
-						
-						promptNewWineCard();
-						
-						Thread.sleep(500);
-//						break;
 					}
-				} catch (Exception e) {
-					if (log.isErrorEnabled()) log.error("Exception:" + e.getMessage());
-					message = e.getMessage();
-					e.printStackTrace();
-				}
-				
-				//check database
-				if(LoginSession.staffSignal){
-					if(LoginSession.allow)
-						new CardAction(bodyPanel).promptNewWineCard();
-				}
-				
-				cardRFID.beep(10);
-				cardRFID.destroy();
-				if (log.isDebugEnabled()) log.debug("run finlsh!"+LoginSession.staffSignal);
+					/*
+					//Authority verification
+					if(LoginSession.staffSignal){
+						if(LoginSession.allow)
+							promptNewWineCard();
+					}
+					if (log.isDebugEnabled()) log.debug("run finlsh!"+LoginSession.staffSignal);
+					
+					*/
 			}
 		}
 }

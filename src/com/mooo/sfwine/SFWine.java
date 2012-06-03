@@ -69,6 +69,8 @@ public class SFWine {
 		bodyPanel.setBackground(bg);
 		bodyPanel.setForeground(fg);
 		bodyPanel.setBorder(BorderFactory.createLineBorder(bg));
+		
+		
 		//设置背景图片
         URL url = SFWine.class.getResource("bg.png");
         ImageIcon img = new ImageIcon(url);
@@ -127,9 +129,10 @@ public class SFWine {
 			}
 		});
 		
-		frame.setResizable(false);//缩放
-		frame.setVisible(true);//显示
+		frame.setResizable(false);//缩放	
+		frame.setVisible(true);// 显示
 		frame.repaint();
+		frame.validate();
 		
 		if(log.isErrorEnabled()) log.debug("init end");
 	}

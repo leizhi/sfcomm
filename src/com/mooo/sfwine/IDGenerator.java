@@ -7,10 +7,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.mooo.mycoz.db.pool.DbConnectionManager;
 
 public class IDGenerator {
 	
+	private static Log log = LogFactory.getLog(IDGenerator.class);
+
 	//commons SQL
 
 	private static final String SELECT_MAX_BY_TABLE="SELECT MAX(id) maxid FROM ";
@@ -67,23 +72,43 @@ public class IDGenerator {
 		boolean notConn = false;
 		PreparedStatement pstmt = null;
 		int id = -1;
+		
+		if (log.isDebugEnabled()) log.debug("OKAY:");
+
 		String sql = "SELECT id FROM "+table+" WHERE "+fieldName+"=?";
 		try{
+			if (log.isDebugEnabled()) log.debug("OKAY:");
+
         	if(connection==null){
         		notConn = true;
-        		DbConnectionManager.getConnection();
+        		connection=DbConnectionManager.getConnection();
         	}
         	
+			if (log.isDebugEnabled()) log.debug("OKAY:");
+
+			if (log.isDebugEnabled()) log.debug("sql:"+sql);
+
 			pstmt = connection.prepareStatement(sql);
+			if (log.isDebugEnabled()) log.debug("fieldValue:"+fieldValue);
+
 			pstmt.setString(1, fieldValue);
 			
+			if (log.isDebugEnabled()) log.debug("OKAY:");
+
 			System.out.println("sql:"+sql);
 
 			ResultSet result = pstmt.executeQuery();
+			
+			if (log.isDebugEnabled()) log.debug("OKAY:");
+
 			if(result.next()){
 				id = result.getInt(1);
 			}
+			if (log.isDebugEnabled()) log.debug("OKAY:");
+
 		} catch (Exception e) {
+			if (log.isErrorEnabled()) log.error("Exception:"+e.getMessage());
+//			log.error("Exception:"+e.getMessage());
 			System.out.println("Exception="+e.getMessage());
 		}finally{
 
@@ -104,7 +129,7 @@ public class IDGenerator {
 	}
 	
 	public static int getId(String table,String fieldName,String fieldValue){
-		return getId( table, fieldName, fieldValue);
+		return getId(null,table, fieldName, fieldValue);
 	}
 	
 	public synchronized static boolean find(String table,String fieldName,String fieldValue){
@@ -211,5 +236,49 @@ public class IDGenerator {
 			
 		}
         return result;
+	}
+	
+	public synchronized static int getBranchId(Connection connection,String table,int value){
+		boolean notConn = false;
+		PreparedStatement pstmt = null;
+		int branchId = -1;
+		String sql = "SELECT branchId FROM "+table+" WHERE id=?";
+		try{
+        	if(connection==null){
+        		notConn = true;
+        		connection=DbConnectionManager.getConnection();
+        	}
+        	
+			pstmt = connection.prepareStatement(sql);
+			pstmt.setInt(1, value);
+			
+			System.out.println("sql:"+sql);
+
+			ResultSet result = pstmt.executeQuery();
+			if(result.next()){
+				branchId = result.getInt(1);
+			}
+		} catch (Exception e) {
+			System.out.println("Exception="+e.getMessage());
+		}finally{
+
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				
+				if(notConn){
+					if(connection != null)
+						connection.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return branchId;
+	}
+	
+	public static int getBranchId(String table,int value){
+		return getBranchId(null, table, value);
 	}
 }

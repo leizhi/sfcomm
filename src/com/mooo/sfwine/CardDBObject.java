@@ -24,16 +24,21 @@ public class CardDBObject {
 	private static final String SELECT_MAX_BY_LIKE="SELECT MAX(rfidcode) nowCode FROM Card WHERE rfidcode LIKE ?";
 	
 	//Card
-	private static final String ADD_CARD="INSERT INTO Card(id,operatorId,cardDate,rfidcode,uuid) VALUES(?,?,?,?,?)";
+	private static final String ADD_CARD="INSERT INTO Card(id,operatorId,cardDate,rfidcode,uuid,wineryId,branchId) VALUES(?,?,?,?,?,?,?)";
 
-	public String nextId(String wineryCode) {
+	public String nextId(String winery) {
 		String nextCode=null;
 		
-		if(wineryCode==null || wineryCode.length()!=6)
+		String wineryCode=null;
+		wineryCode = IDGenerator.getKey(winery);
+		if(wineryCode==null || wineryCode.length()>6){
 			wineryCode="000000";
+		}else if(wineryCode.length()>0 && wineryCode.length()<6){
+			for(int i=wineryCode.length();i<6;i++){
+				wineryCode +="0";
+			}
+		}
 		
-		wineryCode = IDGenerator.getKey(wineryCode);
-				
 		String nowDate = dformat.format(Calendar.getInstance().getTime());
 		
 		if(nowDate==null || nowDate.length()!=6)
@@ -128,6 +133,8 @@ public class CardDBObject {
 	}
 	
 	public void save(Card card) throws CardException{
+		if(log.isDebugEnabled()) log.debug("save Card start");
+
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		try{
@@ -141,6 +148,17 @@ public class CardDBObject {
 			pstmt.setTimestamp(3,new Timestamp(new Date().getTime()));
 			pstmt.setString(4, card.getRfidcode());
 			pstmt.setString(5, card.getUuid());
+			
+			if(log.isDebugEnabled()) log.debug("Winery="+card.getWinery());
+
+			int wineryId = IDGenerator.getId("Winery", "definition", card.getWinery());
+			
+			pstmt.setInt(6, wineryId);
+			if(log.isDebugEnabled()) log.debug("okay");
+
+			pstmt.setInt(7, IDGenerator.getBranchId("Winery", wineryId));//branchId
+			if(log.isDebugEnabled()) log.debug("okay");
+
 			pstmt.execute();
 			
 			conn.commit();

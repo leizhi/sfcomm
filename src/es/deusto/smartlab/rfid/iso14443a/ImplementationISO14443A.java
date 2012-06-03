@@ -1,7 +1,5 @@
 package es.deusto.smartlab.rfid.iso14443a;
 
-import java.util.ArrayList;
-
 import com.mooo.mycoz.common.StringUtils;
 import com.mooo.sfwine.ISO14443AAction;
 
@@ -21,7 +19,6 @@ public class ImplementationISO14443A implements ISO14443A{
 	 */
 	public ImplementationISO14443A() {
 		serialManager = new SerialManager();
-		serialManager.openPort(ISO14443AAction.whichPort, ISO14443AAction.whichSpeed);
 	}
 
 	public boolean isOpened() {
@@ -35,7 +32,6 @@ public class ImplementationISO14443A implements ISO14443A{
 	 * @return Returns success if a RFID kit was successfully initialized.
 	 */
 	public boolean initialize() {
-//		boolean opened = false;
 		if (port != null) {
 			if (serialManager.openPort(port, 9600)) {
 				if (testConnection())
@@ -44,16 +40,11 @@ public class ImplementationISO14443A implements ISO14443A{
 					serialManager.closePort();
 			}
 		} else {
-			ArrayList<String> portsAvailable = new ArrayList<String>();
-			portsAvailable = serialManager.getPorts();
-			for (int i = 0; i < portsAvailable.size(); i++) {
-				if (serialManager.openPort(portsAvailable.get(i).toString(), 9600)) {
-					if (testConnection()) {
-						opened = true;
-						break;
-					} else
-						serialManager.closePort();
-				}
+			if (serialManager.openPort(ISO14443AAction.whichPort, ISO14443AAction.whichSpeed)) {
+				if (testConnection()) {
+					opened = true;
+				} else
+					serialManager.closePort();
 			}
 		}
 		System.out.println(opened);
