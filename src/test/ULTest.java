@@ -74,9 +74,9 @@ public class ULTest {
 		try {
 			//write UL
 //			iccrf.write((byte)0x04,buffer);
-			iccrf.saveUL(buf,4,32);
-			reponse = iccrf.read(4,0);
-			System.out.println("1,1"+reponse);
+//			iccrf.saveUL(buf,4,32);
+//			reponse = iccrf.read(4,0);
+//			System.out.println("1,1"+reponse);
 			
 			//write M1
 //			iccrf.loadKey((byte)0x01, password);
@@ -84,16 +84,16 @@ public class ULTest {
 //			
 //			iccrf.write((byte)(1*4 + 1),buf.getBytes("gb2312"));
 					
-//			buf = "sa51";
-//			iccrf.saveM1(buf, 1, 1, 16);
-//			buf = "root";
-//			iccrf.saveM1(buf, 1, 2, 16);
+			buf = "sazc";
+			iccrf.saveM1(buf, 1, 1, 16);
+			buf = "123456";
+			iccrf.saveM1(buf, 1, 2, 16);
 
-//			reponse = iccrf.read(1,1);
-//			System.out.println("1,1"+reponse);
-//
-//			reponse = iccrf.read(1,2);
-//			System.out.println("1,2"+reponse);
+			reponse = iccrf.read(1,1);
+			System.out.println("1,1"+reponse);
+
+			reponse = iccrf.read(1,2);
+			System.out.println("1,2"+reponse);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
