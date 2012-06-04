@@ -1,28 +1,40 @@
 package com.mooo.sfwine;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.List;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.mooo.mycoz.common.StringUtils;
-
+import es.deusto.smartlab.rfid.SerialManager;
 import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 
 public class CardLoginAction {
 	private static Log log = LogFactory.getLog(CardLoginAction.class);
 
 	private JLabel disLabel;
+	
+	private JLabel messageLabel;
+
 	private JProgressBar progressBar;
 	
-	private boolean forever = true;
+	private JComboBox whichPort;
+	
+	private boolean runEnable = false;
 	
 	private JPanel bodyPanel;
 	private String message;
@@ -50,7 +62,7 @@ public class CardLoginAction {
 		x = 400;
 		y = 250;
 		
-		width = 80;
+		width = 90;
 		hight = 20;
 		
 		x += 10;
@@ -65,67 +77,94 @@ public class CardLoginAction {
 		bodyPanel.add(progressBar);
 		
 		y += hight;
-		if(LoginSession.isOpenNetwork()){
-			disLabel = new JLabel("网络正常");
-			disLabel.setForeground(Color.GREEN);
-		}else{
-			disLabel = new JLabel("网络不通");
-			disLabel.setForeground(Color.RED);
-		}
+		
+		disLabel = new JLabel("串口端口:");
 		disLabel.setBounds(x,y,width,hight);
+		disLabel.setForeground(Color.WHITE);
 		bodyPanel.add(disLabel);
 		
-		if(!StringUtils.isNull(message)){
-			y += hight;
-			disLabel = new JLabel(message);
-			disLabel.setForeground(Color.RED);
-			disLabel.setBounds(x,y,width,hight);
-			bodyPanel.add(disLabel);
+		whichPort = new JComboBox();
+		whichPort.setBounds(x+width,y,width,hight);//一个字符9 point
+		whichPort.setSelectedItem(whichPort.getSelectedItem());
+		
+		List<String> ports = new SerialManager().getPorts();
+		for(String value:ports){
+			whichPort.addItem(value);
 		}
+		bodyPanel.add(whichPort);
+		
+		whichPort.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				ISO14443AAction.whichPort=e.getItem().toString();
+			}
+		});
 		
 		y += hight;
+		JButton login = new JButton("登录/退出");
+		login.setBounds(x+width,y,width,hight);
+		login.setForeground(Color.WHITE);
+		login.setBackground(new Color(105,177,35));
+		login.requestFocus();
+
+		login.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if(runEnable){
+						runEnable = false;
+						messageLabel.setText("停止登录");
+						messageLabel.setForeground(Color.GREEN);
+					}else{
+						new Thread (new CardProcessLogin(messageLabel)).start();
+					}
+				}
+			});
+		bodyPanel.add(login);
+		
+		y += hight;
+		
+		messageLabel= new JLabel();
+		
+		if(LoginSession.isOpenNetwork()){
+			messageLabel.setText("网络正常");
+			messageLabel.setForeground(Color.GREEN);
+		}else{
+			messageLabel.setText("网络不通");
+			messageLabel.setForeground(Color.RED);
+		}
+		messageLabel.setBounds(x,y,200,hight);
+		bodyPanel.add(messageLabel);
 		
 		bodyPanel.setVisible(true);
 		bodyPanel.validate();//显示
 		bodyPanel.repaint();
+		
 		//设置背景图片
 		URL url = SFWine.class.getResource("bg.png");
         ImageIcon img = new ImageIcon(url);
         JLabel background = new JLabel(img);
         bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
         background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
-		if(log.isDebugEnabled()) log.debug("initializeGUI end");
-		
-		Thread loopCard = new Thread(new CardProcessLogin());
-		loopCard.start();
-		
-		if(log.isDebugEnabled()) log.debug("unLock end");
 	}
 	
 	 class CardProcessLogin implements Runnable {
-
-		 @Override
+		private JLabel messageLabel;
+		
+		CardProcessLogin(JLabel messageLabel){
+			this.messageLabel=messageLabel;
+		}
+		
 		public void run(){
-				ISO14443AAction cardRFID = new ISO14443AAction();
-				try {
-					//初始化
-					cardRFID.initialize();
-					//初始化检查
-					LoginSession.staffSignal = true;
-					
-					//do while
-					forever = true;
-					while(forever){
-						if (log.isDebugEnabled()) log.debug("staffSignal:"+LoginSession.staffSignal);
-
-						if(LoginSession.staffSignal==false){
-							forever = false;
-							continue;
-						}
+			 Runnable runner = new Runnable() {
+				public void run() {
+					ISO14443AAction cardRFID = new ISO14443AAction();
+					try {
+						//初始化
+						cardRFID.initialize();
+						
 						//请正确连接发卡器
 						if(!cardRFID.isOpened()){
-							Thread.sleep(100);
-							continue;
+							throw new NullPointerException("发卡器未连接或者端口选择错误!");
 						}
 						
 						if (log.isDebugEnabled()) log.debug("连接发卡器 okay:");
@@ -134,19 +173,16 @@ public class CardLoginAction {
 						String serialNumber = cardRFID.findSerialNumber();
 						if(serialNumber == null){
 							if (log.isDebugEnabled()) log.debug("请放人电子标签或者电子卡");
-							Thread.sleep(37);
-							continue;
+							throw new NullPointerException("请放人电子标签或者电子卡!");
 						}
 						if (log.isDebugEnabled()) log.debug("卡片 okay:");
 						
 						int cardType = cardRFID.findCardType();
 						if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
 						if (log.isDebugEnabled()) log.debug("falt card:"+CommandsISO14443A.CARD_14443A_M1);
+						
 						if(cardType!=CommandsISO14443A.CARD_14443A_M1){
-            				JOptionPane.showMessageDialog(SFWine.frame, "此卡非员工卡");
-            				
-							Thread.sleep(100);
-							continue;
+							throw new NullPointerException("此卡非标签卡!");
 						}
 						
 						cardRFID.findSerialNumber();
@@ -159,25 +195,66 @@ public class CardLoginAction {
 						if (log.isDebugEnabled()) log.debug("password:"+password);
 						LoginSession.user.setPassword(password);
 
-						if(LoginSession.isAllow())
-							forever = false;
-						
-						Thread.sleep(500);
-//						break;
+						if(LoginSession.isAllow()){
+							runEnable = false;
+						}else{
+							message = "登录失败!";
+							messageLabel.setText(message);
+							messageLabel.setForeground(Color.RED);
+						}
+					}catch (NullPointerException e){
+							if (log.isErrorEnabled()) log.error("NullPointerException:" + e.getMessage());
+	
+							message = e.getMessage();
+							messageLabel.setText(message);
+							messageLabel.setForeground(Color.RED);
+							
+							e.printStackTrace();
+					} catch (Exception e) {
+							if (log.isErrorEnabled()) log.error("Exception:" + e.getMessage());
+							message = e.getMessage();
+							messageLabel.setText(message);
+							messageLabel.setForeground(Color.RED);
+							
+							e.printStackTrace();
+					} finally {
+							cardRFID.beep(10);
+							cardRFID.destroy();
 					}
-				} catch (Exception e) {
-					if (log.isErrorEnabled()) log.error("Exception:" + e.getMessage());
-					e.printStackTrace();
-				}				
-				//check database
-				if(LoginSession.staffSignal){
+					
+					//check database
 					if(LoginSession.allow)
 						new CardAction(bodyPanel).promptNewWineCard();
-				}
 				
-				cardRFID.beep(10);
-				cardRFID.destroy();
-				if (log.isDebugEnabled()) log.debug("run finlsh!"+LoginSession.staffSignal);
+					if (log.isDebugEnabled()) log.debug("run finlsh!"+LoginSession.staffSignal);
+				}
+			 };
+			
+
+			//do while
+			runEnable = true;
+			LoginSession.staffSignal = true;
+			 if (log.isDebugEnabled()) log.debug("LoginSession.staffSignal:"+LoginSession.staffSignal);
+
+			while(runEnable && LoginSession.staffSignal){
+				try {
+					message = "开始登录";
+					messageLabel.setText(message);
+					messageLabel.setForeground(Color.GREEN);
+					
+					SwingUtilities.invokeAndWait(runner);
+					
+					 if (log.isDebugEnabled()) log.debug("Lookup:");
+
+					// Our task for each step is to just sleep
+					//Sleep 500 ms
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+				}
 			}
 		}
+	 }
 }

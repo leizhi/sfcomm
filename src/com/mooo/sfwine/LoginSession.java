@@ -27,7 +27,8 @@ public class LoginSession {
 		if(!StringUtils.isNull(user.getPassword()))
 			user.setPassword(user.getPassword().trim());
 
-		allow = userAction.processLogin();
+		if(allow = userAction.processLogin())
+			staffSignal=false;
 		
 		return allow;
 	}

@@ -34,6 +34,8 @@ public class ULTest {
 		}
 	}
 	public static void main(String args[]) throws InterruptedException {
+		ISO14443AAction.whichPort="COM3";
+
 		ISO14443AAction iccrf = new ISO14443AAction();
 		iccrf.initialize();
 		

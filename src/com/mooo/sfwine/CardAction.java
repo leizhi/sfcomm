@@ -171,42 +171,29 @@ public class CardAction {
 		
 		y += hight;
 		
-		JButton start = new JButton("启动");
-		start.setBackground(new Color(105,177,35));
-		start.setForeground(fg);
-		start.requestFocus();
-		start.setBounds(x+width,y,execWidth,hight);//一个字符9 point
+		JButton runProcess = new JButton("启动/停止");
+		runProcess.setBackground(new Color(105,177,35));
+		runProcess.setForeground(fg);
+		runProcess.requestFocus();
+		runProcess.setBounds(x+width,y,execWidth,hight);//一个字符9 point
 
-		start.addActionListener( new ActionListener() {
+		runProcess.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					if(!runEnable){
+					if(runEnable){
+						runEnable=false;
+						
+						message = "发卡停止..";
+						messageLabel.setText(message);
+					}else{
 						new Thread (new CardProcessRegister(messageLabel)).start();
 					}
 				}
 			});
 		//为按钮添加键盘适配器
-		start.addKeyListener(new KeyAction());
+		runProcess.addKeyListener(new KeyAction());
 		
-		bodyPanel.add(start);
+		bodyPanel.add(runProcess);
 
-		y += hight;
-		
-		JButton stop = new JButton("停止");
-		stop.setBackground(new Color(105,177,35));
-		stop.setForeground(fg);
-		stop.requestFocus();
-		stop.setBounds(x+width,y,execWidth,hight);//一个字符9 point
-
-		stop.addActionListener( new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					runEnable=false;
-					
-					message = "发卡停止..";
-					messageLabel.setText(message);
-				}
-			});
-		bodyPanel.add(stop);
-		
 		bodyPanel.setVisible(true);
 		bodyPanel.validate();//显示
 		bodyPanel.repaint();
@@ -308,7 +295,7 @@ public class CardAction {
 			CardProcessRegister(JLabel messageLabel){
 				this.messageLabel=messageLabel;
 				ISO14443AAction.whichPort = whichPort.getSelectedItem().toString();
-			}		
+			}	
 			
 			public void run(){
 				Runnable runner = new Runnable() {
