@@ -75,7 +75,7 @@ public class CardAction {
 		}
 		
 		int x, y,width,hight,width_1;
-		int execWidth = 60;
+		int execWidth = 97;
 		
 		x = 340;
 		y = 180;
