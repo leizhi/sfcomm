@@ -3,14 +3,18 @@ package com.mooo.sfwine;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -22,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import com.mooo.mycoz.common.StringUtils;
 import com.mooo.mycoz.db.pool.DbConnectionManager;
 
+import es.deusto.smartlab.rfid.SerialManager;
 import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 
 public class UserAction {
@@ -45,6 +50,7 @@ public class UserAction {
 	private JLabel disLabel;
 	private JTextField userNameText;
 	private JPasswordField passwordText;
+	private JComboBox whichPort;
 	
 	private JPanel bodyPanel;
 	private String message;
@@ -98,6 +104,25 @@ public class UserAction {
 		passwordText = new JPasswordField();
 		passwordText.setBounds(x+width,y,width_1,hight);//一个字符9 point
 		bodyPanel.add(passwordText);
+		
+		y += hight;
+		whichPort = new JComboBox();
+		whichPort.setBounds(x+width,y,width,hight);//一个字符9 point
+		whichPort.setSelectedItem(whichPort.getSelectedItem());
+		
+		List<String> ports = new SerialManager().getPorts();
+		for(String value:ports){
+			whichPort.addItem(value);
+		}
+		bodyPanel.add(whichPort);
+		
+		whichPort.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				ISO14443AAction.whichPort=e.getItem().toString();
+			}
+		});
 		
 		y += hight;
 		if(LoginSession.isOpenNetwork()){
