@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -16,10 +18,16 @@ public class IDGenerator {
 	
 	private static Log log = LogFactory.getLog(IDGenerator.class);
 
+	private static SimpleDateFormat dformat = new SimpleDateFormat("yyMMdd");
+
 	//commons SQL
 
 	private static final String SELECT_MAX_BY_TABLE="SELECT MAX(id) maxid FROM ";
 	
+	private static final String SELECT_MAX_BY_LIKE="SELECT MAX(rfidcode) nowCode FROM Card WHERE rfidcode LIKE ?";
+
+	private static final String FIND_CARD="SELECT count(*) FROM Card WHERE uuid=?";
+
 	public synchronized static int getNextID(Connection connection,String table) {
 		boolean notConn = false;
         PreparedStatement pstmt = null;
@@ -204,7 +212,7 @@ public class IDGenerator {
 	}
 	
 	/*
-	 * getValues
+	 * getKey
 	 */
 	public synchronized static String getKey(String value) {
 		
@@ -280,5 +288,112 @@ public class IDGenerator {
 	
 	public static int getBranchId(String table,int value){
 		return getBranchId(null, table, value);
+	}
+	
+	
+	public synchronized static String nextRfidCode(String winery) {
+		String nextCode=null;
+		
+		String wineryCode=null;
+		wineryCode = getKey(winery);
+		if(wineryCode==null || wineryCode.length()>6){
+			wineryCode="000000";
+		}else if(wineryCode.length()>0 && wineryCode.length()<6){
+			for(int i=wineryCode.length();i<6;i++){
+				wineryCode +="0";
+			}
+		}
+		
+		String nowDate = dformat.format(Calendar.getInstance().getTime());
+		
+		if(nowDate==null || nowDate.length()!=6)
+			nowDate="000000";
+		
+		String prefix = wineryCode+nowDate;
+		
+		String nextNumber = "0000";
+		
+		Connection connection=null;
+        PreparedStatement pstmt = null;
+        try {
+			connection = DbConnectionManager.getConnection();
+            pstmt = connection.prepareStatement(SELECT_MAX_BY_LIKE);
+            pstmt.setString(1, prefix+"%");
+            
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+            	nextCode = rs.getString(1);
+            }
+            
+            if(nextCode!=null && nextCode.length()==16){
+            	nextNumber = nextCode.substring(12);
+            	
+            	int number = new Integer(nextNumber);
+            	
+            	number++;
+            	
+            	if(number<10){
+            		nextNumber = "000"+number;
+            	}else if(number<100){
+            		nextNumber = "00"+number;
+            	}else if(number<1000){
+            		nextNumber = "0"+number;
+            	}else{
+            		nextNumber = ""+number;
+            	}
+            }
+		}catch (SQLException e) {
+			e.printStackTrace();
+	   }finally {
+			try {
+				if(pstmt != null)
+					pstmt.close();
+				if(connection != null)
+					connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+		}
+        
+        nextCode = prefix+nextNumber;
+        
+		return nextCode;
+	}
+	
+	public synchronized static boolean isExistCard(Card card){
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		int count = 0;
+		try{
+			conn = DbConnectionManager.getConnection();
+			pstmt = conn.prepareStatement(FIND_CARD);
+			pstmt.setString(1, card.getUuid());
+			
+			ResultSet result = pstmt.executeQuery();
+			if(result.next()){
+				count = result.getInt(1);
+			}
+		} catch (Exception e) {
+			System.out.println("Exception="+e.getMessage());
+		}finally{
+
+			try {
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if(count > 0)
+			return true;
+		
+		return false;
 	}
 }

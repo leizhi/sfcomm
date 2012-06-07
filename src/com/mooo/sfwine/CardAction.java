@@ -338,15 +338,17 @@ public class CardAction {
 
 								CardDBObject dbObjcet = new CardDBObject();
 
-								if (dbObjcet.isRegistr(card)){
+								if (IDGenerator.isExistCard(card)){
 									throw new NullPointerException("卡片已经使用,请换新卡!");
 								}
 								
 								if (log.isDebugEnabled()) log.debug("Winery:"+card.getWinery());
 
-								if (log.isDebugEnabled()) log.debug("Rfidcode:"+dbObjcet.nextId(card.getWinery()));
+								if (log.isDebugEnabled()) log.debug("Rfidcode:"+IDGenerator.nextRfidCode(card.getWinery()));
 
-								card.setRfidcode(dbObjcet.nextId(card.getWinery()));
+								System.out.println("Rfidcode:"+IDGenerator.nextRfidCode(card.getWinery()));
+
+								card.setRfidcode(IDGenerator.nextRfidCode(card.getWinery()));
 									
 								cardRFID.save(card);
 								
