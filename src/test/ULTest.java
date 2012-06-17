@@ -34,7 +34,7 @@ public class ULTest {
 		}
 	}
 	public static void main(String args[]) throws InterruptedException {
-		ISO14443AAction.whichPort="COM3";
+//		ISO14443AAction.whichPort="COM3";
 
 		ISO14443AAction iccrf = new ISO14443AAction();
 		iccrf.initialize();
@@ -86,9 +86,9 @@ public class ULTest {
 //			
 //			iccrf.write((byte)(1*4 + 1),buf.getBytes("gb2312"));
 					
-			buf = "sazc";
+			buf = "张宇";
 			iccrf.saveM1(buf, 1, 1, 16);
-			buf = "123456";
+			buf = "000000";
 			iccrf.saveM1(buf, 1, 2, 16);
 
 			reponse = iccrf.read(1,1);

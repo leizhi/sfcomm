@@ -7,11 +7,20 @@ import javax.swing.text.*;
 
 public class AutoComplete extends JComboBox implements
 		JComboBox.KeySelectionManager {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6232739765500767299L;
+
 	private String searchFor;
 	private long lap;
 
 	public class CBDocument extends PlainDocument {
-		@Override
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -2033883697026014519L;
+
 		public void insertString(int offset, String str, AttributeSet a)
 				throws BadLocationException {
 			if (str == null)

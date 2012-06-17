@@ -50,6 +50,7 @@ public class UserAction {
 	private JLabel disLabel;
 	private JTextField userNameText;
 	private JPasswordField passwordText;
+	private JComboBox branch;
 	private JComboBox whichPort;
 	
 	private JPanel bodyPanel;
@@ -104,6 +105,18 @@ public class UserAction {
 		passwordText = new JPasswordField();
 		passwordText.setBounds(x+width,y,width_1,hight);//一个字符9 point
 		bodyPanel.add(passwordText);
+		
+		
+		y += hight;
+		branch = new JComboBox();
+		branch.setBounds(x+width,y,width,hight);//一个字符9 point
+		branch.setSelectedItem(branch.getSelectedItem());
+		
+		List<String> branchs = new SerialManager().getPorts();
+		for(String value:branchs){
+			branch.addItem(value);
+		}
+		bodyPanel.add(branch);
 		
 		y += hight;
 		whichPort = new JComboBox();
@@ -346,10 +359,6 @@ public class UserAction {
 				public void actionPerformed(ActionEvent e) {
 					if(log.isDebugEnabled()) log.debug("getName->:"+userNameText.getText());	
 					if(log.isDebugEnabled()) log.debug("getPassword->:"+String.valueOf(passwordText.getPassword()));	
-					
-//					LoginSession.user.setName(userNameText.getText());
-//					LoginSession.user.setPassword(String.valueOf(passwordText.getPassword()));
-					
 					processRegister();
 				}
 			});
