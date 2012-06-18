@@ -19,7 +19,6 @@ public class LoginSession {
 	public static boolean staffSignal = false;
 
 	public static boolean isAllow() {
-		UserAction userAction = new UserAction();
 
 		if(!StringUtils.isNull(user.getName()))
 			user.setName(user.getName().trim());
@@ -27,7 +26,7 @@ public class LoginSession {
 		if(!StringUtils.isNull(user.getPassword()))
 			user.setPassword(user.getPassword().trim());
 
-		if(allow = userAction.processLogin())
+		if(allow == true)
 			staffSignal=false;
 		
 		return allow;

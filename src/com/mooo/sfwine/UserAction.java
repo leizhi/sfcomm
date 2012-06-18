@@ -39,7 +39,7 @@ public class UserAction {
 
 	private static final String ADD_USER_INFO="INSERT INTO UserInfo(id,uuid) VALUES(?,?)";
 
-	private static final String ADD_USER="INSERT INTO User(id,name,password,userInfoId) VALUES(?,?,?,?)";
+	private static final String ADD_USER="INSERT INTO User(id,name,password,userInfoId,branchId) VALUES(?,?,?,?,1)";
 
 	private static final String EXISTS_USER="SELECT count(*) FROM User WHERE name=?";
 
@@ -48,9 +48,11 @@ public class UserAction {
 	private static final String LOGIN="SELECT id  FROM  User where   name=? AND password=?";
 	
 	private JLabel disLabel;
+	private JLabel messageLabel;
+
 	private JTextField userNameText;
 	private JPasswordField passwordText;
-	private JComboBox branch;
+//	private JComboBox branch;
 	private JComboBox whichPort;
 	
 	private JPanel bodyPanel;
@@ -107,17 +109,17 @@ public class UserAction {
 		bodyPanel.add(passwordText);
 		
 		
-		y += hight;
-		branch = new JComboBox();
-		branch.setBounds(x+width,y,width,hight);//一个字符9 point
-		branch.setSelectedItem(branch.getSelectedItem());
-		
-		List<String> branchs = new SerialManager().getPorts();
-		for(String value:branchs){
-			branch.addItem(value);
-		}
-		bodyPanel.add(branch);
-		
+//		y += hight;
+//		branch = new JComboBox();
+//		branch.setBounds(x+width,y,width,hight);//一个字符9 point
+//		branch.setSelectedItem(branch.getSelectedItem());
+//		
+//		List<String> branchs = new SerialManager().getPorts();
+//		for(String value:branchs){
+//			branch.addItem(value);
+//		}
+//		bodyPanel.add(branch);
+//		
 		y += hight;
 		whichPort = new JComboBox();
 		whichPort.setBounds(x+width,y,width,hight);//一个字符9 point
@@ -138,23 +140,16 @@ public class UserAction {
 		});
 		
 		y += hight;
+		messageLabel= new JLabel();
 		if(LoginSession.isOpenNetwork()){
-			disLabel = new JLabel("网络正常");
-			disLabel.setForeground(Color.GREEN);
+			messageLabel.setText("网络正常");
+			messageLabel.setForeground(Color.GREEN);
 		}else{
-			disLabel = new JLabel("网络不通");
-			disLabel.setForeground(Color.RED);
+			messageLabel.setText("网络不通");
+			messageLabel.setForeground(Color.RED);
 		}
-		disLabel.setBounds(x,y,width,hight);
-		bodyPanel.add(disLabel);
-		
-		if(!StringUtils.isNull(message)){
-			y += hight;
-			disLabel = new JLabel(message);
-			disLabel.setForeground(Color.RED);
-			disLabel.setBounds(x,y,width,hight);
-			bodyPanel.add(disLabel);
-		}
+		messageLabel.setBounds(x,y,width,hight);
+		bodyPanel.add(messageLabel);
 		
 		y += hight;
 		
@@ -170,14 +165,11 @@ public class UserAction {
 				public void actionPerformed(ActionEvent e) {
 					if(log.isDebugEnabled()) log.debug("getName->:"+userNameText.getText());	
 					if(log.isDebugEnabled()) log.debug("getPassword->:"+String.valueOf(passwordText.getPassword()));	
+					
 					LoginSession.user.setName(userNameText.getText());
 					LoginSession.user.setPassword(String.valueOf(passwordText.getPassword()));
-					if(processLogin()){
-						new CardAction(bodyPanel).promptNewWineCard();
-					}else{
-						message = "请再次登录.";
-						promptLogin();
-					}
+					
+					processLogin();
 				}
 			});
 		//为按钮添加键盘适配器
@@ -197,7 +189,7 @@ public class UserAction {
 		if(log.isDebugEnabled()) log.debug("initializeGUI end");
 	}
 
-	public boolean processLogin(){
+	public void processLogin(){
 		if(log.isDebugEnabled()) log.debug("processLogin");	
 
 		Connection connection=null;
@@ -240,17 +232,24 @@ public class UserAction {
             
     		if (log.isDebugEnabled()) log.debug("count:"+count);
 
-            if(count == 1){
-            	LoginSession.allow = true;
-            	return true;
-            }else{
+            if(count < 1)
     			throw new NullPointerException("用户和密码不匹配");
-            }
+            
+            //成功登录
+            LoginSession.allow = true;
+        	new CardAction(bodyPanel).promptNewWineCard();
+        	
 		}catch (NullPointerException e) {
 			message = e.getMessage();
+			messageLabel.setText(message);
+			messageLabel.setForeground(Color.RED);
+			
 			if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());	
 		}catch (SQLException e) {
 			message = e.getMessage();
+			messageLabel.setText(message);
+			messageLabel.setForeground(Color.RED);
+			
 			if(log.isErrorEnabled()) log.error("SQLException:"+e.getMessage());	
 	   }finally {
 			try {
@@ -263,7 +262,6 @@ public class UserAction {
 			}
 			
 		}
-		return false;
 	}
 	
 	public void promptRegister() {
@@ -331,23 +329,18 @@ public class UserAction {
 		
 		y += hight;
 		
+		messageLabel= new JLabel();
 		if(LoginSession.isOpenNetwork()){
-			disLabel = new JLabel("网络正常");
-			disLabel.setForeground(Color.GREEN);
+			message="网络正常";
+			messageLabel.setText(message);
+			messageLabel.setForeground(Color.GREEN);
 		}else{
-			disLabel = new JLabel("网络不通");
-			disLabel.setForeground(Color.RED);
+			message="网络不通";
+			messageLabel.setText(message);
+			messageLabel.setForeground(Color.RED);
 		}
-		disLabel.setBounds(x,y,width,hight);
-		bodyPanel.add(disLabel);
-		
-		if(!StringUtils.isNull(message)){
-			y += hight;
-			disLabel = new JLabel(message);
-			disLabel.setForeground(Color.RED);
-			disLabel.setBounds(x,y,20*message.length(),hight);
-			bodyPanel.add(disLabel);
-		}
+		messageLabel.setBounds(x,y,200,hight);
+		bodyPanel.add(messageLabel);
 		
 		y += hight;
 		
@@ -355,10 +348,7 @@ public class UserAction {
 		confirm.requestFocus();
 		confirm.setBounds(x+width,y,execWidth,hight);
 		confirm.addActionListener( new ActionListener() {
-				@Override
 				public void actionPerformed(ActionEvent e) {
-					if(log.isDebugEnabled()) log.debug("getName->:"+userNameText.getText());	
-					if(log.isDebugEnabled()) log.debug("getPassword->:"+String.valueOf(passwordText.getPassword()));	
 					processRegister();
 				}
 			});
@@ -381,13 +371,14 @@ public class UserAction {
 		if(log.isDebugEnabled()) log.debug("initializeGUI end");
 		} catch (Exception e) {
 			if(log.isErrorEnabled()) log.error("Exception:"+e.getMessage());
-			
-			promptLogin();
+//			promptLogin();
+			message = e.getMessage();
+			messageLabel.setText(message);
 		}
 	}
 	
 	public void processRegister(){
-		if(log.isDebugEnabled()) log.debug("processLogin");	
+		if(log.isDebugEnabled()) log.debug("processRegister");	
 
 		Connection connection=null;
         PreparedStatement pstmt = null;
@@ -398,6 +389,9 @@ public class UserAction {
     		
     		if(log.isDebugEnabled()) log.debug("processLogin getName:"+userNameText.getText());	
     		if(log.isDebugEnabled()) log.debug("processLogin getPassword:"+String.valueOf(passwordText.getPassword()));	
+    		
+    		StringUtils.notEmpty(userNameText.getText());
+    		StringUtils.notEmpty(String.valueOf(passwordText.getPassword()));
     		
 			// 初始化检查
 			if (!cardRFID.isOpened())
@@ -458,8 +452,6 @@ public class UserAction {
             if(count > 0)
     			throw new NullPointerException("此卡已注册");
             
-            
-            
             pstmt = connection.prepareStatement(ADD_USER_INFO);
             int userInfoId = IDGenerator.getNextID(connection,"UserInfo");
             pstmt.setLong(1, userInfoId);
@@ -476,6 +468,8 @@ public class UserAction {
             connection.commit();
             
             message = "注册成功";
+			messageLabel.setText(message);
+
 		}catch (NullPointerException e) {
 			if(connection != null)
 				try {
@@ -484,6 +478,8 @@ public class UserAction {
 					e1.printStackTrace();
 				}
 				message = e.getMessage();
+				messageLabel.setText(message);
+
 			if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());	
 		}catch (SQLException e) {
 				if(connection != null)
@@ -493,6 +489,7 @@ public class UserAction {
 						e1.printStackTrace();
 					}
 				message = e.getMessage();
+				messageLabel.setText(message);
 			if(log.isErrorEnabled()) log.error("SQLException:"+e.getMessage());	
 		}catch (Exception e) {
 				if(connection != null)
@@ -502,6 +499,7 @@ public class UserAction {
 						e1.printStackTrace();
 					}
 				message = e.getMessage();
+				messageLabel.setText(message);
 			if(log.isErrorEnabled()) log.error("SQLException:"+e.getMessage());	
 		}finally {
 			try {
@@ -516,6 +514,5 @@ public class UserAction {
 			cardRFID.beep(10);
 			cardRFID.destroy();
 		}
-        promptRegister();
 	}
 }

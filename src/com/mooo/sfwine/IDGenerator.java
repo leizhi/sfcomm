@@ -28,6 +28,8 @@ public class IDGenerator {
 
 	private static final String FIND_CARD="SELECT count(*) FROM Card WHERE uuid=?";
 
+//	private static final String BRANCH="SELECT definition FROM wineShared.Branch";
+
 	public synchronized static int getNextID(Connection connection,String table) {
 		boolean notConn = false;
         PreparedStatement pstmt = null;
@@ -396,4 +398,36 @@ public class IDGenerator {
 		
 		return false;
 	}
+	
+	/*
+	 * getValues
+	 */
+//	public synchronized static List<String> getBranch() {
+//		
+//		Connection connection=null;
+//        PreparedStatement pstmt = null;
+//        List<String> values = new ArrayList<String>();
+//        try {
+//			connection = DbConnectionManager.getConnection();
+//            pstmt = connection.prepareStatement(BRANCH);
+//            
+//            ResultSet rs = pstmt.executeQuery();
+//            while (rs.next()) {
+//            	values.add(rs.getString(1));
+//            }
+//		}catch (SQLException e) {
+//			e.printStackTrace();
+//	   }finally {
+//			try {
+//				if(pstmt != null)
+//					pstmt.close();
+//				if(connection != null)
+//					connection.close();
+//			} catch (SQLException e) {
+//				e.printStackTrace();
+//			}
+//			
+//		}
+//        return values;
+//	}
 }
