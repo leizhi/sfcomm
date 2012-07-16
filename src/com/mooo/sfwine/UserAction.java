@@ -515,4 +515,158 @@ public class UserAction {
 			cardRFID.destroy();
 		}
 	}
+	
+	public void promptRestStaff() {
+		LoginSession.staffSignal = false;
+		
+		if (log.isDebugEnabled()) log.debug("staffSignal:"+LoginSession.staffSignal);
+
+		//clean view
+		if (bodyPanel!=null && bodyPanel.isShowing()) {
+			bodyPanel.removeAll();
+		}
+		
+		int x, y,width,hight,width_1;
+		int execWidth = 60;
+
+		x = 340;
+		y = 250;
+		
+		width = 80;
+		hight = 20;
+		width_1 = 120;
+		
+		x += 10;
+		y += 10;
+		
+		disLabel = new JLabel("用户名:");
+		disLabel.setBounds(x,y,width,hight);
+		disLabel.setForeground(Color.WHITE);
+		bodyPanel.add(disLabel);
+		
+		userNameText = new JTextField();
+		userNameText.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		bodyPanel.add(userNameText);
+		
+		y += hight;
+		disLabel = new JLabel("密码:");
+		disLabel.setBounds(x,y,width,hight);
+		disLabel.setForeground(Color.WHITE);
+		bodyPanel.add(disLabel);
+		
+		passwordText = new JPasswordField();
+		passwordText.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		bodyPanel.add(passwordText);
+		
+		y += hight;
+		whichPort = new JComboBox();
+		whichPort.setBounds(x+width,y,width,hight);//一个字符9 point
+		whichPort.setSelectedItem(whichPort.getSelectedItem());
+		
+		List<String> ports = new SerialManager().getPorts();
+		for(String value:ports){
+			whichPort.addItem(value);
+		}
+		bodyPanel.add(whichPort);
+		
+		whichPort.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				ISO14443AAction.whichPort=e.getItem().toString();
+			}
+		});
+		
+		y += hight;
+		messageLabel= new JLabel();
+		if(LoginSession.isOpenNetwork()){
+			messageLabel.setText("网络正常");
+			messageLabel.setForeground(Color.GREEN);
+		}else{
+			messageLabel.setText("网络不通");
+			messageLabel.setForeground(Color.RED);
+		}
+		messageLabel.setBounds(x,y,260,hight);
+		bodyPanel.add(messageLabel);
+		
+		y += hight;
+		
+		JButton confirm = new JButton("确认");
+		confirm.requestFocus();
+		confirm.setBounds(x+width,y,execWidth,hight);//一个字符9 point
+		confirm.setBackground(new Color(105,177,35));
+		confirm.setForeground(Color.WHITE);
+
+		confirm.addActionListener( new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					processRestStaff();
+				}
+			});
+		//为按钮添加键盘适配器
+		confirm.addKeyListener(new KeyAction());
+		
+		bodyPanel.add(confirm);
+
+		bodyPanel.setVisible(true);
+		bodyPanel.validate();//显示
+		bodyPanel.repaint();
+		//设置背景图片
+		URL url = SFWine.class.getResource("bg.png");
+		ImageIcon img = new ImageIcon(url);
+		JLabel background = new JLabel(img);
+		bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+		background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
+		if(log.isDebugEnabled()) log.debug("initializeGUI end");
+	}
+	
+	public void processRestStaff(){
+		ISO14443AAction cardRFID = new ISO14443AAction();
+		 try {
+	    		cardRFID.initialize();
+				
+	    		if (log.isDebugEnabled()) log.debug(ISO14443AAction.whichPort +"/" + ISO14443AAction.whichSpeed);
+
+	    		StringUtils.notEmpty(userNameText.getText());
+	    		StringUtils.notEmpty(String.valueOf(passwordText.getPassword()));
+	    		
+				// 初始化检查
+				if (!cardRFID.isOpened())
+					throw new NullPointerException("请正确连接发卡器");
+				
+				String serialNumber = cardRFID.findSerialNumber();
+				
+				if (serialNumber == null)
+					throw new NullPointerException("请放人电子标签或者电子卡");
+				
+				int cardType = cardRFID.findCardType();
+				if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
+				if (log.isDebugEnabled()) log.debug("falt card:"+CommandsISO14443A.CARD_14443A_M1);
+				
+				if(cardType!=CommandsISO14443A.CARD_14443A_M1)
+					throw new NullPointerException("此卡非员工卡");
+				
+	    		if(StringUtils.isNull(String.valueOf(userNameText.getText())))
+	    			throw new NullPointerException("请输入用户名");
+	    		
+	    		if(StringUtils.isNull(String.valueOf(passwordText.getPassword())))
+	    			throw new NullPointerException("请输入密码");
+	    		
+	    		cardRFID.cleanAll();
+	    		
+	    		cardRFID.saveM1(String.valueOf(userNameText.getText()), 1, 1, 16);
+				cardRFID.saveM1(String.valueOf(passwordText.getPassword()), 1, 2, 16);
+				
+				message = "重置完成!";
+				messageLabel.setText(message);
+				messageLabel.setForeground(Color.GRAY);
+		 }catch (Exception e) {
+				message = e.getMessage();
+				messageLabel.setText(message);
+				messageLabel.setForeground(Color.RED);
+				if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());	
+		}finally {
+			cardRFID.beep(10);
+			cardRFID.destroy();
+		}
+	}
 }

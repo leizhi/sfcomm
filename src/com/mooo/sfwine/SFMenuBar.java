@@ -105,6 +105,19 @@ public class SFMenuBar  extends  JMenuBar{
     		
     		add(menuEdit);
 
+    		JMenuItem restStaff = new JMenuItem("重置员工卡");
+    		restStaff.setBackground(bg);
+    		restStaff.setForeground(fg);
+
+    		restStaff.addActionListener( new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					userAction.promptRestStaff();
+				}
+			});
+    		menuEdit.add(restStaff);
+    		
+    		add(menuEdit);
+    		
     		JMenu readCard = new JMenu("查询");
     		readCard.setBackground(bg);
     		readCard.setForeground(fg);
