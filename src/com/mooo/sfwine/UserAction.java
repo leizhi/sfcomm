@@ -108,18 +108,6 @@ public class UserAction {
 		passwordText.setBounds(x+width,y,width_1,hight);//一个字符9 point
 		bodyPanel.add(passwordText);
 		
-		
-//		y += hight;
-//		branch = new JComboBox();
-//		branch.setBounds(x+width,y,width,hight);//一个字符9 point
-//		branch.setSelectedItem(branch.getSelectedItem());
-//		
-//		List<String> branchs = new SerialManager().getPorts();
-//		for(String value:branchs){
-//			branch.addItem(value);
-//		}
-//		bodyPanel.add(branch);
-//		
 		y += hight;
 		whichPort = new JComboBox();
 		whichPort.setBounds(x+width,y,width,hight);//一个字符9 point
@@ -557,24 +545,6 @@ public class UserAction {
 		passwordText = new JPasswordField();
 		passwordText.setBounds(x+width,y,width_1,hight);//一个字符9 point
 		bodyPanel.add(passwordText);
-		
-		y += hight;
-		whichPort = new JComboBox();
-		whichPort.setBounds(x+width,y,width,hight);//一个字符9 point
-		whichPort.setSelectedItem(whichPort.getSelectedItem());
-		
-		List<String> ports = new SerialManager().getPorts();
-		for(String value:ports){
-			whichPort.addItem(value);
-		}
-		bodyPanel.add(whichPort);
-		
-		whichPort.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				ISO14443AAction.whichPort=e.getItem().toString();
-			}
-		});
 		
 		y += hight;
 		messageLabel= new JLabel();
