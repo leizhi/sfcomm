@@ -195,7 +195,7 @@ public class CardLoginAction {
 						cardRFID.findSerialNumber();
 						String password = cardRFID.read(1, 2);
 						if (log.isDebugEnabled()) log.debug("password:"+password);
-						LoginSession.user.setPassword(StringUtils.hash(password.trim()));
+						LoginSession.user.setPassword(password.trim());
 						
 						//check database
 						if(LoginSession.isAllow()){
