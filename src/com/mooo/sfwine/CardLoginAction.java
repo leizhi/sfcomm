@@ -20,6 +20,8 @@ import javax.swing.SwingUtilities;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.mooo.mycoz.common.StringUtils;
+
 import es.deusto.smartlab.rfid.SerialManager;
 import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 
@@ -188,15 +190,17 @@ public class CardLoginAction {
 						cardRFID.findSerialNumber();
 						String userName = cardRFID.read(1, 1);
 						if (log.isDebugEnabled()) log.debug("userName:"+userName);
-						LoginSession.user.setName(userName);
+						LoginSession.user.setName(userName.trim());
 						
 						cardRFID.findSerialNumber();
 						String password = cardRFID.read(1, 2);
 						if (log.isDebugEnabled()) log.debug("password:"+password);
-						LoginSession.user.setPassword(password);
-
+						LoginSession.user.setPassword(StringUtils.hash(password.trim()));
+						
+						//check database
 						if(LoginSession.isAllow()){
 							runEnable = false;
+							new CardAction(bodyPanel).promptNewWineCard();
 						}else{
 							message = "登录失败!";
 							messageLabel.setText(message);
@@ -221,11 +225,6 @@ public class CardLoginAction {
 							cardRFID.beep(10);
 							cardRFID.destroy();
 					}
-					
-					//check database
-					if(LoginSession.allow)
-						new CardAction(bodyPanel).promptNewWineCard();
-				
 					if (log.isDebugEnabled()) log.debug("run finlsh!"+LoginSession.staffSignal);
 				}
 			 };

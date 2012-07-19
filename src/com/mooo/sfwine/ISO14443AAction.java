@@ -1,5 +1,7 @@
 package com.mooo.sfwine;
 
+import java.io.UnsupportedEncodingException;
+
 import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 import es.deusto.smartlab.rfid.iso14443a.ImplementationISO14443A;
 
@@ -71,10 +73,11 @@ public class ISO14443AAction extends ImplementationISO14443A{
 			if(maxLength>16)
 				maxLength=16;
 			
-			byte[] wbuf = new byte[16];
-			for(int i=0;i<maxLength;i++){
-				wbuf[i] = 0x20;
-			}
+			byte[] wbuf = new byte[]{
+										0x00,0x00,0x00,0x00,
+										0x00,0x00,0x00,0x00,
+										0x00,0x00,0x00,0x00,
+										0x00,0x00,0x00,0x00};
 			
 			for(int i=0;i<maxLength;i++){
 					wbuf[i] = bytes[i];
@@ -137,43 +140,48 @@ public class ISO14443AAction extends ImplementationISO14443A{
 	
 
 	public String read(int page,int block) {
-		int choseCard=findCardType();
+		byte[] bytes =null;
+		String buffer = null;
 		
-		if(choseCard==CommandsISO14443A.CARD_14443A_M1){
-			return readM1(page,block);
-		}else if(choseCard==CommandsISO14443A.CARD_14443A_UL){
-			return readUL(page);
-		}
-		return null;
-	}
-	
-	public String readM1(int page,int block) {
-		String buffer=null;
 		try {
-			findSerialNumber();
+			int choseCard=findCardType();
 			
-			loadKey((byte)page, password);
-			authentication((byte)page);
+			if(choseCard==CommandsISO14443A.CARD_14443A_M1){
+				bytes = readM1(page,block);
+			}else if(choseCard==CommandsISO14443A.CARD_14443A_UL){
+				bytes = readUL(page);
+			}
 			
-			byte[] response = read((byte)(page*BLOCK_SIZE + block));
+			buffer = new String(bytes,4,16,"GBK");
+
+			bytes = buffer.getBytes();
+			int length = 0;
+			for(int i=0;i<bytes.length;i++){
+				if(bytes[i]==0x00){
+					length=i;
+					break;
+				}
+			}
 			
-			buffer = new String(response,4,16,"GBK");
-		} catch (Exception e) {
+			buffer = new String(bytes,0,length);
+			
+		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		return buffer;
 	}
 	
-	public String readUL(int page) {
-		String buffer=null;
-		try {
-			findSerialNumber();
-			
-			byte[] response = read((byte)page);
-			buffer = new String(response,4,16,"gb2312");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return buffer;
+	public byte[] readM1(int page,int block) {
+		findSerialNumber();
+		
+		loadKey((byte)page, password);
+		authentication((byte)page);
+		
+		return read((byte)(page*BLOCK_SIZE + block));
+	}
+	
+	public byte[] readUL(int page) {
+		findSerialNumber();
+		return read((byte)page);
 	}
 }
