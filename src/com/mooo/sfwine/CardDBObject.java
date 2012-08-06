@@ -15,7 +15,8 @@ public class CardDBObject {
 	private static Log log = LogFactory.getLog(CardDBObject.class);
 	
 	//Card
-	private static final String ADD_CARD="INSERT INTO Card(id,operatorId,cardDate,rfidcode,uuid,wineryId,branchId) VALUES(?,?,?,?,?,?,?)";
+	private static final String ADD_CARD="INSERT INTO Card(id,rfidcode,uuid,wineryId) VALUES(?,?,?,?)";
+	private static final String ADD_CARD_TRACK="INSERT INTO CardTrack(id,cardId,userId,trackDate,statusId,isLast) VALUES(?,?,?,?,1,'Yes')";
 
 	public void save(Card card) throws CardException{
 		if(log.isDebugEnabled()) log.debug("save Card start");
@@ -29,22 +30,18 @@ public class CardDBObject {
 			pstmt = conn.prepareStatement(ADD_CARD);
 			long cardId = IDGenerator.getNextID(conn,"Card");
 			pstmt.setLong(1, cardId);
-			pstmt.setLong(2, LoginSession.user.getId());
-			pstmt.setTimestamp(3,new Timestamp(new Date().getTime()));
-			pstmt.setString(4, card.getRfidcode());
-			pstmt.setString(5, card.getUuid());
-			
-			if(log.isDebugEnabled()) log.debug("Winery="+card.getWinery());
+			pstmt.setString(2, card.getRfidcode());
+			pstmt.setString(3, card.getUuid());
 
 			int wineryId = IDGenerator.getId("Winery", "definition", card.getWinery());
-			
-			pstmt.setInt(6, wineryId);
-			if(log.isDebugEnabled()) log.debug("okay");
-
-			pstmt.setInt(7, IDGenerator.getBranchId("Winery", wineryId));//branchId
-			if(log.isDebugEnabled()) log.debug("okay");
-
+			pstmt.setInt(4, wineryId);
 			pstmt.execute();
+			
+			pstmt = conn.prepareStatement(ADD_CARD_TRACK);
+			pstmt.setLong(1, IDGenerator.getNextID(conn,"CardTrack"));
+			pstmt.setLong(2, cardId);
+			pstmt.setLong(3, LoginSession.user.getId());
+			pstmt.setTimestamp(4,new Timestamp(new Date().getTime()));
 			
 			conn.commit();
 			if(log.isDebugEnabled()) log.debug("save finlsh");
