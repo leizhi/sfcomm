@@ -42,6 +42,7 @@ public class CardDBObject {
 			pstmt.setLong(2, cardId);
 			pstmt.setLong(3, LoginSession.user.getId());
 			pstmt.setTimestamp(4,new Timestamp(new Date().getTime()));
+			pstmt.execute();
 			
 			conn.commit();
 			if(log.isDebugEnabled()) log.debug("save finlsh");
