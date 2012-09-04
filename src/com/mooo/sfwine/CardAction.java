@@ -34,7 +34,7 @@ import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 public class CardAction {
 	private static Log log = LogFactory.getLog(CardAction.class);
 
-	private static Object initLock = new Object();
+	private final static Object initLock = new Object();
 
 	private boolean runEnable = false;
 	
