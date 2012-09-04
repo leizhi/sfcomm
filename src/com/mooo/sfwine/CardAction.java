@@ -34,6 +34,8 @@ import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 public class CardAction {
 	private static Log log = LogFactory.getLog(CardAction.class);
 
+	private static Object initLock = new Object();
+
 	private boolean runEnable = false;
 	
 	private Color fg = Color.WHITE;
@@ -291,7 +293,7 @@ public class CardAction {
 	 class CardProcessRegister implements Runnable {
 		 
 			private JLabel messageLabel;
-			
+
 			CardProcessRegister(JLabel messageLabel){
 				this.messageLabel=messageLabel;
 				ISO14443AAction.whichPort = whichPort.getSelectedItem().toString();
@@ -300,90 +302,92 @@ public class CardAction {
 			public void run(){
 				Runnable runner = new Runnable() {
 						public void run() {
-							ISO14443AAction cardRFID = new ISO14443AAction();
-							try {
-								//初始化
-								cardRFID.initialize();
-								
-								//请正确连接发卡器
-								if(!cardRFID.isOpened()){
-									throw new NullPointerException("发卡器未连接或者端口选择错误!");
-								}
+							synchronized (initLock) {
+								ISO14443AAction cardRFID = new ISO14443AAction();
+								try {
+									//初始化
+									cardRFID.initialize();
 									
-								if (log.isDebugEnabled()) log.debug("连接发卡器 okay:");
-
-								//请放人电子标签或者电子卡
-								String serialNumber = cardRFID.findSerialNumber();
-								if(serialNumber == null){
-//									Thread.sleep(37);
-									throw new NullPointerException("请放人电子标签或者电子卡!");
-								}
-								if (log.isDebugEnabled()) log.debug("卡片 okay:");
-								
-								int cardType = cardRFID.findCardType();
-								if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
-								if (log.isDebugEnabled()) log.debug("M1 Card is:"+CommandsISO14443A.CARD_14443A_M1);
-								if (log.isDebugEnabled()) log.debug("UL Card is:"+CommandsISO14443A.CARD_14443A_UL);
-
-								if(cardType!=CommandsISO14443A.CARD_14443A_UL){
-//									Thread.sleep(100);
-									throw new NullPointerException("此卡非标签卡!");
-								}
+									//请正确连接发卡器
+									if(!cardRFID.isOpened()){
+										throw new NullPointerException("发卡器未连接或者端口选择错误!");
+									}
+										
+									if (log.isDebugEnabled()) log.debug("连接发卡器 okay:");
+	
+									//请放人电子标签或者电子卡
+									String serialNumber = cardRFID.findSerialNumber();
+									if(serialNumber == null){
+	//									Thread.sleep(37);
+										throw new NullPointerException("请放人电子标签或者电子卡!");
+									}
+									if (log.isDebugEnabled()) log.debug("卡片 okay:");
 									
-								card = new Card();
-								fillCard();
-								card.setUuid(StringUtils.hash(serialNumber));
-								
-								if (log.isDebugEnabled()) log.debug("uuid:"+card.getUuid());
-
-								CardDBObject dbObjcet = new CardDBObject();
-
-								if (IDGenerator.isExistCard(card)){
-									throw new NullPointerException("卡片已经使用,请换新卡!");
-								}
-								
-								if (log.isDebugEnabled()) log.debug("Winery:"+card.getWinery());
-
-								if (log.isDebugEnabled()) log.debug("Rfidcode:"+IDGenerator.nextRfidCode(card.getWinery()));
-
-								System.out.println("Rfidcode:"+IDGenerator.nextRfidCode(card.getWinery()));
-
-								card.setRfidcode(IDGenerator.nextRfidCode(card.getWinery()));
+									int cardType = cardRFID.findCardType();
+									if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
+									if (log.isDebugEnabled()) log.debug("M1 Card is:"+CommandsISO14443A.CARD_14443A_M1);
+									if (log.isDebugEnabled()) log.debug("UL Card is:"+CommandsISO14443A.CARD_14443A_UL);
+	
+									if(cardType!=CommandsISO14443A.CARD_14443A_UL){
+	//									Thread.sleep(100);
+										throw new NullPointerException("此卡非标签卡!");
+									}
+										
+									card = new Card();
+									fillCard();
+									card.setUuid(StringUtils.hash(serialNumber));
 									
-								cardRFID.save(card);
-								
-								if (log.isDebugEnabled()) log.debug("RFID save card");
-
-								dbObjcet.save(card);
-								
-								if (log.isDebugEnabled()) log.debug("DB save card");
-
-								message = "发卡成功";
-								messageLabel.setText(message);
-								
-							}  catch (NullPointerException e){
-								if (log.isErrorEnabled()) log.error("NullPointerException:" + e.getMessage());
-
-								message = e.getMessage();
-								messageLabel.setText(message);
-								
-								e.printStackTrace();
-							}  catch (CardException e){
-								if (log.isErrorEnabled()) log.error("CardException:" + e.getMessage());
-
-								message = e.getMessage();
-								messageLabel.setText(message);
-								
-								e.printStackTrace();
-							} catch (Exception e) {
-								if (log.isErrorEnabled()) log.error("Exception:" + e.getMessage());
-								message = e.getMessage();
-								messageLabel.setText(message);
-								
-								e.printStackTrace();
-							} finally {
-								cardRFID.beep(10);
-								cardRFID.destroy();
+									if (log.isDebugEnabled()) log.debug("uuid:"+card.getUuid());
+	
+									CardDBObject dbObjcet = new CardDBObject();
+	
+									if (IDGenerator.isExistCard(card)){
+										throw new NullPointerException("卡片已经使用,请换新卡!");
+									}
+									
+									if (log.isDebugEnabled()) log.debug("Winery:"+card.getWinery());
+	
+									if (log.isDebugEnabled()) log.debug("Rfidcode:"+IDGenerator.nextRfidCode(card.getWinery()));
+	
+									System.out.println("Rfidcode:"+IDGenerator.nextRfidCode(card.getWinery()));
+	
+									card.setRfidcode(IDGenerator.nextRfidCode(card.getWinery()));
+										
+									cardRFID.save(card);
+									
+									if (log.isDebugEnabled()) log.debug("RFID save card");
+	
+									dbObjcet.save(card);
+									
+									if (log.isDebugEnabled()) log.debug("DB save card");
+	
+									message = "发卡成功";
+									messageLabel.setText(message);
+									
+								}  catch (NullPointerException e){
+									if (log.isErrorEnabled()) log.error("NullPointerException:" + e.getMessage());
+	
+									message = e.getMessage();
+									messageLabel.setText(message);
+									
+									e.printStackTrace();
+								}  catch (CardException e){
+									if (log.isErrorEnabled()) log.error("CardException:" + e.getMessage());
+	
+									message = e.getMessage();
+									messageLabel.setText(message);
+									
+									e.printStackTrace();
+								} catch (Exception e) {
+									if (log.isErrorEnabled()) log.error("Exception:" + e.getMessage());
+									message = e.getMessage();
+									messageLabel.setText(message);
+									
+									e.printStackTrace();
+								} finally {
+									cardRFID.beep(10);
+									cardRFID.destroy();
+								}
 							}
 						}
 					};

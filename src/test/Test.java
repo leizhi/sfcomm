@@ -20,6 +20,6 @@ public class Test {
 		int wineryId = IDGenerator.getId("Winery", "definition", "金川酒厂");
 
 		System.out.println("wineryId:"+wineryId);
-
+//010F001000040100
 	}
 }

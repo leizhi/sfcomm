@@ -21,7 +21,7 @@ public class CommandsISO14443A {
 	private int length;//数据长度
 	private byte command;//命令字
 	private byte parameters[];//数据
-	private final byte CRC = (byte)0x00;;//异或校验值
+	private final byte CRC = (byte)0x00;//异或校验值
 
 	public CommandsISO14443A(byte command, byte parameters[]) {
 		this.command = command;
