@@ -401,8 +401,8 @@ public class CardAction {
 							
 							SwingUtilities.invokeAndWait(runner);
 							// Our task for each step is to just sleep
-							//Sleep 500 ms
-							Thread.sleep(500);
+							//Sleep 1200 ms
+							Thread.sleep(1200);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						} catch (InvocationTargetException e) {
