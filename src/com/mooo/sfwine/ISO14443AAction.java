@@ -144,6 +144,8 @@ public class ISO14443AAction extends ImplementationISO14443A{
 		String buffer = null;
 		
 		try {
+			findSerialNumber();
+			
 			int choseCard=findCardType();
 			
 			if(choseCard==CommandsISO14443A.CARD_14443A_M1){
@@ -151,6 +153,8 @@ public class ISO14443AAction extends ImplementationISO14443A{
 			}else if(choseCard==CommandsISO14443A.CARD_14443A_UL){
 				bytes = readUL(page);
 			}
+			
+			System.out.println("choseCard:"+choseCard);
 			
 			buffer = new String(bytes,4,16,"GBK");
 
