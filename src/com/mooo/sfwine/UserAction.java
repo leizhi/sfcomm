@@ -15,6 +15,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+//import javax.swing.event.DocumentEvent;
+//import javax.swing.text.Document;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,6 +36,9 @@ public class UserAction {
 	private JLabel disLabel;
 	private JLabel messageLabel;
 
+//	private JTextField hostName;
+//	private JTextField hostPort;
+
 	private JTextField userNameText;
 	private JPasswordField passwordText;
 //	private JComboBox branch;
@@ -42,10 +47,6 @@ public class UserAction {
 	private JPanel bodyPanel;
 	private String message;
 
-	public UserAction() {
-		
-	}
-	
 	public UserAction(JPanel bodyPanel) {
 			this.bodyPanel=bodyPanel;
 		}
@@ -72,7 +73,55 @@ public class UserAction {
 		
 		x += 10;
 		y += 10;
+		/*
+		disLabel = new JLabel("服务器:");
+		disLabel.setBounds(x,y,width,hight);
+		disLabel.setForeground(Color.WHITE);
+		bodyPanel.add(disLabel);
 		
+		hostName = new JTextField();
+		hostName.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		hostName.setText("192.168.1.7");
+		bodyPanel.add(hostName);
+		
+		Document hostNameDoc = hostName.getDocument();
+		hostNameDoc.addDocumentListener(new javax.swing.event.DocumentListener() {
+			public void changedUpdate(DocumentEvent documentEvent) {
+				SFClient.host = hostName.getText();
+			}
+			public void insertUpdate(DocumentEvent documentEvent) {
+				SFClient.host = hostName.getText();
+			}
+			public void removeUpdate(DocumentEvent documentEvent) {
+				SFClient.host = hostName.getText();
+			}
+		});
+        
+		disLabel = new JLabel("端口:");
+		disLabel.setBounds(x+width+width_1,y,40,hight);
+		disLabel.setForeground(Color.WHITE);
+		bodyPanel.add(disLabel);
+		
+		hostPort = new JTextField();
+		hostPort.setBounds(x+width+width_1+40,y,40,hight);//一个字符9 point
+		hostPort.setText("8000");
+		bodyPanel.add(hostPort);
+		
+		Document hostPortDoc = hostPort.getDocument();
+		hostPortDoc.addDocumentListener(new javax.swing.event.DocumentListener() {
+			public void changedUpdate(DocumentEvent documentEvent) {
+				SFClient.port = new Integer(hostPort.getText());
+			}
+			public void insertUpdate(DocumentEvent documentEvent) {
+				SFClient.port = new Integer(hostPort.getText());
+			}
+			public void removeUpdate(DocumentEvent documentEvent) {
+				SFClient.port = new Integer(hostPort.getText());
+			}
+		});
+		
+		y += hight;
+		*/
 		disLabel = new JLabel("用户名:");
 		disLabel.setBounds(x,y,width,hight);
 		disLabel.setForeground(Color.WHITE);
@@ -137,7 +186,6 @@ public class UserAction {
 				public void actionPerformed(ActionEvent e) {
 					if(log.isDebugEnabled()) log.debug("getName->:"+userNameText.getText());	
 					if(log.isDebugEnabled()) log.debug("getPassword->:"+String.valueOf(passwordText.getPassword()));	
-					
 					SFClient.user.setName(userNameText.getText());
 					SFClient.user.setPassword(String.valueOf(passwordText.getPassword()));
 					

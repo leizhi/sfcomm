@@ -22,13 +22,16 @@ public class SFClient {
 //	private static Object initLock = new Object();
 
 	private static Socket socket = new Socket();
+
+	public static String host="127.0.0.1";
+	public static int port=8000;
 	
 	private OutputStream out = null;
 	private InputStream in = null;
 	private static BufferedReader read = null;
 	private static PrintStream print = null;
 	
-	public SFClient(String host,int port) {
+	public SFClient() {
 			synchronized (socket) {
 				try {
 //					socket = new Socket();
@@ -109,7 +112,50 @@ public class SFClient {
 		String REQ;
 		String reponse;
 		
-		REQ = "*10;1#";
+		REQ = "*10";
+		REQ += ";"+user.getId();
+		REQ += "#";
+		
+		reponse = request(REQ);//0 no limit
+		System.out.println("reponse:"+reponse);
+
+		if(!reponse.startsWith("*")||!reponse.endsWith("#")){
+//			response = "数据格式不正确";
+		}
+		
+		String doRequest=reponse.substring(reponse.indexOf("*")+1,
+				reponse.lastIndexOf("#"));
+
+	    String[] args=doRequest.split(";");
+	    
+	    if(log.isDebugEnabled()) log.debug("length:"+args.length);
+	    
+		for(int i=0;i<args.length;i++){
+			args[i]=args[i].trim();
+			if(log.isDebugEnabled()) log.debug(args[i]);
+		}
+		
+		int ret = new Integer(args[0]);
+		
+		if(ret!=0) System.out.println("返回错误");
+		
+		if(args.length > 2) {
+			reponse = doRequest.substring(doRequest.indexOf(";", 2)+1);
+		}
+		
+	    String[] winerys=reponse.split(",");
+		for(int i=0;i<winerys.length;i++){
+			winerys[i]=winerys[i].trim();
+		}
+		return winerys;
+	}
+	
+	public String[] getCardTypes(){
+		//send command
+		String REQ;
+		String reponse;
+		
+		REQ = "*11#";
 		reponse = request(REQ);//0 no limit
 		System.out.println("reponse:"+reponse);
 

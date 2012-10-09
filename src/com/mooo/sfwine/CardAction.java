@@ -55,7 +55,7 @@ public class CardAction {
 	private JPanel bodyPanel;
 	private String message;
 	
-	private SFClient sfClient = new SFClient("127.0.0.1",8000);
+	private SFClient sfClient = new SFClient();
 
 	public CardAction(JPanel bodyPanel) {
 		this.bodyPanel = bodyPanel;
@@ -134,7 +134,7 @@ public class CardAction {
 		
 		cardType = new JComboBox();
 		cardType.setBounds(x+width,y,width_1,hight);//一个字符9 point
-		items = sfClient.getWineryValues();
+		items = sfClient.getCardTypes();
 		for(String value:items){
 			cardType.addItem(value);
 		}
