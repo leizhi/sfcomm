@@ -20,8 +20,6 @@ import javax.swing.SwingUtilities;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.mooo.mycoz.common.StringUtils;
-
 import es.deusto.smartlab.rfid.SerialManager;
 import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 
@@ -52,7 +50,7 @@ public class CardLoginAction {
 	}
 	
 	public void promptCardLogin() {
-		LoginSession.staffSignal = false;
+		SFClient.staffSignal = false;
 
 		//clean view
 		if (bodyPanel!=null && bodyPanel.isShowing()) {
@@ -127,7 +125,7 @@ public class CardLoginAction {
 		
 		messageLabel= new JLabel();
 		
-		if(LoginSession.isOpenNetwork()){
+		if(SFClient.isOpenNetwork()){
 			messageLabel.setText("网络正常");
 			messageLabel.setForeground(Color.GREEN);
 		}else{
@@ -190,15 +188,15 @@ public class CardLoginAction {
 						cardRFID.findSerialNumber();
 						String userName = cardRFID.read(1, 1);
 						if (log.isDebugEnabled()) log.debug("userName:"+userName);
-						LoginSession.user.setName(userName.trim());
+						SFClient.user.setName(userName.trim());
 						
 						cardRFID.findSerialNumber();
 						String password = cardRFID.read(1, 2);
 						if (log.isDebugEnabled()) log.debug("password:"+password);
-						LoginSession.user.setPassword(password.trim());
+						SFClient.user.setPassword(password.trim());
 						
 						//check database
-						if(LoginSession.isAllow()){
+						if(SFClient.isAllow()){
 							runEnable = false;
 							new CardAction(bodyPanel).promptNewWineCard();
 						}else{
@@ -225,17 +223,17 @@ public class CardLoginAction {
 							cardRFID.beep(10);
 							cardRFID.destroy();
 					}
-					if (log.isDebugEnabled()) log.debug("run finlsh!"+LoginSession.staffSignal);
+					if (log.isDebugEnabled()) log.debug("run finlsh!"+SFClient.staffSignal);
 				}
 			 };
 			
 
 			//do while
 			runEnable = true;
-			LoginSession.staffSignal = true;
-			 if (log.isDebugEnabled()) log.debug("LoginSession.staffSignal:"+LoginSession.staffSignal);
+			SFClient.staffSignal = true;
+			 if (log.isDebugEnabled()) log.debug("LoginSession.staffSignal:"+SFClient.staffSignal);
 
-			while(runEnable && LoginSession.staffSignal){
+			while(runEnable && SFClient.staffSignal){
 				try {
 					message = "开始登录";
 					messageLabel.setText(message);

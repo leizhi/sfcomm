@@ -1,4 +1,4 @@
-package gui;
+package test.gui;
 
 import java.awt.Dialog;
 import java.awt.Frame;

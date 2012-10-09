@@ -55,6 +55,8 @@ public class CardAction {
 	private JPanel bodyPanel;
 	private String message;
 	
+	private SFClient sfClient = new SFClient("127.0.0.1",8000);
+
 	public CardAction(JPanel bodyPanel) {
 		this.bodyPanel = bodyPanel;
 		this.message = null;
@@ -68,7 +70,7 @@ public class CardAction {
 	public void promptNewWineCard() {
 		try {
 			//isAllow
-			if(!LoginSession.isAllow())
+			if(!SFClient.isAllow())
 				throw new Exception("请先登录!");
 			
 		//clean view
@@ -96,7 +98,7 @@ public class CardAction {
 		disLabel.setBounds(x,y,width,hight);
 		bodyPanel.add(disLabel);
 		
-		disLabel = new JLabel(LoginSession.user.getName());
+		disLabel = new JLabel(SFClient.user.getName());
 		disLabel.setForeground(fg);
 		disLabel.setBounds(x+width,y,width_1,hight);
 		bodyPanel.add(disLabel);
@@ -110,7 +112,7 @@ public class CardAction {
 		
 		winery = new JComboBox();
 		winery.setBounds(x+width,y,width_1,hight);//一个字符9 point
-		List<String> items = IDGenerator.getWineryValues();
+		String[] items = sfClient.getWineryValues();
 		for(String value:items){
 			winery.addItem(value);
 		}
@@ -132,8 +134,10 @@ public class CardAction {
 		
 		cardType = new JComboBox();
 		cardType.setBounds(x+width,y,width_1,hight);//一个字符9 point
-		cardType.addItem("铅封标签");
-		cardType.addItem("纸质标签");
+		items = sfClient.getWineryValues();
+		for(String value:items){
+			cardType.addItem(value);
+		}
 		bodyPanel.add(cardType);
 		
 		y += hight;
@@ -218,7 +222,7 @@ public class CardAction {
 	public void viewWineCard() {
 		try {
 			//isAllow
-			if(!LoginSession.isAllow())
+			if(!SFClient.isAllow())
 				throw new Exception("请先登录!");
 			
 		//clean view
@@ -339,26 +343,18 @@ public class CardAction {
 									
 									if (log.isDebugEnabled()) log.debug("uuid:"+card.getUuid());
 	
-									CardDBObject dbObjcet = new CardDBObject();
-	
-									if (IDGenerator.isExistCard(card)){
+									if (sfClient.existCard(card.getUuid())){
 										throw new NullPointerException("卡片已经使用,请换新卡!");
 									}
 									
 									if (log.isDebugEnabled()) log.debug("Winery:"+card.getWinery());
 	
-									if (log.isDebugEnabled()) log.debug("Rfidcode:"+IDGenerator.nextRfidCode(card.getWinery()));
-	
-									System.out.println("Rfidcode:"+IDGenerator.nextRfidCode(card.getWinery()));
-	
-									card.setRfidcode(IDGenerator.nextRfidCode(card.getWinery()));
+									card.setRfidcode(sfClient.nextRfidCode(card.getWinery()));
 										
 									cardRFID.save(card);
-									
 									if (log.isDebugEnabled()) log.debug("RFID save card");
 	
-									dbObjcet.save(card);
-									
+									sfClient.saveCard("",card.getRfidcode(),card.getUuid(),card.getWinery());
 									if (log.isDebugEnabled()) log.debug("DB save card");
 	
 									message = "发卡成功";

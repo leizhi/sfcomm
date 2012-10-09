@@ -1,4 +1,4 @@
-package gui;
+package test.gui;
 
 import gnu.io.*;
 

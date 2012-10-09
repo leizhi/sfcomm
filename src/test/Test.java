@@ -1,7 +1,6 @@
 package test;
 
 import com.mooo.mycoz.common.StringUtils;
-import com.mooo.sfwine.IDGenerator;
 
 public class Test {
 
@@ -17,9 +16,6 @@ public class Test {
 		System.out.printf("orderByDESC:0x%x\n",obytes[1]);
 
 		System.out.println("orderByDESC:"+obytes[0]);
-		int wineryId = IDGenerator.getId("Winery", "definition", "金川酒厂");
-
-		System.out.println("wineryId:"+wineryId);
 //010F001000040100
 	}
 }

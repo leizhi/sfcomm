@@ -6,10 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.swing.ImageIcon;
@@ -24,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.mooo.mycoz.common.StringUtils;
-import com.mooo.mycoz.db.pool.DbConnectionManager;
 
 import es.deusto.smartlab.rfid.SerialManager;
 import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
@@ -35,17 +30,6 @@ public class UserAction {
 	 * 
 	 */
 	private static Log log = LogFactory.getLog(UserAction.class);
-	
-
-	private static final String ADD_USER_INFO="INSERT INTO UserInfo(id,uuid) VALUES(?,?)";
-
-	private static final String ADD_USER="INSERT INTO User(id,name,password,userInfoId,branchId) VALUES(?,?,?,?,1)";
-
-	private static final String EXISTS_USER="SELECT count(*) FROM User WHERE name=?";
-
-	private static final String EXISTS_CARD="SELECT count(*) FROM UserInfo WHERE uuid=?";
-
-	private static final String LOGIN="SELECT id  FROM  User where   name=? AND password=?";
 	
 	private JLabel disLabel;
 	private JLabel messageLabel;
@@ -67,9 +51,9 @@ public class UserAction {
 		}
 	
 	public void promptLogin() {
-		LoginSession.staffSignal = false;
+		SFClient.staffSignal = false;
 		
-		if (log.isDebugEnabled()) log.debug("staffSignal:"+LoginSession.staffSignal);
+		if (log.isDebugEnabled()) log.debug("staffSignal:"+SFClient.staffSignal);
 
 		//clean view
 		if (bodyPanel!=null && bodyPanel.isShowing()) {
@@ -129,7 +113,7 @@ public class UserAction {
 		
 		y += hight;
 		messageLabel= new JLabel();
-		if(LoginSession.isOpenNetwork()){
+		if(SFClient.isOpenNetwork()){
 			messageLabel.setText("网络正常");
 			messageLabel.setForeground(Color.GREEN);
 		}else{
@@ -154,8 +138,8 @@ public class UserAction {
 					if(log.isDebugEnabled()) log.debug("getName->:"+userNameText.getText());	
 					if(log.isDebugEnabled()) log.debug("getPassword->:"+String.valueOf(passwordText.getPassword()));	
 					
-					LoginSession.user.setName(userNameText.getText());
-					LoginSession.user.setPassword(String.valueOf(passwordText.getPassword()));
+					SFClient.user.setName(userNameText.getText());
+					SFClient.user.setPassword(String.valueOf(passwordText.getPassword()));
 					
 					processLogin();
 				}
@@ -179,81 +163,32 @@ public class UserAction {
 
 	public void processLogin(){
 		if(log.isDebugEnabled()) log.debug("processLogin");	
-
-		Connection connection=null;
-        PreparedStatement pstmt = null;
-        int count=0;
         try {
-    		if(log.isDebugEnabled()) log.debug("processLogin getName:"+LoginSession.user.getName());	
-    		if(log.isDebugEnabled()) log.debug("processLogin getPassword:"+LoginSession.user.getPassword());	
+    		if(log.isDebugEnabled()) log.debug("processLogin getName:"+SFClient.user.getName());	
+    		if(log.isDebugEnabled()) log.debug("processLogin getPassword:"+SFClient.user.getPassword());	
 
-    		if(StringUtils.isNull(LoginSession.user.getName()))
+    		if(StringUtils.isNull(SFClient.user.getName()))
     			throw new NullPointerException("请输入用户名");
     		
-    		if(StringUtils.isNull(LoginSession.user.getPassword()))
+    		if(StringUtils.isNull(SFClient.user.getPassword()))
     			throw new NullPointerException("请输入密码");
     		
-			connection = DbConnectionManager.getConnection();
-			pstmt = connection.prepareStatement(EXISTS_USER);
-            pstmt.setString(1, LoginSession.user.getName());
+    		if(!SFClient.isAllow())
+    			throw new NullPointerException("登录失败!");
             
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-            	count = rs.getInt(1);
-            }
-            
-            if(count < 1)
-    			throw new NullPointerException("无此用户");
-            
-            count=0;
-            
-            pstmt = connection.prepareStatement(LOGIN);
-            pstmt.setString(1, LoginSession.user.getName());
-            pstmt.setString(2, StringUtils.hash(LoginSession.user.getPassword()));
-
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-            	LoginSession.user.setId(rs.getInt(1));
-            	
-            	count=1;
-            }
-            
-    		if (log.isDebugEnabled()) log.debug("count:"+count);
-
-            if(count < 1)
-    			throw new NullPointerException("用户和密码不匹配");
-            
-            //成功登录
-            LoginSession.allow = true;
+    		//成功登录
         	new CardAction(bodyPanel).promptNewWineCard();
-        	
-		}catch (NullPointerException e) {
+		}catch (Exception e) {
 			message = e.getMessage();
 			messageLabel.setText(message);
 			messageLabel.setForeground(Color.RED);
 			
 			if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());	
-		}catch (SQLException e) {
-			message = e.getMessage();
-			messageLabel.setText(message);
-			messageLabel.setForeground(Color.RED);
-			
-			if(log.isErrorEnabled()) log.error("SQLException:"+e.getMessage());	
-	   }finally {
-			try {
-				if(pstmt != null)
-					pstmt.close();
-				if(connection != null)
-					connection.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			
 		}
 	}
 	
 	public void promptRegister() {
-		LoginSession.staffSignal = false;
+		SFClient.staffSignal = false;
 
 		//clean view
 		if (bodyPanel!=null && bodyPanel.isShowing()) {
@@ -262,7 +197,7 @@ public class UserAction {
 		
 		try {
 		//isAllow
-		if(!LoginSession.isAllow())
+		if(!SFClient.isAllow())
 			throw new Exception("请先登录!");
 			
 		int x, y,width,hight,width_1;
@@ -278,7 +213,7 @@ public class UserAction {
 		x += 10;
 		y += 10;
 		
-		String display = "操作员:"+LoginSession.user.getName();
+		String display = "操作员:"+SFClient.user.getName();
 		
 		disLabel = new JLabel(display);
 		disLabel.setBounds(x,y,20*display.length(),hight);
@@ -318,7 +253,7 @@ public class UserAction {
 		y += hight;
 		
 		messageLabel= new JLabel();
-		if(LoginSession.isOpenNetwork()){
+		if(SFClient.isOpenNetwork()){
 			message="网络正常";
 			messageLabel.setText(message);
 			messageLabel.setForeground(Color.GREEN);
@@ -368,8 +303,6 @@ public class UserAction {
 	public void processRegister(){
 		if(log.isDebugEnabled()) log.debug("processRegister");	
 
-		Connection connection=null;
-        PreparedStatement pstmt = null;
         long count=0;
 		ISO14443AAction cardRFID = new ISO14443AAction();
         try {
@@ -411,103 +344,34 @@ public class UserAction {
 			cardRFID.saveM1(String.valueOf(userNameText.getText()), 1, 1, 16);
 			cardRFID.saveM1(String.valueOf(passwordText.getPassword()), 1, 2, 16);
 
-			connection = DbConnectionManager.getConnection();
-			connection.setAutoCommit(false);
-			
-			pstmt = connection.prepareStatement(EXISTS_USER);
-            pstmt.setString(1, String.valueOf(userNameText.getText()));
-            
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-            	count = rs.getInt(1);
-            }
             
     		if(log.isDebugEnabled()) log.debug("count:"+count);	
 
             if(count > 0)
     			throw new NullPointerException("此用户已注册");
             
-            pstmt = connection.prepareStatement(EXISTS_CARD);
-            pstmt.setString(1, serialNumber);
-            
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-            	count = rs.getInt(1);
-            }
-            
     		if(log.isDebugEnabled()) log.debug("count:"+count);	
 
             if(count > 0)
     			throw new NullPointerException("此卡已注册");
             
-            pstmt = connection.prepareStatement(ADD_USER_INFO);
-            int userInfoId = IDGenerator.getNextID(connection,"UserInfo");
-            pstmt.setLong(1, userInfoId);
-            pstmt.setString(2, StringUtils.hash(serialNumber));
-            pstmt.execute();
-            
-            pstmt = connection.prepareStatement(ADD_USER);
-            pstmt.setLong(1, IDGenerator.getNextID(connection,"UserInfo"));
-            pstmt.setString(2, String.valueOf(userNameText.getText()));
-            pstmt.setString(3, StringUtils.hash(String.valueOf(passwordText.getPassword())));
-            pstmt.setInt(4, userInfoId);
-            pstmt.execute();
-
-            connection.commit();
-            
             message = "注册成功";
 			messageLabel.setText(message);
 
-		}catch (NullPointerException e) {
-			if(connection != null)
-				try {
-					connection.rollback();
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
-				message = e.getMessage();
-				messageLabel.setText(message);
-
-			if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());	
-		}catch (SQLException e) {
-				if(connection != null)
-					try {
-						connection.rollback();
-					} catch (SQLException e1) {
-						e1.printStackTrace();
-					}
-				message = e.getMessage();
-				messageLabel.setText(message);
-			if(log.isErrorEnabled()) log.error("SQLException:"+e.getMessage());	
 		}catch (Exception e) {
-				if(connection != null)
-					try {
-						connection.rollback();
-					} catch (SQLException e1) {
-						e1.printStackTrace();
-					}
 				message = e.getMessage();
 				messageLabel.setText(message);
 			if(log.isErrorEnabled()) log.error("SQLException:"+e.getMessage());	
 		}finally {
-			try {
-				if(pstmt != null)
-					pstmt.close();
-				if(connection != null)
-					connection.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			
 			cardRFID.beep(10);
 			cardRFID.destroy();
 		}
 	}
 	
 	public void promptRestStaff() {
-		LoginSession.staffSignal = false;
+		SFClient.staffSignal = false;
 		
-		if (log.isDebugEnabled()) log.debug("staffSignal:"+LoginSession.staffSignal);
+		if (log.isDebugEnabled()) log.debug("staffSignal:"+SFClient.staffSignal);
 
 		//clean view
 		if (bodyPanel!=null && bodyPanel.isShowing()) {
@@ -548,7 +412,7 @@ public class UserAction {
 		
 		y += hight;
 		messageLabel= new JLabel();
-		if(LoginSession.isOpenNetwork()){
+		if(SFClient.isOpenNetwork()){
 			messageLabel.setText("网络正常");
 			messageLabel.setForeground(Color.GREEN);
 		}else{

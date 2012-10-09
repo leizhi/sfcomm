@@ -1,4 +1,4 @@
-package gui;
+package test.gui;
 /*
  * @(#)SimpleWrite.java	1.12 98/06/25 SMI
  * 
