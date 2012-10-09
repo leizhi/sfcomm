@@ -23,7 +23,7 @@ public class SFClient {
 
 	private static Socket socket = new Socket();
 
-	public static String host="127.0.0.1";
+	public static String host="192.168.1.7";
 	public static int port=8000;
 	
 	private OutputStream out = null;
