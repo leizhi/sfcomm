@@ -24,17 +24,12 @@ public class ISO14443AAction extends ImplementationISO14443A{
 			}
 			
 			for(int i=1;i<16;i++){
-				
+				findSerialNumber();
 				loadKey((byte)i, password);
 				authentication((byte)i);
 				
-				findSerialNumber();
 				write((byte)(i*BLOCK_SIZE+0),buffer);
-				
-				findSerialNumber();
 				write((byte)(i*BLOCK_SIZE+1),buffer);
-				
-				findSerialNumber();
 				write((byte)(i*BLOCK_SIZE+2),buffer);
 			}
 		}catch (Exception e) {
@@ -43,7 +38,7 @@ public class ISO14443AAction extends ImplementationISO14443A{
 	}
 	
 	public void save(Card card) throws Exception{
-		int choseCard=findCardType();
+		int choseCard=request();
 		
 		if(choseCard==CommandsISO14443A.CARD_14443A_M1){
 			saveM1(card.getRfidcode(), 1, 0, 16);
@@ -53,7 +48,7 @@ public class ISO14443AAction extends ImplementationISO14443A{
 	}
 
 	public void save(User user) throws Exception{
-		int choseCard=findCardType();
+		int choseCard=request();
 		
 		if(choseCard==CommandsISO14443A.CARD_14443A_M1){
 			saveM1(user.getName(), 1, 1, 16);
@@ -91,8 +86,7 @@ public class ISO14443AAction extends ImplementationISO14443A{
 	}
 	
 	public void saveUL(String buf,int page,int maxLength) throws Exception{
-			findSerialNumber();
-			
+		
 			byte[] bbuf = buf.getBytes("gb2312");
 
 			int countPage = 0;
@@ -110,13 +104,15 @@ public class ISO14443AAction extends ImplementationISO14443A{
 
 			if(countPage>16)
 				countPage=16;
-			
+			System.out.println("saveUL>>>>>>>>>>>>>>>>>>>>>>>>>");
+
 			System.out.println("maxLength:"+maxLength);
 			System.out.println("countPage:"+countPage);
 			System.out.println("page:"+page);
 
 			for(int i=0;i<countPage;i++){
 				byte[] wbuf = {0,0,0,0};
+				
 				if(i*4+0<maxLength)
 					wbuf[0] = bbuf[i*4+0];
 				
@@ -129,12 +125,10 @@ public class ISO14443AAction extends ImplementationISO14443A{
 				if(i*4+3<maxLength)
 					wbuf[3] = bbuf[i*4+3];
 				
-				System.out.println("write page:"+page);
-
-				write((byte)(page),wbuf);//default 4 bytes
-				
-				page++;
+				System.out.println("write page:"+(page+i));
+				write((byte)(page+i),wbuf);//default 4 bytes
 			}
+			System.out.println("saveUL<<<<<<<<<<<<<<<<<<<<<<<<<<");
 	}
 	
 	
@@ -144,19 +138,19 @@ public class ISO14443AAction extends ImplementationISO14443A{
 		String buffer = null;
 		
 		try {
-			findSerialNumber();
-			
-			int choseCard=findCardType();
-			
+			int choseCard=request();
+			System.out.println("choseCard:"+choseCard);
+
 			if(choseCard==CommandsISO14443A.CARD_14443A_M1){
-				bytes = readM1(page,block);
+				loadKey((byte)page, password);
+				authentication((byte)page);
+				bytes = read((byte)(page*BLOCK_SIZE + block));
 			}else if(choseCard==CommandsISO14443A.CARD_14443A_UL){
-				bytes = readUL(page);
+				bytes = read((byte)page);
 			}
 			
-			System.out.println("choseCard:"+choseCard);
-			
 			buffer = new String(bytes,4,16,"GBK");
+			System.out.println("buffer:"+buffer);
 
 			bytes = buffer.getBytes();
 			int length = 0;
@@ -167,6 +161,11 @@ public class ISO14443AAction extends ImplementationISO14443A{
 				}
 			}
 			
+			if(length==0 && bytes.length>0)
+				length=bytes.length;
+			
+			System.out.println("length:"+length);
+
 			buffer = new String(bytes,0,length);
 			
 		} catch (UnsupportedEncodingException e) {
@@ -175,17 +174,11 @@ public class ISO14443AAction extends ImplementationISO14443A{
 		return buffer;
 	}
 	
-	public byte[] readM1(int page,int block) {
-		findSerialNumber();
-		
-		loadKey((byte)page, password);
-		authentication((byte)page);
-		
-		return read((byte)(page*BLOCK_SIZE + block));
-	}
-	
-	public byte[] readUL(int page) {
-		findSerialNumber();
-		return read((byte)page);
+	public String readUL(int page) throws Exception {
+		byte[] bytes =null;
+		String buffer = null;
+		bytes = read((byte)page);
+		buffer = new String(bytes,4,16,"GBK");
+		return buffer;
 	}
 }

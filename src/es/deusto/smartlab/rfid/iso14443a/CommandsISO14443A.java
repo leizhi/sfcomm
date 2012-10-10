@@ -85,25 +85,19 @@ public class CommandsISO14443A {
 		static CommandsISO14443A getVersion() {
 			return new CommandsISO14443A((byte) 0x11,null);
 		}
-		
-		public static CommandsISO14443A findCardType() {
-			byte[] data = new byte[1];
-			data[0] = MODE_ONE;
-			return new CommandsISO14443A((byte) 0x02, data);
-		}
-		
+		/*
 		static CommandsISO14443A findM1() {
 			byte[] data = new byte[1];
 			data[0] = MODE_ONE;
 			return new CommandsISO14443A((byte) 0x01, data);
 		}
 		
-		static CommandsISO14443A findUL() {
+		static CommandsISO14443A requestUL() {
 			byte[] data = new byte[1];
 			data[0] = MODE_UL;
 			return new CommandsISO14443A((byte) 0x38, data);
 		}
-		
+		*/
 		static CommandsISO14443A loadKey(byte address,byte[] password) {
 			byte[] data = new byte[8];
 			data[0] = 0x00;
@@ -153,4 +147,88 @@ public class CommandsISO14443A {
 			data[1] = (byte) (msec/256);
 			return new CommandsISO14443A((byte) 0x14, data);
 		}
+
+		//是否有卡
+		static CommandsISO14443A request() {
+			byte[] data = new byte[1];
+			data[0] = MODE_ONE;
+			return new CommandsISO14443A((byte) 0x02, data);
+		}
+		
+		//返回卡的序列号 防止卡冲突
+		static CommandsISO14443A anticoll() {
+			byte[] data = new byte[1];
+			data[0] = 0x00;//预选卡所用的位数，标准值为0
+			return new CommandsISO14443A((byte) 0x03, data);
+		}
+		//选取指定序列号的卡
+		static CommandsISO14443A select(byte[] serialAddr) {
+			byte[] data = new byte[4];
+			data[0] = serialAddr[0];
+			data[1] = serialAddr[1];
+			data[2] = serialAddr[2];
+			data[3] = serialAddr[3];
+			return new CommandsISO14443A((byte) 0x04, data);
+		}
+		
+		static CommandsISO14443A anticoll2() {
+			byte[] data = new byte[1];
+			data[0] = 0x00;//预选卡所用的位数，标准值为0
+			return new CommandsISO14443A((byte) 0x70, data);
+		}
+		
+		static CommandsISO14443A select2(byte[] serialAddr) {
+			byte[] data = new byte[4];
+			data[0] = serialAddr[0];
+			data[1] = serialAddr[1];
+			data[2] = serialAddr[2];
+			data[3] = serialAddr[3];
+			return new CommandsISO14443A((byte) 0x71, data);
+		}
+		/*
+		public static byte[] writeUL(byte address,byte[] buffer) {
+			byte[] request = new byte[30];
+			request[0] = (byte) 0xa7;
+			request[1] = 0x12;
+			request[2] = 0x08;
+			request[3] = 0x04;
+			
+			//要写入的数据
+			int maxLen = 16;
+			
+			if(buffer.length < 16) 
+				maxLen = buffer.length;
+			
+			for (int i=0;i<maxLen;i++)
+				request[4+i]=buffer[i];
+			
+			request[20] = 0;
+			
+			//求发送数据包的异或校验值
+			for(int i=0;i<2+request[1];i++)
+				request[20]=(byte) (request[20]^request[i]);
+			
+			return request;
+//			Sleep(10);
+//			for (int i=0;i<21;i++)
+//		        WriteChar(icdevice,sendbuf[i]);
+//			
+//			if(ReceiveST(icdevice,&t))
+//			{
+//				return (-132);//超时错误
+//			}
+//		    LRC=t;
+//			
+//			ReadChar(icdevice,&len);
+//			LRC=LRC^len;
+//			for(i=0;i<=len;i++)
+//			{
+//				ReadChar(icdevice,&rebuf[i]);
+//		   	}
+//			for(i=0;i<len;i++)
+//			{
+//		    	LRC=LRC^rebuf[i]; 
+//		    }
+		}
+		*/
 }

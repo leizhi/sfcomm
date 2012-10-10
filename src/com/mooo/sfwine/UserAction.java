@@ -371,7 +371,7 @@ public class UserAction {
 			if (serialNumber == null)
 				throw new NullPointerException("请放人电子标签或者电子卡");
 			
-			int cardType = cardRFID.findCardType();
+			int cardType = cardRFID.request();
 			if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
 			if (log.isDebugEnabled()) log.debug("falt card:"+CommandsISO14443A.CARD_14443A_M1);
 			
@@ -520,7 +520,7 @@ public class UserAction {
 				if (serialNumber == null)
 					throw new NullPointerException("请放人电子标签或者电子卡");
 				
-				int cardType = cardRFID.findCardType();
+				int cardType = cardRFID.request();
 				if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
 				if (log.isDebugEnabled()) log.debug("falt card:"+CommandsISO14443A.CARD_14443A_M1);
 				

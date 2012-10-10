@@ -6,7 +6,7 @@ public interface ISO14443A {
 	
 	String findSerialNumber();
 	
-	short findCardType();
+	short request();
 	
 	boolean initialize();
 	

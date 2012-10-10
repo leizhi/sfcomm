@@ -41,9 +41,9 @@ public class IccrfTest {
 //		long id = iccrf.();
 
 		System.out.println("serialNumber:"+serialNumber);
-		int cardType = iccrf.findCardType();
+		int cardType = iccrf.request();
 
-		System.out.println("findCardType:"+iccrf.findCardType());
+		System.out.println("findCardType:"+iccrf.request());
 		
 		if(cardType==0x0044){
 			System.out.println("The Card is UL");

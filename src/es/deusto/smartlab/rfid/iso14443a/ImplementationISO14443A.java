@@ -36,7 +36,7 @@ public class ImplementationISO14443A implements ISO14443A{
 	public boolean initialize() {
 		if (port != null) {
 			if (serialManager.openPort(port, 9600)) {
-				if (testConnection())
+				if (shakeHands())
 					opened = true;
 				else
 					serialManager.closePort();
@@ -49,9 +49,9 @@ public class ImplementationISO14443A implements ISO14443A{
 			}
 			
 			if (serialManager.openPort(ISO14443AAction.whichPort, ISO14443AAction.whichSpeed)) {
-				if (testConnection()) {
+				if (shakeHands())
 					opened = true;
-				} else
+				else
 					serialManager.closePort();
 			}
 		}
@@ -68,85 +68,53 @@ public class ImplementationISO14443A implements ISO14443A{
 			serialManager.closePort();
 	}
 	
-	private boolean testConnection() {
-		
+	private boolean shakeHands() {
     	byte [] command = CommandsISO14443A.shakeHands().getBytes();
 		
-		System.out.println("testConnection:");
+		System.out.println("shakeHands:");
     	testCommand(command);
 		
 		serialManager.send(command);
 
 		byte[] response = serialManager.read();
-		byte[] compar = {(byte) 0xA7};
 
-		System.out.println("testConnection response:"+StringUtils.toHex(response));
+		System.out.println("shakeHands response:"+StringUtils.toHex(response));
+		byte LRC = 0x00;
 
-		if (response.length == 0) {
-			return false;
-		} else if (response[0] == compar[0]) {
-			return true;
-		} else {
-			return false;
+		byte respS  = (byte)response[0];
+		LRC = respS;
+
+		byte respE  = (byte)response[response.length-1];
+
+		byte respL = (byte)response[1];
+		LRC = (byte) (LRC^respL);
+		
+		byte[] buf = new byte[respL];
+		for(int i=0;i<respL;i++){
+			buf[i]=response[i+2];
+			LRC = (byte) (LRC^buf[i]);
 		}
+		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
+			return false;
+		} 
+		System.out.println("shakeHands buffer:"+StringUtils.toHex(buf));
+		return true;
 	}
 	
 	public String findSerialNumber() {
+		String serialNumber = "";
 		
-		CommandsISO14443A execCmd = CommandsISO14443A.findM1();
-		if(execCmd==null)
-			return null;
+		request();
+		byte[] s1 = anticoll();
+		select(s1);
 		
-    	byte [] command = execCmd.getBytes();
-		System.out.println("findSerialNumber:");
+		byte[] s2 = anticoll2();
+		select2(s2);
+        
+		serialNumber = StringUtils.toHex(s2);
+		serialNumber += StringUtils.toHex(s1);
 
-		testCommand(command);
-		serialManager.send(command);
-
-		byte[] response = serialManager.read();
-		byte[] compar = {(byte) 0xA7};
-
-		System.out.println("findSerialNumber response:"+StringUtils.toHex(response));
-		boolean isOK = false;
-		
-		if (response ==null || response.length == 0) {
-			return null;
-		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
-			isOK = true;
-			return StringUtils.toHex(StringUtils.subBytes(response,4,4));
-		}	
-	
-		if(isOK) {
-			System.out.println("The Card is CARD_14443A_M1");
-		}else{
-			execCmd = CommandsISO14443A.findUL();
-			if(execCmd==null)
-				return null;
-			
-	    	command = execCmd.getBytes();
-			System.out.println("findSerialNumber:");
-
-			testCommand(command);
-			serialManager.send(command);
-
-			response = serialManager.read();
-
-			System.out.println("findSerialNumber response:"+StringUtils.toHex(response));
-			
-			if (response ==null || response.length == 0) {
-				return null;
-			} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
-				isOK = true;
-				return StringUtils.toHex(StringUtils.subBytes(response,4,4));
-			}	
-		}
-		
-		if(isOK) 
-			System.out.println("The Card is CARD_14443A_UL");
-		else 
-			System.out.println("The Card is 15693 or other Type");
-		
-		return null;
+		return serialNumber;
 	}
 	
 	public boolean driveVersion() {
@@ -172,26 +140,175 @@ public class ImplementationISO14443A implements ISO14443A{
 		}
 	}
 
-	public short findCardType() {
-    	byte [] command = CommandsISO14443A.findCardType().getBytes();
-		System.out.println("findCardType:");
-    	testCommand(command);
+	public short request() {
+		byte [] command = CommandsISO14443A.request().getBytes();
+		System.out.println("request:");
+		testCommand(command);
+		
+		serialManager.send(command);
+		byte[] response = serialManager.read();
+
+		System.out.println("request response:"+StringUtils.toHex(response));
+		byte LRC = 0x00;
+
+		byte respS  = (byte)response[0];
+		LRC = respS;
+
+		byte respE  = (byte)response[response.length-1];
+
+		int respL = (byte)response[1];
+		LRC = (byte) (LRC^respL);
+		
+		byte[] buf = new byte[respL];
+		for(int i=0;i<respL;i++){
+			buf[i]=response[i+2];
+			LRC = (byte) (LRC^buf[i]);
+		}
+		
+		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
+			return -1;
+		} 
+		System.out.println("request buffer:"+StringUtils.toHex(buf));
+		return StringUtils.toShort(StringUtils.swapBytes(StringUtils.subBytes(response,4,2)));
+	}
+	
+	public byte[] anticoll() {
+		byte[] command = CommandsISO14443A.anticoll().getBytes();
+
+		System.out.println("anticoll:");
+		testCommand(command);
+		
 		serialManager.send(command);
 
 		byte[] response = serialManager.read();
-		byte[] compar = {(byte) 0xA7};
 
-		System.out.println("findCardType response:"+StringUtils.toHex(response));
+		System.out.println("anticoll response:"+StringUtils.toHex(response));
+		byte LRC = 0x00;
 
-		if (response ==null || response.length == 0) {
-			return -1;
-		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
-			return StringUtils.toShort(StringUtils.swapBytes(StringUtils.subBytes(response,4,2)));
-		} else {
-			return -2;
+		byte respS  = (byte)response[0];
+		LRC = respS;
+
+		byte respE  = (byte)response[response.length-1];
+
+		byte respL = (byte)response[1];
+		LRC = (byte) (LRC^respL);
+		
+		byte[] buf = new byte[respL];
+		for(int i=0;i<respL;i++){
+			buf[i]=response[i+2];
+			LRC = (byte) (LRC^buf[i]);
 		}
+		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
+			return null;
+		} 
+		
+		System.out.println("anticoll buffer:"+StringUtils.toHex(buf));
+		byte[] serialAddr = StringUtils.subBytes(buf,2,4);
+//		serialAddr = StringUtils.swapBytes(serialAddr);
+		
+		return serialAddr;
 	}
 	
+	public boolean select(byte[] serialAddr) {
+		byte [] command = CommandsISO14443A.select(serialAddr).getBytes();
+
+		System.out.println("select:");
+		testCommand(command);
+		
+		serialManager.send(command);
+
+		byte[] response = serialManager.read();
+
+		System.out.println("select response:"+StringUtils.toHex(response));
+		byte LRC = 0x00;
+
+		byte respS  = (byte)response[0];
+		LRC = respS;
+
+		byte respE  = (byte)response[response.length-1];
+
+		byte respL = (byte)response[1];
+		LRC = (byte) (LRC^respL);
+		
+		byte[] buf = new byte[respL];
+		for(int i=0;i<respL;i++){
+			buf[i]=response[i+2];
+			LRC = (byte) (LRC^buf[i]);
+		}
+		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
+			return false;
+		} 
+		System.out.println("select buffer:"+StringUtils.toHex(buf));
+		return true;
+	}
+	
+	public byte[] anticoll2() {
+		byte [] command = CommandsISO14443A.anticoll2().getBytes();
+
+		System.out.println("anticoll2:");
+		testCommand(command);
+		
+		serialManager.send(command);
+
+		byte[] response = serialManager.read();
+
+		System.out.println("anticoll2 response:"+StringUtils.toHex(response));
+		byte LRC = 0x00;
+
+		byte respS  = (byte)response[0];
+		LRC = respS;
+
+		byte respE  = (byte)response[response.length-1];
+
+		byte respL = (byte)response[1];
+		LRC = (byte) (LRC^respL);
+		
+		byte[] buf = new byte[respL];
+		for(int i=0;i<respL;i++){
+			buf[i]=response[i+2];
+			LRC = (byte) (LRC^buf[i]);
+		}
+		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
+			return null;
+		} 
+		System.out.println("anticoll2 buffer:"+StringUtils.toHex(buf));
+		byte[] serialAddr = StringUtils.subBytes(buf,2,4);
+		System.out.println("serialAddr 2:"+StringUtils.toHex(StringUtils.swapBytes(serialAddr)));
+		return serialAddr;
+	}
+	
+	public boolean select2(byte[] serialAddr) {
+		byte[] command = CommandsISO14443A.select2(serialAddr).getBytes();
+		System.out.println("select2:");
+		testCommand(command);
+		
+		serialManager.send(command);
+
+		byte[] response = serialManager.read();
+
+		System.out.println("select2 response:"+StringUtils.toHex(response));
+		byte LRC = 0x00;
+
+		byte respS  = (byte)response[0];
+		LRC = respS;
+
+		byte respE  = (byte)response[response.length-1];
+
+		byte respL = (byte)response[1];
+		LRC = (byte) (LRC^respL);
+		
+		byte[] buf = new byte[respL];
+		for(int i=0;i<respL;i++){
+			buf[i]=response[i+2];
+			LRC = (byte) (LRC^buf[i]);
+		}
+		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
+			return false;
+		} 
+		System.out.println("select2 buffer:"+StringUtils.toHex(buf));
+		return true;
+	}
+
 	public boolean loadKey(byte address,byte[] password){
 		byte[] command = CommandsISO14443A.loadKey(address, password).getBytes();
 
@@ -201,17 +318,28 @@ public class ImplementationISO14443A implements ISO14443A{
 		serialManager.send(command);
 		
 		byte[] response = serialManager.read();
-		byte[] compar = {(byte) 0xA7};
 
-		System.out.println(StringUtils.toHex(response));
-	
-		if (response==null || response.length == 0) {
-			return false;
-		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
-			System.out.println("loadKey response:"+StringUtils.toHex(response));
-			return true;
+		System.out.println("select2 response:"+StringUtils.toHex(response));
+		byte LRC = 0x00;
+
+		byte respS  = (byte)response[0];
+		LRC = respS;
+
+		byte respE  = (byte)response[response.length-1];
+
+		byte respL = (byte)response[1];
+		LRC = (byte) (LRC^respL);
+		
+		byte[] buf = new byte[respL];
+		for(int i=0;i<respL;i++){
+			buf[i]=response[i+2];
+			LRC = (byte) (LRC^buf[i]);
 		}
-		return false;
+		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
+			return false;
+		} 
+		System.out.println("select2 buffer:"+StringUtils.toHex(buf));
+		return true;
 	}
 	
 	public boolean authentication(byte address){
@@ -223,17 +351,28 @@ public class ImplementationISO14443A implements ISO14443A{
 		serialManager.send(command);
 		
 		byte[] response = serialManager.read();
-		byte[] compar = {(byte) 0xA7};
-		
-   	 	System.out.println(StringUtils.toHex(response));
 
-		if (response==null || response.length == 0) {
-			return false;
-		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
-			System.out.println("authentication response:"+StringUtils.toHex(response));
-	    	 return true;
+		System.out.println("select2 response:"+StringUtils.toHex(response));
+		byte LRC = 0x00;
+
+		byte respS  = (byte)response[0];
+		LRC = respS;
+
+		byte respE  = (byte)response[response.length-1];
+
+		byte respL = (byte)response[1];
+		LRC = (byte) (LRC^respL);
+		
+		byte[] buf = new byte[respL];
+		for(int i=0;i<respL;i++){
+			buf[i]=response[i+2];
+			LRC = (byte) (LRC^buf[i]);
 		}
-		return false;
+		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
+			return false;
+		} 
+		System.out.println("select2 buffer:"+StringUtils.toHex(buf));
+		return true;
 	}
 	
 	public boolean halt(){
@@ -245,37 +384,60 @@ public class ImplementationISO14443A implements ISO14443A{
 		serialManager.send(command);
 		
 		byte[] response = serialManager.read();
-		byte[] compar = {(byte) 0xA7};
 
-		System.out.println(StringUtils.toHex(response));
+		System.out.println("select2 response:"+StringUtils.toHex(response));
+		byte LRC = 0x00;
+
+		byte respS  = (byte)response[0];
+		LRC = respS;
+
+		byte respE  = (byte)response[response.length-1];
+
+		byte respL = (byte)response[1];
+		LRC = (byte) (LRC^respL);
 		
-		if (response.length == 0) {
-			return false;
-		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
-	    	 return true;
+		byte[] buf = new byte[respL];
+		for(int i=0;i<respL;i++){
+			buf[i]=response[i+2];
+			LRC = (byte) (LRC^buf[i]);
 		}
-		return false;
+		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
+			return false;
+		} 
+		System.out.println("select2 buffer:"+StringUtils.toHex(buf));
+		return true;
 	}
 	
 	public boolean write(byte address,byte[] data){
 		byte[] command = CommandsISO14443A.write(address,data).getBytes();
-		
 		System.out.println("write:");
 		testCommand(command);
-
+		
 		serialManager.send(command);
 		
 		byte[] response = serialManager.read();
-		byte[] compar = {(byte) 0xA7};
 
 		System.out.println("write response:"+StringUtils.toHex(response));
+		byte LRC = 0x00;
+
+		byte respS  = (byte)response[0];
+		LRC = respS;
+
+		byte respE  = (byte)response[response.length-1];
+
+		byte respL = (byte)response[1];
+		LRC = (byte) (LRC^respL);
 		
-		if (response==null || response.length == 0) {
-			return false;
-		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
-	    	  return true;
+		byte[] buf = new byte[respL];
+		for(int i=0;i<respL;i++){
+			buf[i]=response[i+2];
+			LRC = (byte) (LRC^buf[i]);
 		}
-		return false;
+		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
+			return false;
+		} 
+		System.out.println("write buffer:"+StringUtils.toHex(buf));
+		return true;
 	}
 	
 	public byte[] read(byte address){
@@ -287,21 +449,32 @@ public class ImplementationISO14443A implements ISO14443A{
 		serialManager.send(command);
 		
 		byte[] response = serialManager.read();
-		byte[] compar = {(byte) 0xA7};
 
 		System.out.println("read response:"+StringUtils.toHex(response));
+		byte LRC = 0x00;
+
+		byte respS  = (byte)response[0];
+		LRC = respS;
+
+		byte respE  = (byte)response[response.length-1];
+
+		byte respL = (byte)response[1];
+		LRC = (byte) (LRC^respL);
 		
-		if (response.length == 0) {
-			return null;
-		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
-	    	 return response;
+		byte[] buf = new byte[respL];
+		for(int i=0;i<respL;i++){
+			buf[i]=response[i+2];
+			LRC = (byte) (LRC^buf[i]);
 		}
-		return null;
+		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
+			return null;
+		} 
+		System.out.println("read buffer:"+StringUtils.toHex(response));
+		
+		return response;
 	}
 	
-	public String beep(int msec){
-//		findSerialNumber();
-		
+	public boolean beep(int msec){
 		byte[] command =CommandsISO14443A.beep(msec).getBytes();
 		
 		System.out.println("beep:");
@@ -309,16 +482,28 @@ public class ImplementationISO14443A implements ISO14443A{
 		serialManager.send(command);
 		
 		byte[] response = serialManager.read();
-		byte[] compar = {(byte) 0xA7};
 
-//		System.out.println("beep respnse:"+StringUtils.toHex(response));
+		System.out.println("beep response:"+StringUtils.toHex(response));
+		byte LRC = 0x00;
+
+		byte respS  = (byte)response[0];
+		LRC = respS;
+
+		byte respE  = (byte)response[response.length-1];
+
+		byte respL = (byte)response[1];
+		LRC = (byte) (LRC^respL);
 		
-		if (response==null || response.length == 0) {
-			return null;
-		} else if (response[0] == compar[0] && StringUtils.rightLRC(response) && response[2]==0) {
-	    	 return StringUtils.toHex(response);
+		byte[] buf = new byte[respL];
+		for(int i=0;i<respL;i++){
+			buf[i]=response[i+2];
+			LRC = (byte) (LRC^buf[i]);
 		}
-		return null;
+		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
+			return false;
+		} 
+		System.out.println("beep buffer:"+StringUtils.toHex(buf));
+		return true;
 	}
 
     public static void testCommand(byte[] command){
@@ -328,4 +513,55 @@ public class ImplementationISO14443A implements ISO14443A{
             System.out.printf("\t 0x%02X 0d%d \n", bt,bt);
         }
     }
+    
+	public String testRequest() {
+		String serialNumber = "";
+		
+		request();
+		byte[] s1 = anticoll();
+		select(s1);
+		
+		byte[] s2 = anticoll2();
+		select2(s2);
+        
+		serialNumber = StringUtils.toHex(s2);
+		serialNumber += StringUtils.toHex(s1);
+//		
+//		System.out.println("SerialNumber:"+serialNumber);
+//		String buf = "LZZJ001209030023";
+		
+//		byte[] wbuf = {0x78};
+//		
+//		for(int i=0;i<12;i++){
+//			write((byte)(4+i),wbuf);//default 4 bytes
+//		}
+//		
+//		byte[] response = read((byte) 4);
+//		System.out.println("red response:"+StringUtils.toHex(response));
+		
+//		byte[] req = new byte[5];
+//		req[0] = (byte) 0xA7;
+//		req[1] = (byte) 0x02;
+//		req[2] = (byte) 0x07;
+//		req[3] = (byte) 0x04;
+//		req[4] = (byte) 0x00;
+//		
+//		System.out.println("read:");
+//		
+//		for(int i=0;i<req.length-1;i++){
+//            System.out.printf("CRC:	\t 0x%02X 0d%d \n", req[4],req[4]);
+//			req[4] = (byte) (req[4] ^ req[i]);
+//		}
+//        System.out.printf("END CRC:	\t 0x%02X 0d%d \n", req[4],req[4]);
+//
+//		testCommand(req);
+//		serialManager.send(req);
+//		
+//		byte[] response = serialManager.read();
+//		 
+////		byte[] response = read((byte) 4);
+//		
+//		System.out.println("red response:"+StringUtils.toHex(response));
+		return serialNumber;
+	}
 }

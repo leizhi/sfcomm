@@ -1,8 +1,5 @@
 package test;
 
-import java.io.UnsupportedEncodingException;
-
-import com.mooo.mycoz.common.StringUtils;
 import com.mooo.sfwine.ISO14443AAction;
 import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 import es.deusto.smartlab.rfid.iso14443a.ImplementationISO14443A;
@@ -13,29 +10,6 @@ import es.deusto.smartlab.rfid.iso14443a.ImplementationISO14443A;
  */
 public class ULTest {
 
-	public void test(){
-		ImplementationISO14443A iccrf = new ImplementationISO14443A();
-		try {
-			iccrf.initialize();
-			
-			while(true){
-				iccrf.findSerialNumber();
-				
-				short cardType = iccrf.findCardType();
-				
-				if(cardType!=CommandsISO14443A.CARD_14443A_UL){
-    				throw new NullPointerException("此卡非员工卡");
-				}
-				
-				iccrf.beep(10);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			iccrf.beep(10);
-			iccrf.destroy();
-		}
-	}
 	public static void main(String args[]) throws InterruptedException {
 		byte[] password = {(byte) 0xFF,(byte) 0xFF,(byte) 0xFF,(byte) 0xFF,(byte) 0xFF,(byte) 0xFF};
 
@@ -73,18 +47,22 @@ public class ULTest {
 		System.out.println(respnse);
 */
 		String buf = "LZZJ001209030023";
-//		buf = "111111111111";
+		buf = "ZZZZ001209030036";
 		String reponse;
 		try {
 			//write UL
+			reponse = iccrf.findSerialNumber();
+			
+//			System.out.println("SerialNumber:"+reponse);
+			
+			iccrf.saveUL(buf,4,16);
+			reponse = iccrf.readUL(4);
+			
+			System.out.println("reponse:"+reponse);
 //			iccrf.cleanAll();
-//			iccrf.saveUL(buf,4,32);
-//			reponse = iccrf.read(4,0);
-//			String serialNumber = iccrf.findSerialNumber();
-//			System.out.println("SerialNumber:"+serialNumber);
-//			System.out.println("SerialNumber:"+iccrf.findCardType());
-
-//			System.out.println("SerialNumber:"+StringUtils.hash(serialNumber));
+//			iccrf.saveUL(buf,4,16);
+//			
+//			reponse = iccrf.testRequest();
 //			System.out.println("reponse:"+reponse);
 
 			//write M1
@@ -93,16 +71,16 @@ public class ULTest {
 //			iccrf.write((byte)(1*4 + 1),buf.getBytes("gb2312"));
 //			iccrf.cleanAll();
 			
-			buf = "赵杰1";
-			iccrf.saveM1(buf, 1, 1, 16);
-			buf = "000000";
-			iccrf.saveM1(buf, 1, 2, 16);
-
-			reponse = iccrf.read(1,1);
-			System.out.println("1,1:"+reponse);
-
-			reponse = iccrf.read(1,2);
-			System.out.println("1,2:"+reponse);
+//			buf = "赵杰";
+//			iccrf.saveM1(buf, 1, 1, 16);
+//			buf = "000000";
+//			iccrf.saveM1(buf, 1, 2, 16);
+//
+//			reponse = iccrf.read(1,1);
+//			System.out.println("1,1:"+reponse);
+//
+//			reponse = iccrf.read(1,2);
+//			System.out.println("1,2:"+reponse);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

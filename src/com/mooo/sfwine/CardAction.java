@@ -327,7 +327,7 @@ public class CardAction {
 									}
 									if (log.isDebugEnabled()) log.debug("卡片 okay:");
 									
-									int cardType = cardRFID.findCardType();
+									int cardType = cardRFID.request();
 									if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
 									if (log.isDebugEnabled()) log.debug("M1 Card is:"+CommandsISO14443A.CARD_14443A_M1);
 									if (log.isDebugEnabled()) log.debug("UL Card is:"+CommandsISO14443A.CARD_14443A_UL);
