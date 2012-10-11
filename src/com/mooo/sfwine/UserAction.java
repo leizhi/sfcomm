@@ -354,7 +354,8 @@ public class UserAction {
         long count=0;
 		ISO14443AAction cardRFID = new ISO14443AAction();
         try {
-    		cardRFID.initialize();
+    		cardRFID.initSerial();
+    		cardRFID.initCard();
     		
     		if(log.isDebugEnabled()) log.debug("processLogin getName:"+userNameText.getText());	
     		if(log.isDebugEnabled()) log.debug("processLogin getPassword:"+String.valueOf(passwordText.getPassword()));	
@@ -366,7 +367,7 @@ public class UserAction {
 			if (!cardRFID.isOpened())
 				throw new NullPointerException("请正确连接发卡器");
 
-			String serialNumber = cardRFID.findSerialNumber();
+			String serialNumber = cardRFID.getSerialNumber();
 			
 			if (serialNumber == null)
 				throw new NullPointerException("请放人电子标签或者电子卡");
@@ -389,8 +390,8 @@ public class UserAction {
 			if (log.isDebugEnabled()) log.debug("userNameText:"+String.valueOf(userNameText.getText()));
 			if (log.isDebugEnabled()) log.debug("passwordText:"+String.valueOf(passwordText.getPassword()));
 
-			cardRFID.saveM1(String.valueOf(userNameText.getText()), 1, 1, 16);
-			cardRFID.saveM1(String.valueOf(passwordText.getPassword()), 1, 2, 16);
+			cardRFID.save(String.valueOf(userNameText.getText()), 1, 1, 16);
+			cardRFID.save(String.valueOf(passwordText.getPassword()), 1, 2, 16);
 
             
     		if(log.isDebugEnabled()) log.debug("count:"+count);	
@@ -504,8 +505,9 @@ public class UserAction {
 	public void processRestStaff(){
 		ISO14443AAction cardRFID = new ISO14443AAction();
 		 try {
-	    		cardRFID.initialize();
-				
+	    		cardRFID.initSerial();
+	    		cardRFID.initCard();
+	    		
 	    		if (log.isDebugEnabled()) log.debug(ISO14443AAction.whichPort +"/" + ISO14443AAction.whichSpeed);
 
 	    		StringUtils.notEmpty(userNameText.getText());
@@ -515,7 +517,7 @@ public class UserAction {
 				if (!cardRFID.isOpened())
 					throw new NullPointerException("请正确连接发卡器");
 				
-				String serialNumber = cardRFID.findSerialNumber();
+				String serialNumber = cardRFID.getSerialNumber();
 				
 				if (serialNumber == null)
 					throw new NullPointerException("请放人电子标签或者电子卡");
@@ -535,8 +537,8 @@ public class UserAction {
 	    		
 	    		cardRFID.cleanAll();
 	    		
-	    		cardRFID.saveM1(String.valueOf(userNameText.getText()), 1, 1, 16);
-				cardRFID.saveM1(String.valueOf(passwordText.getPassword()), 1, 2, 16);
+	    		cardRFID.save(String.valueOf(userNameText.getText()), 1, 1, 16);
+				cardRFID.save(String.valueOf(passwordText.getPassword()), 1, 2, 16);
 				
 				message = "重置完成!";
 				messageLabel.setText(message);

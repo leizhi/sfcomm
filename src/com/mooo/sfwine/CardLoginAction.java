@@ -160,7 +160,8 @@ public class CardLoginAction {
 					ISO14443AAction cardRFID = new ISO14443AAction();
 					try {
 						//初始化
-						cardRFID.initialize();
+						cardRFID.initSerial();
+						cardRFID.initCard();
 						
 						//请正确连接发卡器
 						if(!cardRFID.isOpened()){
@@ -170,7 +171,7 @@ public class CardLoginAction {
 						if (log.isDebugEnabled()) log.debug("连接发卡器 okay:");
 
 						//请放人电子标签或者电子卡
-						String serialNumber = cardRFID.findSerialNumber();
+						String serialNumber = cardRFID.getSerialNumber();
 						if(serialNumber == null){
 							if (log.isDebugEnabled()) log.debug("请放人电子标签或者电子卡");
 							throw new NullPointerException("请放人电子标签或者电子卡!");
@@ -185,12 +186,10 @@ public class CardLoginAction {
 							throw new NullPointerException("此卡非标签卡!");
 						}
 						
-						cardRFID.findSerialNumber();
 						String userName = cardRFID.read(1, 1);
 						if (log.isDebugEnabled()) log.debug("userName:"+userName);
 						SFClient.user.setName(userName.trim());
 						
-						cardRFID.findSerialNumber();
 						String password = cardRFID.read(1, 2);
 						if (log.isDebugEnabled()) log.debug("password:"+password);
 						SFClient.user.setPassword(password.trim());

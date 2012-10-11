@@ -4,12 +4,12 @@ public interface ISO14443A {
 	
 	boolean driveVersion();
 	
-	String findSerialNumber();
-	
 	short request();
 	
-	boolean initialize();
+	boolean initSerial();
 	
+	void initCard();
+
 	void destroy();
 	
 	boolean loadKey(byte address,byte[] password);
@@ -20,7 +20,7 @@ public interface ISO14443A {
 	
 	boolean authentication(byte address);
 	
-//	boolean shakeHands();
+	boolean shakeHands();
 	
 	boolean halt();
 }

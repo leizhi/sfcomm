@@ -23,7 +23,7 @@ public class SFClient {
 
 	private static Socket socket = new Socket();
 
-	public static String host="192.168.1.106";
+	public static String host="192.168.1.101";
 	public static int port=8000;
 	
 	private OutputStream out = null;
@@ -71,8 +71,6 @@ public class SFClient {
 						if(log.isDebugEnabled())log.debug("command:"+url);
 						print.println(url);//request to server
 						buffer=read.readLine().trim();//response from server
-						print.flush();
-						
 						if(log.isDebugEnabled())log.debug("response:"+buffer);
 					}
 				}

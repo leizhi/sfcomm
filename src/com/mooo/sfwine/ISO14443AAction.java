@@ -17,62 +17,72 @@ public class ISO14443AAction extends ImplementationISO14443A{
 	//清除所有数据
 	public void cleanAll() {
 		try {
+			int choseCard=getCardType();
 			
-			byte[] buffer = new byte[16];
-			for(int i=1;i<16;i++){
-				buffer[i] = (byte) 0x00;
-			}
-			
-			for(int i=1;i<16;i++){
-				findSerialNumber();
-				loadKey((byte)i, password);
-				authentication((byte)i);
+			if(choseCard==CommandsISO14443A.CARD_14443A_M1){
+				byte[] buffer = new byte[16];
+				for(int i=1;i<16;i++){
+					buffer[i] = (byte) 0x00;
+				}
 				
-				write((byte)(i*BLOCK_SIZE+0),buffer);
-				write((byte)(i*BLOCK_SIZE+1),buffer);
-				write((byte)(i*BLOCK_SIZE+2),buffer);
+				for(int i=1;i<16;i++){
+					loadKey((byte)i, password);
+					authentication((byte)i);
+					
+					write((byte)(i*BLOCK_SIZE+0),buffer);
+					write((byte)(i*BLOCK_SIZE+1),buffer);
+					write((byte)(i*BLOCK_SIZE+2),buffer);
+				}
+			}else if(choseCard==CommandsISO14443A.CARD_14443A_UL){
+				byte[] dword = {0x00,0x00,0x00,0x00};
+				for(int i=0;i<12;i++){
+					write((byte)(4+i),dword);
+				}
 			}
+			
+			
 		}catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
 	public void save(Card card) throws Exception{
-		int choseCard=request();
+		int choseCard=getCardType();
 		
 		if(choseCard==CommandsISO14443A.CARD_14443A_M1){
-			saveM1(card.getRfidcode(), 1, 0, 16);
+			save(card.getRfidcode(), 1, 0, 16);
 		}else if(choseCard==CommandsISO14443A.CARD_14443A_UL){
-			saveUL(card.getRfidcode(), 4, 16);
+			save(card.getRfidcode(), 4,0, 16);
 		}
 	}
 
 	public void save(User user) throws Exception{
-		int choseCard=request();
+		int choseCard=getCardType();
 		
 		if(choseCard==CommandsISO14443A.CARD_14443A_M1){
-			saveM1(user.getName(), 1, 1, 16);
-			saveM1(user.getPassword(), 1, 2, 16);
+			save(user.getName(), 1, 1, 16);
+			save(user.getPassword(), 1, 2, 16);
 		}else if(choseCard==CommandsISO14443A.CARD_14443A_UL){
-			saveUL(user.getName(), 4, 16);
+			save(user.getName(), 4,0,16);
 		}
 	}
-	public void saveM1(String buf,int page,int offset,int maxLength) throws Exception{
-			findSerialNumber();
+	
+	public void save(String buf,int page,int offset,int maxLength) throws Exception{
+		int choseCard=getCardType();
+		
+		byte[] bytes = buf.getBytes("gb2312");
+
+		if(maxLength < 1 || maxLength>bytes.length)
+			maxLength = bytes.length;
+		
+		if(choseCard==CommandsISO14443A.CARD_14443A_M1){
 			
-			byte[] bytes = buf.getBytes("gb2312");
+			if(maxLength>16) maxLength=16;
 			
-			if(maxLength < 1 || maxLength>bytes.length)
-				maxLength = bytes.length;
-			
-			if(maxLength>16)
-				maxLength=16;
-			
-			byte[] wbuf = new byte[]{
-										0x00,0x00,0x00,0x00,
-										0x00,0x00,0x00,0x00,
-										0x00,0x00,0x00,0x00,
-										0x00,0x00,0x00,0x00};
+			byte[] wbuf = new byte[16];
+			for(int i=1;i<16;i++){
+				wbuf[i] = (byte) 0x00;
+			}
 			
 			for(int i=0;i<maxLength;i++){
 					wbuf[i] = bytes[i];
@@ -81,30 +91,17 @@ public class ISO14443AAction extends ImplementationISO14443A{
 			
 			loadKey((byte)page, password);
 			authentication((byte)page);
-			
 			write((byte)(page*BLOCK_SIZE + offset),wbuf);//default 16bits
-	}
-	
-	public void saveUL(String buf,int page,int maxLength) throws Exception{
-		
-			byte[] bbuf = buf.getBytes("gb2312");
-
+		}else if(choseCard==CommandsISO14443A.CARD_14443A_UL){
 			int countPage = 0;
 			
-			if(maxLength > bbuf.length)
-				maxLength = bbuf.length;
-			
-			if(maxLength > 4*16)
-				maxLength = 4;
+			if(maxLength > 4*16)maxLength = 4;
 			
 			countPage = (int) Math.floor(maxLength/4);
 			
-			if(maxLength%4!=0)
-				countPage++;
-
-			if(countPage>16)
-				countPage=16;
-			System.out.println("saveUL>>>>>>>>>>>>>>>>>>>>>>>>>");
+			if(maxLength%4!=0)countPage++;
+			
+			if(countPage>16)countPage=16;
 
 			System.out.println("maxLength:"+maxLength);
 			System.out.println("countPage:"+countPage);
@@ -113,32 +110,23 @@ public class ISO14443AAction extends ImplementationISO14443A{
 			for(int i=0;i<countPage;i++){
 				byte[] wbuf = {0,0,0,0};
 				
-				if(i*4+0<maxLength)
-					wbuf[0] = bbuf[i*4+0];
-				
-				if(i*4+1<maxLength)
-					wbuf[1] = bbuf[i*4+1];
-				
-				if(i*4+2<maxLength)
-					wbuf[2] = bbuf[i*4+2];
-				
-				if(i*4+3<maxLength)
-					wbuf[3] = bbuf[i*4+3];
+				if(i*4+0<maxLength)wbuf[0] = bytes[i*4+0];
+				if(i*4+1<maxLength)wbuf[1] = bytes[i*4+1];
+				if(i*4+2<maxLength)wbuf[2] = bytes[i*4+2];
+				if(i*4+3<maxLength)wbuf[3] = bytes[i*4+3];
 				
 				System.out.println("write page:"+(page+i));
 				write((byte)(page+i),wbuf);//default 4 bytes
 			}
-			System.out.println("saveUL<<<<<<<<<<<<<<<<<<<<<<<<<<");
-	}
+		}
+}
 	
-	
-
 	public String read(int page,int block) {
 		byte[] bytes =null;
 		String buffer = null;
 		
 		try {
-			int choseCard=request();
+			int choseCard=getCardType();
 			System.out.println("choseCard:"+choseCard);
 
 			if(choseCard==CommandsISO14443A.CARD_14443A_M1){
@@ -171,14 +159,6 @@ public class ISO14443AAction extends ImplementationISO14443A{
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		return buffer;
-	}
-	
-	public String readUL(int page) throws Exception {
-		byte[] bytes =null;
-		String buffer = null;
-		bytes = read((byte)page);
-		buffer = new String(bytes,4,16,"GBK");
 		return buffer;
 	}
 }

@@ -16,6 +16,9 @@ public class ImplementationISO14443A implements ISO14443A{
 	public SerialManager serialManager;
 	boolean opened = false;
 
+	private int cardType = 4;
+	private String serialNumber;
+
 	/**
 	 * Constructor.
 	 */
@@ -33,7 +36,7 @@ public class ImplementationISO14443A implements ISO14443A{
 	 * 
 	 * @return Returns success if a RFID kit was successfully initialized.
 	 */
-	public boolean initialize() {
+	public boolean initSerial() {
 		if (port != null) {
 			if (serialManager.openPort(port, 9600)) {
 				if (shakeHands())
@@ -63,12 +66,20 @@ public class ImplementationISO14443A implements ISO14443A{
 		this.port = port;
 	}
 	
+	public int getCardType() {
+		return cardType;
+	}
+	
+	public String getSerialNumber() {
+		return serialNumber;
+	}
+
 	public void destroy() {
 		if(serialManager!=null)
 			serialManager.closePort();
 	}
 	
-	private boolean shakeHands() {
+	public boolean shakeHands() {
     	byte [] command = CommandsISO14443A.shakeHands().getBytes();
 		
 		System.out.println("shakeHands:");
@@ -101,22 +112,18 @@ public class ImplementationISO14443A implements ISO14443A{
 		return true;
 	}
 	
-	public String findSerialNumber() {
-		String serialNumber = "";
-		
-		request();
+	public void initCard() {
+		cardType = request();
 		byte[] s1 = anticoll();
 		select(s1);
 		
-		byte[] s2 = anticoll2();
-		select2(s2);
-        
-		serialNumber = StringUtils.toHex(s2);
+		if(cardType==CommandsISO14443A.CARD_14443A_UL){
+			byte[] s2 = anticoll2();
+			select2(s2);
+			serialNumber = StringUtils.toHex(s2);
+		}
 		serialNumber += StringUtils.toHex(s1);
-
-		return serialNumber;
 	}
-	
 	public boolean driveVersion() {
 		
     	byte [] command = CommandsISO14443A.getVersion().getBytes();
@@ -139,7 +146,7 @@ public class ImplementationISO14443A implements ISO14443A{
 			return false;
 		}
 	}
-
+	
 	public short request() {
 		byte [] command = CommandsISO14443A.request().getBytes();
 		System.out.println("request:");
@@ -171,7 +178,7 @@ public class ImplementationISO14443A implements ISO14443A{
 		System.out.println("request buffer:"+StringUtils.toHex(buf));
 		return StringUtils.toShort(StringUtils.swapBytes(StringUtils.subBytes(response,4,2)));
 	}
-	
+
 	public byte[] anticoll() {
 		byte[] command = CommandsISO14443A.anticoll().getBytes();
 
@@ -513,55 +520,4 @@ public class ImplementationISO14443A implements ISO14443A{
             System.out.printf("\t 0x%02X 0d%d \n", bt,bt);
         }
     }
-    
-	public String testRequest() {
-		String serialNumber = "";
-		
-		request();
-		byte[] s1 = anticoll();
-		select(s1);
-		
-		byte[] s2 = anticoll2();
-		select2(s2);
-        
-		serialNumber = StringUtils.toHex(s2);
-		serialNumber += StringUtils.toHex(s1);
-//		
-//		System.out.println("SerialNumber:"+serialNumber);
-//		String buf = "LZZJ001209030023";
-		
-//		byte[] wbuf = {0x78};
-//		
-//		for(int i=0;i<12;i++){
-//			write((byte)(4+i),wbuf);//default 4 bytes
-//		}
-//		
-//		byte[] response = read((byte) 4);
-//		System.out.println("red response:"+StringUtils.toHex(response));
-		
-//		byte[] req = new byte[5];
-//		req[0] = (byte) 0xA7;
-//		req[1] = (byte) 0x02;
-//		req[2] = (byte) 0x07;
-//		req[3] = (byte) 0x04;
-//		req[4] = (byte) 0x00;
-//		
-//		System.out.println("read:");
-//		
-//		for(int i=0;i<req.length-1;i++){
-//            System.out.printf("CRC:	\t 0x%02X 0d%d \n", req[4],req[4]);
-//			req[4] = (byte) (req[4] ^ req[i]);
-//		}
-//        System.out.printf("END CRC:	\t 0x%02X 0d%d \n", req[4],req[4]);
-//
-//		testCommand(req);
-//		serialManager.send(req);
-//		
-//		byte[] response = serialManager.read();
-//		 
-////		byte[] response = read((byte) 4);
-//		
-//		System.out.println("red response:"+StringUtils.toHex(response));
-		return serialNumber;
-	}
 }

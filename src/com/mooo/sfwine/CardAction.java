@@ -310,7 +310,8 @@ public class CardAction {
 								ISO14443AAction cardRFID = new ISO14443AAction();
 								try {
 									//初始化
-									cardRFID.initialize();
+									cardRFID.initSerial();
+									cardRFID.initCard();
 									
 									//请正确连接发卡器
 									if(!cardRFID.isOpened()){
@@ -320,20 +321,19 @@ public class CardAction {
 									if (log.isDebugEnabled()) log.debug("连接发卡器 okay:");
 	
 									//请放人电子标签或者电子卡
-									String serialNumber = cardRFID.findSerialNumber();
+									String serialNumber = cardRFID.getSerialNumber();
 									if(serialNumber == null){
 	//									Thread.sleep(37);
 										throw new NullPointerException("请放人电子标签或者电子卡!");
 									}
 									if (log.isDebugEnabled()) log.debug("卡片 okay:");
 									
-									int cardType = cardRFID.request();
-									if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
-									if (log.isDebugEnabled()) log.debug("M1 Card is:"+CommandsISO14443A.CARD_14443A_M1);
-									if (log.isDebugEnabled()) log.debug("UL Card is:"+CommandsISO14443A.CARD_14443A_UL);
+									int cardType = cardRFID.getCardType();
+//									if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
+//									if (log.isDebugEnabled()) log.debug("M1 Card is:"+CommandsISO14443A.CARD_14443A_M1);
+//									if (log.isDebugEnabled()) log.debug("UL Card is:"+CommandsISO14443A.CARD_14443A_UL);
 	
 									if(cardType!=CommandsISO14443A.CARD_14443A_UL){
-	//									Thread.sleep(100);
 										throw new NullPointerException("此卡非标签卡!");
 									}
 										

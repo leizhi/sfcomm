@@ -16,7 +16,9 @@ public class ULTest {
 		ISO14443AAction.whichPort="COM3";
 
 		ISO14443AAction iccrf = new ISO14443AAction();
-		iccrf.initialize();
+		iccrf.initSerial();
+		iccrf.initCard();
+		
 		/*
 		int page = 4;//0x00->0x0F:0x04
 		int offset = 0;
@@ -47,23 +49,17 @@ public class ULTest {
 		System.out.println(respnse);
 */
 		String buf = "LZZJ001209030023";
-		buf = "ZZZZ001209030036";
+		buf = "ZZZZ001209030039";
 		String reponse;
 		try {
-			//write UL
-			reponse = iccrf.findSerialNumber();
-			
+			//request card
+			reponse = iccrf.getSerialNumber();
 //			System.out.println("SerialNumber:"+reponse);
-			
-			iccrf.saveUL(buf,4,16);
-			reponse = iccrf.readUL(4);
-			
+			iccrf.cleanAll();
+			//write UL
+			iccrf.save(buf,4,0,16);
+			reponse = iccrf.read(4,0);
 			System.out.println("reponse:"+reponse);
-//			iccrf.cleanAll();
-//			iccrf.saveUL(buf,4,16);
-//			
-//			reponse = iccrf.testRequest();
-//			System.out.println("reponse:"+reponse);
 
 			//write M1
 //			iccrf.loadKey((byte)0x01, password);
@@ -71,10 +67,10 @@ public class ULTest {
 //			iccrf.write((byte)(1*4 + 1),buf.getBytes("gb2312"));
 //			iccrf.cleanAll();
 			
-//			buf = "赵杰";
-//			iccrf.saveM1(buf, 1, 1, 16);
+//			buf = "赵杰1";
+//			iccrf.save(buf, 1, 1, 16);
 //			buf = "000000";
-//			iccrf.saveM1(buf, 1, 2, 16);
+//			iccrf.save(buf, 1, 2, 16);
 //
 //			reponse = iccrf.read(1,1);
 //			System.out.println("1,1:"+reponse);

@@ -12,7 +12,8 @@ public class IccrfTest {
 
 	public static void main(String args[]) throws InterruptedException {
 		ImplementationISO14443A iccrf = new ImplementationISO14443A();
-		iccrf.initialize();
+		iccrf.initSerial();
+		iccrf.initCard();
 		
 //		byte[] value = new byte[4];
 //		value[0] = (byte) 0xFF;
@@ -37,13 +38,13 @@ public class IccrfTest {
 //		
 //		iccrf.beep(100);
 		
-		String serialNumber = iccrf.findSerialNumber();
+		String serialNumber = iccrf.getSerialNumber();
 //		long id = iccrf.();
 
 		System.out.println("serialNumber:"+serialNumber);
-		int cardType = iccrf.request();
+		int cardType = iccrf.getCardType();
 
-		System.out.println("findCardType:"+iccrf.request());
+		System.out.println("findCardType:"+iccrf.getCardType());
 		
 		if(cardType==0x0044){
 			System.out.println("The Card is UL");
