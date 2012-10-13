@@ -3,27 +3,19 @@ package com.mooo.sfwine;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.net.URL;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-//import javax.swing.event.DocumentEvent;
-//import javax.swing.text.Document;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.mooo.mycoz.common.StringUtils;
 
-import es.deusto.smartlab.rfid.SerialManager;
 import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 
 public class UserAction {
@@ -36,29 +28,17 @@ public class UserAction {
 	private JLabel disLabel;
 	private JLabel messageLabel;
 
-//	private JTextField hostName;
-//	private JTextField hostPort;
-
 	private JTextField userNameText;
 	private JPasswordField passwordText;
-//	private JComboBox branch;
-	private JComboBox whichPort;
-	
-	private JPanel bodyPanel;
-	private String message;
 
-	public UserAction(JPanel bodyPanel) {
-			this.bodyPanel=bodyPanel;
-		}
-	
 	public void promptLogin() {
 		SFClient.staffSignal = false;
 		
 		if (log.isDebugEnabled()) log.debug("staffSignal:"+SFClient.staffSignal);
 
 		//clean view
-		if (bodyPanel!=null && bodyPanel.isShowing()) {
-			bodyPanel.removeAll();
+		if (SFWine.global.getBodyPanel()!=null && SFWine.global.getBodyPanel().isShowing()) {
+			SFWine.global.getBodyPanel().removeAll();
 		}
 		
 		int x, y,width,hight,width_1;
@@ -73,110 +53,53 @@ public class UserAction {
 		
 		x += 10;
 		y += 10;
+		
 		/*
-		disLabel = new JLabel("服务器:");
-		disLabel.setBounds(x,y,width,hight);
-		disLabel.setForeground(Color.WHITE);
-		bodyPanel.add(disLabel);
-		
-		hostName = new JTextField();
-		hostName.setBounds(x+width,y,width_1,hight);//一个字符9 point
-		hostName.setText("192.168.1.7");
-		bodyPanel.add(hostName);
-		
 		Document hostNameDoc = hostName.getDocument();
 		hostNameDoc.addDocumentListener(new javax.swing.event.DocumentListener() {
 			public void changedUpdate(DocumentEvent documentEvent) {
 				SFClient.host = hostName.getText();
+				SFClient.start();
 			}
 			public void insertUpdate(DocumentEvent documentEvent) {
 				SFClient.host = hostName.getText();
+				SFClient.start();
 			}
 			public void removeUpdate(DocumentEvent documentEvent) {
 				SFClient.host = hostName.getText();
+				SFClient.start();
 			}
 		});
-        
-		disLabel = new JLabel("端口:");
-		disLabel.setBounds(x+width+width_1,y,40,hight);
-		disLabel.setForeground(Color.WHITE);
-		bodyPanel.add(disLabel);
+        */
 		
-		hostPort = new JTextField();
-		hostPort.setBounds(x+width+width_1+40,y,40,hight);//一个字符9 point
-		hostPort.setText("8000");
-		bodyPanel.add(hostPort);
-		
-		Document hostPortDoc = hostPort.getDocument();
-		hostPortDoc.addDocumentListener(new javax.swing.event.DocumentListener() {
-			public void changedUpdate(DocumentEvent documentEvent) {
-				SFClient.port = new Integer(hostPort.getText());
-			}
-			public void insertUpdate(DocumentEvent documentEvent) {
-				SFClient.port = new Integer(hostPort.getText());
-			}
-			public void removeUpdate(DocumentEvent documentEvent) {
-				SFClient.port = new Integer(hostPort.getText());
-			}
-		});
-		
-		y += hight;
-		*/
 		disLabel = new JLabel("用户名:");
 		disLabel.setBounds(x,y,width,hight);
 		disLabel.setForeground(Color.WHITE);
-		bodyPanel.add(disLabel);
+		SFWine.global.getBodyPanel().add(disLabel);
 		
 		userNameText = new JTextField();
 		userNameText.setBounds(x+width,y,width_1,hight);//一个字符9 point
-		bodyPanel.add(userNameText);
+		SFWine.global.getBodyPanel().add(userNameText);
 		
 		y += hight;
 		disLabel = new JLabel("密码:");
 		disLabel.setBounds(x,y,width,hight);
 		disLabel.setForeground(Color.WHITE);
-		bodyPanel.add(disLabel);
+		SFWine.global.getBodyPanel().add(disLabel);
 		
 		passwordText = new JPasswordField();
 		passwordText.setBounds(x+width,y,width_1,hight);//一个字符9 point
-		bodyPanel.add(passwordText);
+		SFWine.global.getBodyPanel().add(passwordText);
 		
 		y += hight;
-		whichPort = new JComboBox();
-		whichPort.setBounds(x+width,y,width,hight);//一个字符9 point
-		whichPort.setSelectedItem(whichPort.getSelectedItem());
 		
-		List<String> ports = new SerialManager().getPorts();
-		for(String value:ports){
-			whichPort.addItem(value);
-		}
-		bodyPanel.add(whichPort);
-		
-		whichPort.addItemListener(new ItemListener() {
-
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				ISO14443AAction.whichPort=e.getItem().toString();
-			}
-		});
-		
-		y += hight;
 		messageLabel= new JLabel();
-		if(SFClient.isOpenNetwork()){
-			messageLabel.setText("网络正常");
-			messageLabel.setForeground(Color.GREEN);
-		}else{
-			messageLabel.setText("网络不通");
-			messageLabel.setForeground(Color.RED);
-		}
 		messageLabel.setBounds(x,y,width,hight);
-		bodyPanel.add(messageLabel);
+		SFWine.global.getBodyPanel().add(messageLabel);
 		
 		y += hight;
-		
 		JButton confirm = new JButton("登录");
 		confirm.requestFocus();
-//		confirm.addActionListener(new LoginAction(bodyPanel,execPanel,getUser()));
 		confirm.setBounds(x+width,y,execWidth,hight);//一个字符9 point
 		confirm.setBackground(new Color(105,177,35));
 		confirm.setForeground(Color.WHITE);
@@ -192,19 +115,20 @@ public class UserAction {
 					processLogin();
 				}
 			});
+		
 		//为按钮添加键盘适配器
 		confirm.addKeyListener(new KeyAction());
 		
-		bodyPanel.add(confirm);
+		SFWine.global.getBodyPanel().add(confirm);
 
-		bodyPanel.setVisible(true);
-		bodyPanel.validate();//显示
-		bodyPanel.repaint();
+		SFWine.global.getBodyPanel().setVisible(true);
+		SFWine.global.getBodyPanel().validate();//显示
+		SFWine.global.getBodyPanel().repaint();
 		//设置背景图片
 		URL url = SFWine.class.getResource("bg.png");
 		ImageIcon img = new ImageIcon(url);
 		JLabel background = new JLabel(img);
-		bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+		SFWine.global.getBodyPanel().add(background, new Integer(Integer.MIN_VALUE));
 		background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
 		if(log.isDebugEnabled()) log.debug("initializeGUI end");
 	}
@@ -225,10 +149,10 @@ public class UserAction {
     			throw new NullPointerException("登录失败!");
             
     		//成功登录
-        	new CardAction(bodyPanel).promptNewWineCard();
+    		SFWine.global.getCardAction().promptNewWineCard();
 		}catch (Exception e) {
-			message = e.getMessage();
-			messageLabel.setText(message);
+			Global.message = e.getMessage();
+			messageLabel.setText(Global.message);
 			messageLabel.setForeground(Color.RED);
 			
 			if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());	
@@ -239,8 +163,8 @@ public class UserAction {
 		SFClient.staffSignal = false;
 
 		//clean view
-		if (bodyPanel!=null && bodyPanel.isShowing()) {
-			bodyPanel.removeAll();
+		if (SFWine.global.getBodyPanel()!=null && SFWine.global.getBodyPanel().isShowing()) {
+			SFWine.global.getBodyPanel().removeAll();
 		}
 		
 		try {
@@ -265,53 +189,53 @@ public class UserAction {
 		
 		disLabel = new JLabel(display);
 		disLabel.setBounds(x,y,20*display.length(),hight);
-		bodyPanel.add(disLabel);
+		SFWine.global.getBodyPanel().add(disLabel);
 		
 		y += hight;
 		
 		disLabel = new JLabel("用户名:");
 		disLabel.setBounds(x,y,width,hight);
-		bodyPanel.add(disLabel);
+		SFWine.global.getBodyPanel().add(disLabel);
 		 
 		userNameText = new JTextField();
 		userNameText.setBounds(x+width,y,width_1,hight);//一个字符9 point
-		bodyPanel.add(userNameText);
+		SFWine.global.getBodyPanel().add(userNameText);
 		
 		display = " * 4位中文";
 		disLabel = new JLabel(display);
 		disLabel.setBounds(x+width+width_1,y,20*display.length(),hight);
 		disLabel.setForeground(Color.RED);
-		bodyPanel.add(disLabel);
+		SFWine.global.getBodyPanel().add(disLabel);
 		
 		y += hight;
 		disLabel = new JLabel("密码:");
 		disLabel.setBounds(x,y,width,hight);
-		bodyPanel.add(disLabel);
+		SFWine.global.getBodyPanel().add(disLabel);
 		
 		passwordText = new JPasswordField();
 		passwordText.setBounds(x+width,y,width_1,hight);//最大8位密码
-		bodyPanel.add(passwordText);
+		SFWine.global.getBodyPanel().add(passwordText);
 		
 		display = " * 8位数字字母组合";
 		disLabel = new JLabel(display);
 		disLabel.setBounds(x+width+width_1,y,20*display.length(),hight);
 		disLabel.setForeground(Color.RED);
-		bodyPanel.add(disLabel);
+		SFWine.global.getBodyPanel().add(disLabel);
 		
 		y += hight;
 		
 		messageLabel= new JLabel();
 		if(SFClient.isOpenNetwork()){
-			message="网络正常";
-			messageLabel.setText(message);
+			Global.message="网络正常";
+			messageLabel.setText(Global.message);
 			messageLabel.setForeground(Color.GREEN);
 		}else{
-			message="网络不通";
-			messageLabel.setText(message);
+			Global.message="网络不通";
+			messageLabel.setText(Global.message);
 			messageLabel.setForeground(Color.RED);
 		}
 		messageLabel.setBounds(x,y,200,hight);
-		bodyPanel.add(messageLabel);
+		SFWine.global.getBodyPanel().add(messageLabel);
 		
 		y += hight;
 		
@@ -326,25 +250,25 @@ public class UserAction {
 		//为按钮添加键盘适配器
 		confirm.addKeyListener(new KeyAction());
 		
-		bodyPanel.add(confirm);
+		SFWine.global.getBodyPanel().add(confirm);
 
-		bodyPanel.setVisible(true);
-		bodyPanel.validate();//显示
-		bodyPanel.repaint();
+		SFWine.global.getBodyPanel().setVisible(true);
+		SFWine.global.getBodyPanel().validate();//显示
+		SFWine.global.getBodyPanel().repaint();
 
 		//设置背景图片
 		URL url = SFWine.class.getResource("bg.png");
         ImageIcon img = new ImageIcon(url);
         JLabel background = new JLabel(img);
-        bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+        SFWine.global.getBodyPanel().add(background, new Integer(Integer.MIN_VALUE));
         background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
         
 		if(log.isDebugEnabled()) log.debug("initializeGUI end");
 		} catch (Exception e) {
 			if(log.isErrorEnabled()) log.error("Exception:"+e.getMessage());
 //			promptLogin();
-			message = e.getMessage();
-			messageLabel.setText(message);
+			Global.message = e.getMessage();
+			messageLabel.setText(Global.message);
 		}
 	}
 	
@@ -404,12 +328,12 @@ public class UserAction {
             if(count > 0)
     			throw new NullPointerException("此卡已注册");
             
-            message = "注册成功";
-			messageLabel.setText(message);
+            Global.message = "注册成功";
+			messageLabel.setText(Global.message);
 
 		}catch (Exception e) {
-				message = e.getMessage();
-				messageLabel.setText(message);
+				Global.message = e.getMessage();
+				messageLabel.setText(Global.message);
 			if(log.isErrorEnabled()) log.error("SQLException:"+e.getMessage());	
 		}finally {
 			cardRFID.beep(10);
@@ -418,88 +342,97 @@ public class UserAction {
 	}
 	
 	public void promptRestStaff() {
-		SFClient.staffSignal = false;
-		
-		if (log.isDebugEnabled()) log.debug("staffSignal:"+SFClient.staffSignal);
-
-		//clean view
-		if (bodyPanel!=null && bodyPanel.isShowing()) {
-			bodyPanel.removeAll();
-		}
-		
-		int x, y,width,hight,width_1;
-		int execWidth = 60;
-
-		x = 340;
-		y = 250;
-		
-		width = 80;
-		hight = 20;
-		width_1 = 120;
-		
-		x += 10;
-		y += 10;
-		
-		disLabel = new JLabel("用户名:");
-		disLabel.setBounds(x,y,width,hight);
-		disLabel.setForeground(Color.WHITE);
-		bodyPanel.add(disLabel);
-		
-		userNameText = new JTextField();
-		userNameText.setBounds(x+width,y,width_1,hight);//一个字符9 point
-		bodyPanel.add(userNameText);
-		
-		y += hight;
-		disLabel = new JLabel("密码:");
-		disLabel.setBounds(x,y,width,hight);
-		disLabel.setForeground(Color.WHITE);
-		bodyPanel.add(disLabel);
-		
-		passwordText = new JPasswordField();
-		passwordText.setBounds(x+width,y,width_1,hight);//一个字符9 point
-		bodyPanel.add(passwordText);
-		
-		y += hight;
-		messageLabel= new JLabel();
-		if(SFClient.isOpenNetwork()){
-			messageLabel.setText("网络正常");
-			messageLabel.setForeground(Color.GREEN);
-		}else{
-			messageLabel.setText("网络不通");
+		try {
+//			if(!SFClient.isAllow()) throw new Exception("请先登录");
+	
+			//clean view
+			if (SFWine.global.getBodyPanel()!=null && SFWine.global.getBodyPanel().isShowing()) {
+				SFWine.global.getBodyPanel().removeAll();
+			}
+			
+			int x, y,width,hight,width_1;
+			int execWidth = 60;
+	
+			x = 340;
+			y = 250;
+			
+			width = 80;
+			hight = 20;
+			width_1 = 120;
+			
+			x += 10;
+			y += 10;
+			
+			disLabel = new JLabel("用户名:");
+			disLabel.setBounds(x,y,width,hight);
+			disLabel.setForeground(Color.WHITE);
+			SFWine.global.getBodyPanel().add(disLabel);
+			
+			userNameText = new JTextField();
+			userNameText.setBounds(x+width,y,width_1,hight);//一个字符9 point
+			SFWine.global.getBodyPanel().add(userNameText);
+			
+			y += hight;
+			disLabel = new JLabel("密码:");
+			disLabel.setBounds(x,y,width,hight);
+			disLabel.setForeground(Color.WHITE);
+			SFWine.global.getBodyPanel().add(disLabel);
+			
+			passwordText = new JPasswordField();
+			passwordText.setBounds(x+width,y,width_1,hight);//一个字符9 point
+			SFWine.global.getBodyPanel().add(passwordText);
+			
+			y += hight;
+			
+			messageLabel= new JLabel();
+			if(SFClient.isOpenNetwork()){
+				Global.message="网络正常";
+				messageLabel.setText(Global.message);
+				messageLabel.setForeground(Color.GREEN);
+			}else{
+				Global.message="网络不通";
+				messageLabel.setText(Global.message);
+				messageLabel.setForeground(Color.RED);
+			}
+			messageLabel.setBounds(x,y,200,hight);
+			SFWine.global.getBodyPanel().add(messageLabel);
+			
+			y += hight;
+			
+			JButton confirm = new JButton("确认");
+			confirm.requestFocus();
+			confirm.setBounds(x+width,y,execWidth,hight);//一个字符9 point
+			confirm.setBackground(new Color(105,177,35));
+			confirm.setForeground(Color.WHITE);
+	
+			confirm.addActionListener( new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						processRestStaff();
+					}
+				});
+			//为按钮添加键盘适配器
+			confirm.addKeyListener(new KeyAction());
+			
+			SFWine.global.getBodyPanel().add(confirm);
+	
+			SFWine.global.getBodyPanel().setVisible(true);
+			SFWine.global.getBodyPanel().validate();//显示
+			SFWine.global.getBodyPanel().repaint();
+			//设置背景图片
+			URL url = SFWine.class.getResource("bg.png");
+			ImageIcon img = new ImageIcon(url);
+			JLabel background = new JLabel(img);
+			SFWine.global.getBodyPanel().add(background, new Integer(Integer.MIN_VALUE));
+			background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
+			if(log.isDebugEnabled()) log.debug("initializeGUI end");
+			
+		}catch (Exception e) {
+			Global.message = e.getMessage();
+			messageLabel.setText(Global.message);
 			messageLabel.setForeground(Color.RED);
+			if(log.isErrorEnabled()) log.error("Exception:"+e.getMessage());	
 		}
-		messageLabel.setBounds(x,y,260,hight);
-		bodyPanel.add(messageLabel);
-		
-		y += hight;
-		
-		JButton confirm = new JButton("确认");
-		confirm.requestFocus();
-		confirm.setBounds(x+width,y,execWidth,hight);//一个字符9 point
-		confirm.setBackground(new Color(105,177,35));
-		confirm.setForeground(Color.WHITE);
-
-		confirm.addActionListener( new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					processRestStaff();
-				}
-			});
-		//为按钮添加键盘适配器
-		confirm.addKeyListener(new KeyAction());
-		
-		bodyPanel.add(confirm);
-
-		bodyPanel.setVisible(true);
-		bodyPanel.validate();//显示
-		bodyPanel.repaint();
-		//设置背景图片
-		URL url = SFWine.class.getResource("bg.png");
-		ImageIcon img = new ImageIcon(url);
-		JLabel background = new JLabel(img);
-		bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
-		background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
-		if(log.isDebugEnabled()) log.debug("initializeGUI end");
 	}
 	
 	public void processRestStaff(){
@@ -522,7 +455,7 @@ public class UserAction {
 				if (serialNumber == null)
 					throw new NullPointerException("请放人电子标签或者电子卡");
 				
-				int cardType = cardRFID.request();
+				int cardType = cardRFID.getCardType();
 				if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
 				if (log.isDebugEnabled()) log.debug("falt card:"+CommandsISO14443A.CARD_14443A_M1);
 				
@@ -540,12 +473,12 @@ public class UserAction {
 	    		cardRFID.save(String.valueOf(userNameText.getText()), 1, 1, 16);
 				cardRFID.save(String.valueOf(passwordText.getPassword()), 1, 2, 16);
 				
-				message = "重置完成!";
-				messageLabel.setText(message);
+				Global.message = "重置完成!";
+				messageLabel.setText(Global.message);
 				messageLabel.setForeground(Color.GRAY);
 		 }catch (Exception e) {
-				message = e.getMessage();
-				messageLabel.setText(message);
+				Global.message = "Exception:"+e.getMessage();
+				messageLabel.setText(Global.message);
 				messageLabel.setForeground(Color.RED);
 				if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());	
 		}finally {

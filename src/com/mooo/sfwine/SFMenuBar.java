@@ -1,6 +1,5 @@
 package com.mooo.sfwine;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -9,7 +8,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 
 public class SFMenuBar  extends  JMenuBar{
 
@@ -18,53 +16,40 @@ public class SFMenuBar  extends  JMenuBar{
 	 */
 	private static final long serialVersionUID = -3248560207642843767L;
 
-//	private JPanel bodyPanel;
-    
-    private Color bg = new Color(30,178,239);
-    private Color fg = Color.WHITE;
-
-    private CardAction cardAction;
-    private UserAction userAction;
-    private CardLoginAction cardLoginAction;
-	
-    public SFMenuBar(JPanel bodyPanel){
-        	setBackground(bg);
-        	setBorder(BorderFactory.createLineBorder(bg));
-
-    		cardAction = new CardAction(bodyPanel);
-    		userAction = new UserAction(bodyPanel);
-    		cardLoginAction = new CardLoginAction(bodyPanel);
+    public SFMenuBar(){
+        	setBackground(Global.bg);
+        	setBorder(BorderFactory.createLineBorder(Global.fg));
 
         	//开始
     		JMenu menuFile = new JMenu("开始");
-    		menuFile.setBackground(bg);
-    		menuFile.setForeground(fg);
+    		menuFile.setBackground(Global.bg);
+    		menuFile.setForeground(Global.fg);
     		
     		//主菜单
     		JMenuItem loginSystem = new JMenuItem("刷卡登录");
-    		loginSystem.setBackground(bg);
-    		loginSystem.setForeground(fg);
+    		loginSystem.setBackground(Global.bg);
+    		loginSystem.setForeground(Global.fg);
     		loginSystem.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-    				cardLoginAction.promptCardLogin();
+					SFWine.global.getCardLoginAction().promptCardLogin();
     			}
     		});
     		menuFile.add(loginSystem);
     		
     		JMenuItem admin = new JMenuItem("登录");
-    		admin.setBackground(bg);
-    		admin.setForeground(fg);
+    		admin.setBackground(Global.bg);
+    		admin.setForeground(Global.fg);
 
     		admin.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-    				userAction.promptLogin();
+					SFWine.global.getUserAction().promptLogin();
     			}
     		});
     		menuFile.add(admin);
     		
     		JMenuItem menuFileExit = new JMenuItem("退出");
-    		menuFileExit.setBackground(bg);
-    		menuFileExit.setForeground(fg);
+    		menuFileExit.setBackground(Global.bg);
+    		menuFileExit.setForeground(Global.fg);
 
     		menuFileExit.addActionListener(new ActionListener() {
     			@Override
@@ -78,27 +63,27 @@ public class SFMenuBar  extends  JMenuBar{
 
     		//发卡
     		JMenu menuEdit = new JMenu("发卡");
-    		menuEdit.setBackground(bg);
-    		menuEdit.setForeground(fg);
+    		menuEdit.setBackground(Global.bg);
+    		menuEdit.setForeground(Global.fg);
     		//
     		JMenuItem staff = new JMenuItem("员工卡");
-    		staff.setBackground(bg);
-    		staff.setForeground(fg);
+    		staff.setBackground(Global.bg);
+    		staff.setForeground(Global.fg);
 
     		staff.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					userAction.promptRegister();
+					SFWine.global.getUserAction().promptRegister();
 				}
 			});
     		menuEdit.add(staff);
 
     		JMenuItem cardId = new JMenuItem("标识卡");
-    		cardId.setBackground(bg);
-    		cardId.setForeground(fg);
+    		cardId.setBackground(Global.bg);
+    		cardId.setForeground(Global.fg);
 
     		cardId.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					cardAction.promptNewWineCard();
+					SFWine.global.getCardAction().promptNewWineCard();
 				}
 			});
     		menuEdit.add(cardId);
@@ -106,38 +91,38 @@ public class SFMenuBar  extends  JMenuBar{
     		add(menuEdit);
 
     		JMenuItem restStaff = new JMenuItem("重置员工卡");
-    		restStaff.setBackground(bg);
-    		restStaff.setForeground(fg);
+    		restStaff.setBackground(Global.bg);
+    		restStaff.setForeground(Global.fg);
 
     		restStaff.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					userAction.promptRestStaff();
+					SFWine.global.getUserAction().promptRestStaff();
 				}
 			});
     		menuEdit.add(restStaff);
     		
     		add(menuEdit);
-    		
+    		/*
     		JMenu readCard = new JMenu("查询");
-    		readCard.setBackground(bg);
-    		readCard.setForeground(fg);
+    		readCard.setBackground(Global.bg);
+    		readCard.setForeground(Global.fg);
 
     		JMenuItem viewStaff = new JMenuItem("员工卡");
-    		viewStaff.setBackground(bg);
-    		viewStaff.setForeground(fg);
+    		viewStaff.setBackground(Global.bg);
+    		viewStaff.setForeground(Global.fg);
     		viewStaff.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					cardAction.listCard();
+					SFWine.global.getCardAction().listCard();
 				}
 			});
     		readCard.add(viewStaff);
 
     		JMenuItem viewCardId = new JMenuItem("标识卡");
-    		viewCardId.setBackground(bg);
-    		viewCardId.setForeground(fg);
+    		viewCardId.setBackground(Global.bg);
+    		viewCardId.setForeground(Global.fg);
     		viewCardId.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					cardAction.viewWineCard();
+					SFWine.global.getCardAction().viewWineCard();
 				}
 			});
     		readCard.add(viewCardId);
@@ -145,34 +130,34 @@ public class SFMenuBar  extends  JMenuBar{
     		add(readCard);
 
     		JMenu menuPrint = new JMenu("打印");
-    		menuPrint.setBackground(bg);
-    		menuPrint.setForeground(fg);
+    		menuPrint.setBackground(Global.bg);
+    		menuPrint.setForeground(Global.fg);
     		
     		JMenuItem printStaff = new JMenuItem("员工卡");
-    		printStaff.setBackground(bg);
-    		printStaff.setForeground(fg);
+    		printStaff.setBackground(Global.bg);
+    		printStaff.setForeground(Global.fg);
     		menuPrint.add(printStaff);
 
 //          menuPrint.addSeparator();
 
     		JMenuItem printCardId = new JMenuItem("标识卡");
-    		printCardId.setBackground(bg);
-    		printCardId.setForeground(fg);
+    		printCardId.setBackground(Global.bg);
+    		printCardId.setForeground(Global.fg);
     		menuPrint.add(printCardId);
     		
     		add(menuPrint);
-
+*/
     		JMenu menuHelp = new JMenu("帮助");
-    		menuHelp.setBackground(bg);
-    		menuHelp.setForeground(fg);
+    		menuHelp.setBackground(Global.bg);
+    		menuHelp.setForeground(Global.fg);
 
     		JMenuItem menuHelpAbout = new JMenuItem("关于");
-    		menuHelpAbout.setBackground(bg);
-    		menuHelpAbout.setForeground(fg);
+    		menuHelpAbout.setBackground(Global.bg);
+    		menuHelpAbout.setForeground(Global.fg);
     		menuHelpAbout.addActionListener(new ActionListener() {
     			@Override
 				public void actionPerformed(ActionEvent e) {
-    				JOptionPane.showMessageDialog(SFWine.frame, "发卡系统 V1.0");
+    				JOptionPane.showMessageDialog(SFWine.frame, "发卡系统 V1.1");
     			}
     		});
 

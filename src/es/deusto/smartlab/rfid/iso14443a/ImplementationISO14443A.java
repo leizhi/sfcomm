@@ -3,6 +3,7 @@ package es.deusto.smartlab.rfid.iso14443a;
 import java.util.List;
 
 import com.mooo.mycoz.common.StringUtils;
+import com.mooo.sfwine.CardException;
 import com.mooo.sfwine.ISO14443AAction;
 
 import es.deusto.smartlab.rfid.SerialManager;
@@ -11,7 +12,8 @@ import es.deusto.smartlab.rfid.ISO14443A;
  * @author Xabier Echevarría Espinosa
  */
 public class ImplementationISO14443A implements ISO14443A{
-	
+	private final static Object initLock = new Object();
+
 	public String port;
 	public SerialManager serialManager;
 	boolean opened = false;
@@ -112,18 +114,26 @@ public class ImplementationISO14443A implements ISO14443A{
 		return true;
 	}
 	
-	public void initCard() {
-		cardType = request();
-		byte[] s1 = anticoll();
-		select(s1);
-		
-		if(cardType==CommandsISO14443A.CARD_14443A_UL){
-			byte[] s2 = anticoll2();
-			select2(s2);
-			serialNumber = StringUtils.toHex(s2);
+	public void initCard()  throws CardException{
+		synchronized (initLock) {
+			cardType = request();
+			
+			if(cardType<0){
+				throw new CardException("请放入标签");
+			}
+			
+			byte[] s1 = anticoll();
+			select(s1);
+			
+			if(cardType==CommandsISO14443A.CARD_14443A_UL){
+				byte[] s2 = anticoll2();
+				select2(s2);
+				serialNumber = StringUtils.toHex(s2);
+			}
+			serialNumber += StringUtils.toHex(s1);
 		}
-		serialNumber += StringUtils.toHex(s1);
 	}
+	
 	public boolean driveVersion() {
 		
     	byte [] command = CommandsISO14443A.getVersion().getBytes();
@@ -155,6 +165,8 @@ public class ImplementationISO14443A implements ISO14443A{
 		serialManager.send(command);
 		byte[] response = serialManager.read();
 
+		if(response==null) return -1;;
+		
 		System.out.println("request response:"+StringUtils.toHex(response));
 		byte LRC = 0x00;
 
@@ -326,7 +338,7 @@ public class ImplementationISO14443A implements ISO14443A{
 		
 		byte[] response = serialManager.read();
 
-		System.out.println("select2 response:"+StringUtils.toHex(response));
+		System.out.println("loadKey response:"+StringUtils.toHex(response));
 		byte LRC = 0x00;
 
 		byte respS  = (byte)response[0];
@@ -345,7 +357,7 @@ public class ImplementationISO14443A implements ISO14443A{
 		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
 			return false;
 		} 
-		System.out.println("select2 buffer:"+StringUtils.toHex(buf));
+		System.out.println("loadKey buffer:"+StringUtils.toHex(buf));
 		return true;
 	}
 	
@@ -359,7 +371,7 @@ public class ImplementationISO14443A implements ISO14443A{
 		
 		byte[] response = serialManager.read();
 
-		System.out.println("select2 response:"+StringUtils.toHex(response));
+		System.out.println("authentication response:"+StringUtils.toHex(response));
 		byte LRC = 0x00;
 
 		byte respS  = (byte)response[0];
@@ -378,7 +390,7 @@ public class ImplementationISO14443A implements ISO14443A{
 		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
 			return false;
 		} 
-		System.out.println("select2 buffer:"+StringUtils.toHex(buf));
+		System.out.println("authentication buffer:"+StringUtils.toHex(buf));
 		return true;
 	}
 	
@@ -392,7 +404,7 @@ public class ImplementationISO14443A implements ISO14443A{
 		
 		byte[] response = serialManager.read();
 
-		System.out.println("select2 response:"+StringUtils.toHex(response));
+		System.out.println("halt response:"+StringUtils.toHex(response));
 		byte LRC = 0x00;
 
 		byte respS  = (byte)response[0];
@@ -411,7 +423,7 @@ public class ImplementationISO14443A implements ISO14443A{
 		if ( (byte)respS!=(byte)0xA7 || LRC!=respE || buf[0]!= 0) {
 			return false;
 		} 
-		System.out.println("select2 buffer:"+StringUtils.toHex(buf));
+		System.out.println("halt buffer:"+StringUtils.toHex(buf));
 		return true;
 	}
 	

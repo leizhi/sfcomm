@@ -19,64 +19,68 @@ import com.mooo.mycoz.common.StringUtils;
 public class SFClient {
 	private static Log log = LogFactory.getLog(SFClient.class);
 
-//	private static Object initLock = new Object();
+	private static Object initLock = new Object();
+	private static SFClient factory = null;
 
-	private static Socket socket = new Socket();
-
-	public static String host="192.168.1.101";
-	public static int port=8000;
+	public static String host="192.168.0.191";
+	public static Integer port=8000;
 	
-	private OutputStream out = null;
-	private InputStream in = null;
+	private static Socket socket = null;
+
+	private static InputStream in = null;
+	private static OutputStream out = null;
+
 	private static BufferedReader read = null;
 	private static PrintStream print = null;
 	
-	public SFClient() {
-			synchronized (socket) {
-				try {
-//					socket = new Socket();
-			//		socket.getChannel().open();
-			//		Connects this socket to the server.
-					socket.connect(new InetSocketAddress(host, port),1000*60*60*12);//建立连接最多等待6s
-			//		socket.setKeepAlive(true);
-					socket.setSoTimeout(1000*60*60*12);//time out 3s
-			//		socket.setSoLinger(true, 1000);
-					
-					in = socket.getInputStream();
-					out = socket.getOutputStream();
-					
-					read = new BufferedReader(new InputStreamReader(socket.getInputStream(),"GBK"));  
-					print = new PrintStream(socket.getOutputStream(),true,"GBK");
-					
-					if(log.isDebugEnabled())log.debug("\thost:" + host + "\t port:" + port + "\t 连接成功!");
-				} catch (UnknownHostException e) {
-					e.printStackTrace();
-					if(log.isDebugEnabled())log.debug("host:" + host + "\t port:" + port + "主机未找到!");
-				} catch (SocketException e) {
-					e.printStackTrace();
-					if(log.isDebugEnabled())log.debug("host:" + host + "\t port:" + port + "建立连接失败!");
-				} catch (Exception e) {
-					e.printStackTrace();
-					if(log.isDebugEnabled())log.debug("IOException"+e.getMessage());
-				} 
+	public void connect(String host,String port){
+		try {
+			socket = new Socket();
+	//		socket.getChannel().open();
+	//		Connects this socket to the server.
+			socket.connect(new InetSocketAddress(host, new Integer(port)),1000);//建立连接最多等待6s
+			socket.setKeepAlive(true);
+			socket.setSoTimeout(1000*60*60*12);//time out 3s
+	//		socket.setSoLinger(true, 1000);
+//				socket.sendUrgentData(0xFF);
+
+			in = socket.getInputStream();
+			out = socket.getOutputStream();
+			
+			read = new BufferedReader(new InputStreamReader(socket.getInputStream(),"GBK"));  
+			print = new PrintStream(socket.getOutputStream(),true,"GBK");
+			
+			if(log.isDebugEnabled())log.debug("\thost:" + host + "\t port:" + port + "\t 连接成功!");
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			if(log.isDebugEnabled())log.debug("host:" + host + "\t port:" + port + "主机未找到!");
+		} catch (SocketException e) {
+			e.printStackTrace();
+			if(log.isDebugEnabled())log.debug("host:" + host + "\t port:" + port + "建立连接失败!");
+		} catch (Exception e) {
+			e.printStackTrace();
+			if(log.isDebugEnabled())log.debug("IOException"+e.getMessage());
+		} 
+	}
+	
+	public static SFClient getInstance() {
+		synchronized (initLock) {
+			if(factory==null){
+				factory = new SFClient();
 			}
+			return factory;
+		}
 	}
 	
 	public static String request(String url){
 			String buffer = null;
-
 			try {
-				if(socket.isConnected()){
-					synchronized (socket) {
-						if(log.isDebugEnabled())log.debug("command:"+url);
-						print.println(url);//request to server
-						buffer=read.readLine().trim();//response from server
-						if(log.isDebugEnabled())log.debug("response:"+buffer);
-					}
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-				if(log.isDebugEnabled())log.debug("IOException"+e.getMessage());
+				if(log.isDebugEnabled())log.debug("command:"+url);
+				print.println(url);//request to server
+				
+				buffer=read.readLine();
+				if(buffer!=null) buffer = buffer.trim();//response from server
+				if(log.isDebugEnabled())log.debug("response:"+buffer);
 			} catch (Exception e) {
 				e.printStackTrace();
 				if(log.isDebugEnabled())log.debug("Exception"+e.getMessage());
@@ -86,26 +90,20 @@ public class SFClient {
 	
 	public void end(){
 		try {
-			synchronized (socket) {
-				
-				if(out!=null)
-					out.close();
-				if(in!=null)
-					in.close();
-				if(socket!=null)
-					socket.close();
-				
-				//clear 
-				socket = null;
-				out = null;
-				in = null;
-			}
+			if(out!=null)
+				out.close();
+			if(in!=null)
+				in.close();
+			if(socket!=null)
+				socket.close();
+			
+			factory = null;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public String[] getWineryValues(){
+	public static String[] getWineryValues(){
 		//send command
 		String REQ;
 		String reponse;
@@ -148,7 +146,7 @@ public class SFClient {
 		return winerys;
 	}
 	
-	public String[] getCardTypes(){
+	public static String[] getCardTypes(){
 		//send command
 		String REQ;
 		String reponse;
@@ -188,7 +186,7 @@ public class SFClient {
 		return winerys;
 	}
 	
-	public boolean existCard(String uuid){
+	public static boolean existCard(String uuid){
 		//send command
 		String REQ;
 		String reponse;
@@ -197,7 +195,7 @@ public class SFClient {
 		reponse = request(REQ);//0 no limit
 		System.out.println("reponse:"+reponse);
 
-		if(!reponse.startsWith("*")||!reponse.endsWith("#")){
+		if(reponse==null || !reponse.startsWith("*")||!reponse.endsWith("#")){
 //			response = "数据格式不正确";
 			return true;
 		}
@@ -221,7 +219,7 @@ public class SFClient {
 		return true;
 	}
 	
-	public String nextRfidCode(String wineryName){
+	public static String nextRfidCode(String wineryName){
 		//send command
 		String REQ;
 		String reponse;
@@ -258,13 +256,13 @@ public class SFClient {
 		return reponse;
 	}
 	
-	public boolean saveCard(String userId,String rfidcode,String uuid,String wineryName){
+	public static void saveCard(String rfidcode,String uuid,String wineryName) throws CardException {
 		//send command
 		String REQ;
 		String reponse;
 		
 		REQ = "*14";
-		REQ += ";"+userId;
+		REQ += ";"+user.getId();
 		REQ += ";"+rfidcode;
 		REQ += ";"+uuid;
 		REQ += ";"+wineryName;
@@ -272,9 +270,8 @@ public class SFClient {
 		reponse = request(REQ);//0 no limit
 		System.out.println("reponse:"+reponse);
 
-		if(!reponse.startsWith("*")||!reponse.endsWith("#")){
-//			response = "数据格式不正确";
-			return false;
+		if(reponse==null || !reponse.startsWith("*")||!reponse.endsWith("#")){
+			throw new CardException("标签注册异常");
 		}
 		
 		String doRequest=reponse.substring(reponse.indexOf("*")+1,
@@ -290,9 +287,7 @@ public class SFClient {
 		}
 		
 		int ret = new Integer(args[0]);
-		
-		if(ret==0) return true;
-		return false;
+		if(ret!=0) throw new CardException(args[1]);
 	}
 	
 	
@@ -311,9 +306,8 @@ public class SFClient {
 		reponse = request(REQ);//0 no limit
 		System.out.println("reponse:"+reponse);
 
-		if(!reponse.startsWith("*")||!reponse.endsWith("#")){
-//			response = "数据格式不正确";
-//			return true;
+		if(reponse==null || !reponse.startsWith("*")||!reponse.endsWith("#")){
+			return -1;
 		}
 		
 		String doRequest=reponse.substring(reponse.indexOf("*")+1,
@@ -345,19 +339,28 @@ public class SFClient {
 	public static boolean staffSignal = false;
 
 	public static boolean isAllow() {
-		int userId =processLogin(user.getName(),StringUtils.hash(user.getPassword()));
-		
-		if(userId>0){
-			user.setId(userId);
-			allow = true;
+		try{
+			int userId =processLogin(user.getName(),StringUtils.hash(user.getPassword()));
+			if(userId>0){
+				user.setId(userId);
+				allow = true;
+			}
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 		return allow;
 	}
 	
 	public static boolean isOpenNetwork() {
-		if(socket.isConnected())
+		try{
+			if(socket==null || socket.isClosed())
+				return false;
+			
+			socket.sendUrgentData(0xFF);
 			return true;
-		
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 		return false;
 	}
 	/*

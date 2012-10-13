@@ -1,5 +1,7 @@
 package es.deusto.smartlab.rfid;
 
+import com.mooo.sfwine.CardException;
+
 public interface ISO14443A {
 	
 	boolean driveVersion();
@@ -8,7 +10,7 @@ public interface ISO14443A {
 	
 	boolean initSerial();
 	
-	void initCard();
+	void initCard() throws CardException;
 
 	void destroy();
 	

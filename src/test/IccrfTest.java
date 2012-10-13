@@ -10,7 +10,7 @@ import es.deusto.smartlab.rfid.iso14443a.ImplementationISO14443A;
  */
 public class IccrfTest {
 
-	public static void main(String args[]) throws InterruptedException {
+	public static void main(String args[]) throws Exception {
 		ImplementationISO14443A iccrf = new ImplementationISO14443A();
 		iccrf.initSerial();
 		iccrf.initCard();

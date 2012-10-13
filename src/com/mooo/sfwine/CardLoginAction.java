@@ -3,66 +3,46 @@ package com.mooo.sfwine;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
-import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import es.deusto.smartlab.rfid.SerialManager;
 import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 
 public class CardLoginAction {
 	private static Log log = LogFactory.getLog(CardLoginAction.class);
-
-	private JLabel disLabel;
 	
+	private final static Object initLock = new Object();
+
 	private JLabel messageLabel;
 
 	private JProgressBar progressBar;
 	
-	private JComboBox whichPort;
-	
 	private boolean runEnable = false;
-	
-	private JPanel bodyPanel;
-	private String message;
-
-	public CardLoginAction(JPanel bodyPanel) {
-		this.bodyPanel = bodyPanel;
-	}
-	
-	public CardLoginAction(JPanel bodyPanel,String message) {
-		this.bodyPanel = bodyPanel;
-		this.message = message;
-
-	}
 	
 	public void promptCardLogin() {
 		SFClient.staffSignal = false;
 
 		//clean view
-		if (bodyPanel!=null && bodyPanel.isShowing()) {
-			bodyPanel.removeAll();
+		if (SFWine.global.getBodyPanel()!=null && SFWine.global.getBodyPanel().isShowing()) {
+			SFWine.global.getBodyPanel().removeAll();
 		}
 		
-		int x, y,width,hight;
+		int x, y,wm,wt,hight;
 
 		x = 400;
 		y = 250;
 		
-		width = 90;
+		wm = 30;
+		wt = 100;
 		hight = 20;
 		
 		x += 10;
@@ -74,38 +54,27 @@ public class CardLoginAction {
 		progressBar.setStringPainted(true); // 描绘文字
 		progressBar.setString(display); // 设置显示文字
 		progressBar.setBounds(x, y, display.length()*20, hight);
-		bodyPanel.add(progressBar);
+		SFWine.global.getBodyPanel().add(progressBar);
 		
 		y += hight;
 		
-		disLabel = new JLabel("串口端口:");
-		disLabel.setBounds(x,y,width,hight);
-		disLabel.setForeground(Color.WHITE);
-		bodyPanel.add(disLabel);
+		messageLabel= new JLabel();
+		messageLabel.setBounds(x,y,wt+wm,hight);
 		
-		whichPort = new JComboBox();
-		whichPort.setBounds(x+width,y,width,hight);//一个字符9 point
-		whichPort.setSelectedItem(whichPort.getSelectedItem());
-		
-		List<String> ports = new SerialManager().getPorts();
-		for(String value:ports){
-			whichPort.addItem(value);
+		if(SFClient.isOpenNetwork()){
+			messageLabel.setText("网络正常");
+			messageLabel.setForeground(Color.GREEN);
+		}else{
+			messageLabel.setText("网络不通");
+			messageLabel.setForeground(Color.RED);
 		}
-		bodyPanel.add(whichPort);
-		
-		whichPort.addItemListener(new ItemListener() {
-
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				ISO14443AAction.whichPort=e.getItem().toString();
-			}
-		});
+		SFWine.global.getBodyPanel().add(messageLabel);
 		
 		y += hight;
 		JButton login = new JButton("登录/退出");
-		login.setBounds(x+width,y,width,hight);
+		login.setBounds(x,y,wt,hight);
 		login.setForeground(Color.WHITE);
-		login.setBackground(new Color(105,177,35));
+		login.setBackground(Color.GREEN);
 		login.requestFocus();
 
 		login.addActionListener( new ActionListener() {
@@ -119,108 +88,93 @@ public class CardLoginAction {
 					}
 				}
 			});
-		bodyPanel.add(login);
+		SFWine.global.getBodyPanel().add(login);
 		
-		y += hight;
+
 		
-		messageLabel= new JLabel();
-		
-		if(SFClient.isOpenNetwork()){
-			messageLabel.setText("网络正常");
-			messageLabel.setForeground(Color.GREEN);
-		}else{
-			messageLabel.setText("网络不通");
-			messageLabel.setForeground(Color.RED);
-		}
-		messageLabel.setBounds(x,y,200,hight);
-		bodyPanel.add(messageLabel);
-		
-		bodyPanel.setVisible(true);
-		bodyPanel.validate();//显示
-		bodyPanel.repaint();
+		SFWine.global.getBodyPanel().setVisible(true);
+		SFWine.global.getBodyPanel().validate();//显示
+		SFWine.global.getBodyPanel().repaint();
 		
 		//设置背景图片
 		URL url = SFWine.class.getResource("bg.png");
         ImageIcon img = new ImageIcon(url);
         JLabel background = new JLabel(img);
-        bodyPanel.add(background, new Integer(Integer.MIN_VALUE));
+        SFWine.global.getBodyPanel().add(background, new Integer(Integer.MIN_VALUE));
         background.setBounds(0, 0, img.getIconWidth(), img.getIconHeight());
 	}
 	
 	 class CardProcessLogin implements Runnable {
 		private JLabel messageLabel;
-		
+		private ISO14443AAction cardRFID;
+
 		CardProcessLogin(JLabel messageLabel){
 			this.messageLabel=messageLabel;
+			
+			cardRFID = new ISO14443AAction();
+			//初始化
+			cardRFID.initSerial();
 		}
 		
 		public void run(){
 			 Runnable runner = new Runnable() {
 				public void run() {
-					ISO14443AAction cardRFID = new ISO14443AAction();
-					try {
-						//初始化
-						cardRFID.initSerial();
-						cardRFID.initCard();
-						
-						//请正确连接发卡器
-						if(!cardRFID.isOpened()){
-							throw new NullPointerException("发卡器未连接或者端口选择错误!");
-						}
-						
-						if (log.isDebugEnabled()) log.debug("连接发卡器 okay:");
-
-						//请放人电子标签或者电子卡
-						String serialNumber = cardRFID.getSerialNumber();
-						if(serialNumber == null){
-							if (log.isDebugEnabled()) log.debug("请放人电子标签或者电子卡");
-							throw new NullPointerException("请放人电子标签或者电子卡!");
-						}
-						if (log.isDebugEnabled()) log.debug("卡片 okay:");
-						
-						int cardType = cardRFID.request();
-						if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
-						if (log.isDebugEnabled()) log.debug("falt card:"+CommandsISO14443A.CARD_14443A_M1);
-						
-						if(cardType!=CommandsISO14443A.CARD_14443A_M1){
-							throw new NullPointerException("此卡非标签卡!");
-						}
-						
-						String userName = cardRFID.read(1, 1);
-						if (log.isDebugEnabled()) log.debug("userName:"+userName);
-						SFClient.user.setName(userName.trim());
-						
-						String password = cardRFID.read(1, 2);
-						if (log.isDebugEnabled()) log.debug("password:"+password);
-						SFClient.user.setPassword(password.trim());
-						
-						//check database
-						if(SFClient.isAllow()){
-							runEnable = false;
-							new CardAction(bodyPanel).promptNewWineCard();
-						}else{
-							message = "登录失败!";
-							messageLabel.setText(message);
-							messageLabel.setForeground(Color.RED);
-						}
-					}catch (NullPointerException e){
-							if (log.isErrorEnabled()) log.error("NullPointerException:" + e.getMessage());
+					synchronized (initLock) {
+						try {
+							cardRFID.initCard();
+							
+							//请正确连接发卡器
+							if(!cardRFID.isOpened()){
+								throw new NullPointerException("发卡器未连接或者端口选择错误!");
+							}
+							
+							if (log.isDebugEnabled()) log.debug("连接发卡器 okay:");
 	
-							message = e.getMessage();
-							messageLabel.setText(message);
-							messageLabel.setForeground(Color.RED);
+							//请放人电子标签或者电子卡
+							String serialNumber = cardRFID.getSerialNumber();
+							if(serialNumber == null){
+								if (log.isDebugEnabled()) log.debug("请放人电子标签或者电子卡");
+								throw new NullPointerException("请放人电子标签或者电子卡!");
+							}
+							if (log.isDebugEnabled()) log.debug("卡片 okay:");
 							
-							e.printStackTrace();
-					} catch (Exception e) {
-							if (log.isErrorEnabled()) log.error("Exception:" + e.getMessage());
-							message = e.getMessage();
-							messageLabel.setText(message);
-							messageLabel.setForeground(Color.RED);
+							int cardType = cardRFID.getCardType();
+							if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
+							if (log.isDebugEnabled()) log.debug("falt card:"+CommandsISO14443A.CARD_14443A_M1);
 							
-							e.printStackTrace();
-					} finally {
+							if(cardType!=CommandsISO14443A.CARD_14443A_M1){
+								throw new NullPointerException("此卡非标签卡!");
+							}
+							
+							String userName = cardRFID.read(1, 1);
+							if (log.isDebugEnabled()) log.debug("userName:"+userName);
+							SFClient.user.setName(userName.trim());
+							
+							String password = cardRFID.read(1, 2);
+							if (log.isDebugEnabled()) log.debug("password:"+password);
+							SFClient.user.setPassword(password.trim());
+							
+							//check database
+							if(SFClient.isAllow()){
+								runEnable = false;
+								new CardAction().promptNewWineCard();
+							}else{
+								Global.message = "登录失败!";
+								messageLabel.setText(Global.message);
+								messageLabel.setForeground(Color.RED);
+							}
+						} catch (Exception e) {
+								if (log.isErrorEnabled()) log.error("Exception:" + e.getMessage());
+								Global.message = e.getMessage();
+								messageLabel.setText(Global.message);
+								messageLabel.setForeground(Color.RED);
+								
+								e.printStackTrace();
+						} finally {
 							cardRFID.beep(10);
-							cardRFID.destroy();
+	//						SFWine.global.getMessage() = "finally";
+							messageLabel.setText(Global.message);
+						}
 					}
 					if (log.isDebugEnabled()) log.debug("run finlsh!"+SFClient.staffSignal);
 				}
@@ -234,8 +188,8 @@ public class CardLoginAction {
 
 			while(runEnable && SFClient.staffSignal){
 				try {
-					message = "开始登录";
-					messageLabel.setText(message);
+					Global.message = "开始登录";
+					messageLabel.setText(Global.message);
 					messageLabel.setForeground(Color.GREEN);
 					
 					SwingUtilities.invokeAndWait(runner);
@@ -243,14 +197,16 @@ public class CardLoginAction {
 					 if (log.isDebugEnabled()) log.debug("Lookup:");
 
 					// Our task for each step is to just sleep
-					//Sleep 500 ms
-					Thread.sleep(500);
+					//Sleep 2400 ms
+					Thread.sleep(2400);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} catch (InvocationTargetException e) {
 					e.printStackTrace();
 				}
 			}
+			cardRFID.beep(10);
+			cardRFID.destroy();
 		}
 	 }
 }
