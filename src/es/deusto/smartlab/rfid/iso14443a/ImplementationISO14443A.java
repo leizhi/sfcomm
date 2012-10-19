@@ -130,7 +130,10 @@ public class ImplementationISO14443A implements ISO14443A{
 				select2(s2);
 				serialNumber = StringUtils.toHex(s2);
 			}
-			serialNumber += StringUtils.toHex(s1);
+			if(serialNumber!=null)
+				serialNumber += StringUtils.toHex(s1);
+			else
+				serialNumber = StringUtils.toHex(s1);
 		}
 	}
 	
