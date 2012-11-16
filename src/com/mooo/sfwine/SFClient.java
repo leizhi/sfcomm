@@ -22,7 +22,7 @@ public class SFClient {
 	private static Object initLock = new Object();
 	private static SFClient factory = null;
 
-	public static String host="122.225.88.84";
+	public static String host="118.123.244.109";
 	public static Integer port=8000;
 	
 	private static Socket socket = null;
