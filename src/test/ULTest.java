@@ -55,7 +55,7 @@ public class ULTest {
 		try {
 			//request card
 			reponse = iccrf.getSerialNumber();
-//			System.out.println("SerialNumber:"+reponse);
+			System.out.println("SerialNumber:"+reponse);
 //			iccrf.cleanAll();
 			//write UL
 //			iccrf.save(buf,4,0,16);
