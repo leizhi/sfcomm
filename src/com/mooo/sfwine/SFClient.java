@@ -256,7 +256,7 @@ public class SFClient {
 		return reponse;
 	}
 	
-	public static void saveCard(String rfidcode,String uuid,String wineryName) throws CardException {
+	public static void saveCard(String rfidcode,String uuid,String wineryName,String cardTypeName) throws CardException {
 		//send command
 		String REQ;
 		String reponse;
@@ -266,6 +266,7 @@ public class SFClient {
 		REQ += ";"+rfidcode;
 		REQ += ";"+uuid;
 		REQ += ";"+wineryName;
+		REQ += ";"+cardTypeName;
 		REQ += "#";
 		reponse = request(REQ);//0 no limit
 		System.out.println("reponse:"+reponse);

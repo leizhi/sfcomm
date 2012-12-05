@@ -188,7 +188,7 @@ public class CardAction {
 	}
 
 	public void fillCard() {
-		card.setCardType(cardType.getSelectedItem().toString());
+		card.setCardTypeName(cardType.getSelectedItem().toString());
 		card.setWinery(winery.getSelectedItem().toString());
 	}
 	
@@ -298,7 +298,7 @@ public class CardAction {
 									cardRFID.save(card);
 									if (log.isDebugEnabled()) log.debug("RFID save card");
 	
-									SFClient.saveCard(card.getRfidcode(),card.getUuid(),card.getWinery());
+									SFClient.saveCard(card.getRfidcode(),card.getUuid(),card.getWinery(),card.getCardTypeName());
 									
 									if (log.isDebugEnabled()) log.debug("DB save card");
 	

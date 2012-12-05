@@ -7,7 +7,7 @@ public class Card {
 	private String rfidcode;//序列号
 	private String winery;//酒厂定义
 	private Integer orgId;//机构
-	private String cardType;//卡类型 6
+	private String cardTypeName;//卡类型 6
 	
 	public Long getId() {
 		return id;
@@ -33,11 +33,11 @@ public class Card {
 	public void setOrgId(Integer orgId) {
 		this.orgId = orgId;
 	}
-	public String getCardType() {
-		return cardType;
+	public String getCardTypeName() {
+		return cardTypeName;
 	}
-	public void setCardType(String cardType) {
-		this.cardType = cardType;
+	public void setCardTypeName(String cardTypeName) {
+		this.cardTypeName = cardTypeName;
 	}
 	public String getUuid() {
 		return uuid;
