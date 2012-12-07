@@ -64,15 +64,15 @@ public class SFClient {
 	}
 	
 	public static SFClient getInstance() {
-		synchronized (initLock) {
 			if(factory==null){
-				factory = new SFClient();
+				synchronized (initLock) {
+					factory = new SFClient();
+				}
 			}
 			return factory;
-		}
 	}
 	
-	public static String request(String url){
+	public synchronized static String request(String url){
 			String buffer = null;
 			try {
 				if(log.isDebugEnabled())log.debug("command:"+url);
@@ -88,7 +88,7 @@ public class SFClient {
 			return buffer;
 	}
 	
-	public void end(){
+	public synchronized void end(){
 		try {
 			if(out!=null)
 				out.close();
@@ -103,7 +103,7 @@ public class SFClient {
 		}
 	}
 	
-	public static String[] getWineryValues(){
+	public synchronized static String[] getWineryValues(){
 		//send command
 		String REQ;
 		String reponse;
@@ -146,7 +146,7 @@ public class SFClient {
 		return winerys;
 	}
 	
-	public static String[] getCardTypes(){
+	public synchronized static String[] getCardTypes(){
 		//send command
 		String REQ;
 		String reponse;
@@ -186,7 +186,7 @@ public class SFClient {
 		return winerys;
 	}
 	
-	public static boolean existCard(String uuid){
+	public synchronized static boolean existCard(String uuid){
 		//send command
 		String REQ;
 		String reponse;
@@ -219,51 +219,13 @@ public class SFClient {
 		return true;
 	}
 	
-	public static String nextRfidCode(String wineryName){
-		//send command
-		String REQ;
-		String reponse;
-		
-		REQ = "*13;"+wineryName+"#";
-		reponse = request(REQ);//0 no limit
-		System.out.println("reponse:"+reponse);
-
-		if(!reponse.startsWith("*")||!reponse.endsWith("#")){
-//			response = "数据格式不正确";
-//			return true;
-		}
-		
-		String doRequest=reponse.substring(reponse.indexOf("*")+1,
-				reponse.lastIndexOf("#"));
-
-	    String[] args=doRequest.split(";");
-	    
-	    if(log.isDebugEnabled()) log.debug("length:"+args.length);
-	    
-		for(int i=0;i<args.length;i++){
-			args[i]=args[i].trim();
-			if(log.isDebugEnabled()) log.debug(args[i]);
-		}
-		
-		int ret = new Integer(args[0]);
-		
-		if(ret!=0) System.out.println("返回错误");
-		
-		if(args.length > 2) {
-			reponse = doRequest.substring(doRequest.indexOf(";", 2)+1);
-		}
-		
-		return reponse;
-	}
-	
-	public static void saveCard(String rfidcode,String uuid,String wineryName,String cardTypeName) throws CardException {
+	public synchronized static String saveCard(String uuid,String wineryName,String cardTypeName) throws CardException {
 		//send command
 		String REQ;
 		String reponse;
 		
 		REQ = "*14";
 		REQ += ";"+user.getId();
-		REQ += ";"+rfidcode;
 		REQ += ";"+uuid;
 		REQ += ";"+wineryName;
 		REQ += ";"+cardTypeName;
@@ -288,13 +250,19 @@ public class SFClient {
 		}
 		
 		int ret = new Integer(args[0]);
+		
+		if(args.length==3 && ret==0)
+			return args[2];
+		
 		if(ret!=0) throw new CardException(args[1]);
+		
+		return null;
 	}
 	
 	
 //	private Integer userId;
 
-	public static Integer processLogin(String userName,String userPassWord){
+	public synchronized static Integer processLogin(String userName,String userPassWord){
 		//send command
 		String REQ;
 		String reponse;
