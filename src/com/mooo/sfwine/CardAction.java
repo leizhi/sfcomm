@@ -35,7 +35,7 @@ public class CardAction {
 
 	private Card card;
 
-	private	boolean runEnable = true;
+	private	boolean runEnable = false;
 
 	public void promptNewWineCard() {
 		try {
