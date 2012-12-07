@@ -284,7 +284,6 @@ public class CardAction {
 										
 									card = new Card();
 									fillCard();
-									card.setRfidcode(SFClient.nextRfidCode(card.getWinery()));
 
 									card.setUuid(StringUtils.hash(serialNumber));
 									if (log.isDebugEnabled()) log.debug("uuid:"+card.getUuid());
@@ -292,8 +291,10 @@ public class CardAction {
 									if (SFClient.existCard(card.getUuid())){
 										throw new CardException("卡片已经使用,请换新卡!");
 									}
+									
 									if (log.isDebugEnabled()) log.debug("Winery:"+card.getWinery());
-	
+									card.setRfidcode(SFClient.nextRfidCode(card.getWinery()));
+
 									cardRFID.save(card);
 									if (log.isDebugEnabled()) log.debug("RFID save card");
 	
