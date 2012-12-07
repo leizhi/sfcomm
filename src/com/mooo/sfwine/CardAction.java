@@ -262,8 +262,6 @@ public class CardAction {
 						Global.message="发卡开始";
 						messageLabel.setText(Global.message);
 						
-//						SwingUtilities.invokeAndWait(saveCard);
-						
 						cardRFID.initCard();
 						//请正确连接发卡器
 						if(!cardRFID.isOpened()){
@@ -302,6 +300,7 @@ public class CardAction {
 
 						SFClient.saveCard(card.getRfidcode(),card.getUuid(),card.getWinery(),card.getCardTypeName());
 						
+						Global.message = "发卡成功!";
 						if (log.isDebugEnabled()) log.debug("DB save card");
 					} catch (Exception e) {
 						if (log.isErrorEnabled()) log.error("Exception:" + e.getMessage());
@@ -310,9 +309,9 @@ public class CardAction {
 						e.printStackTrace();
 					}
 					
+					messageLabel.setText(Global.message);
 					cardRFID.beep(10);
 					cardRFID.destroy();
-					messageLabel.setText(Global.message);
 		   		}//end while
 			}//end run
 	 }
