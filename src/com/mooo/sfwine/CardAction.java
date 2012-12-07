@@ -284,8 +284,9 @@ public class CardAction {
 										
 									card = new Card();
 									fillCard();
+									card.setRfidcode(SFClient.nextRfidCode(card.getWinery()));
+
 									card.setUuid(StringUtils.hash(serialNumber));
-									
 									if (log.isDebugEnabled()) log.debug("uuid:"+card.getUuid());
 	
 									if (SFClient.existCard(card.getUuid())){
@@ -293,8 +294,6 @@ public class CardAction {
 									}
 									if (log.isDebugEnabled()) log.debug("Winery:"+card.getWinery());
 	
-									card.setRfidcode(SFClient.nextRfidCode(card.getWinery()));
-										
 									cardRFID.save(card);
 									if (log.isDebugEnabled()) log.debug("RFID save card");
 	
