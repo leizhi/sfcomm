@@ -72,7 +72,7 @@ public class SFClient {
 		}
 	}
 	
-	public static String request(String url){
+	public synchronized static String request(String url){
 			String buffer = null;
 			try {
 				if(log.isDebugEnabled())log.debug("command:"+url);
@@ -88,7 +88,7 @@ public class SFClient {
 			return buffer;
 	}
 	
-	public void end(){
+	public synchronized void end(){
 		try {
 			if(out!=null)
 				out.close();
@@ -103,7 +103,7 @@ public class SFClient {
 		}
 	}
 	
-	public static String[] getWineryValues(){
+	public synchronized static String[] getWineryValues(){
 		//send command
 		String REQ;
 		String reponse;
@@ -146,7 +146,7 @@ public class SFClient {
 		return winerys;
 	}
 	
-	public static String[] getCardTypes(){
+	public synchronized static String[] getCardTypes(){
 		//send command
 		String REQ;
 		String reponse;
@@ -186,7 +186,7 @@ public class SFClient {
 		return winerys;
 	}
 	
-	public static boolean existCard(String uuid){
+	public synchronized static boolean existCard(String uuid){
 		//send command
 		String REQ;
 		String reponse;
@@ -219,7 +219,7 @@ public class SFClient {
 		return true;
 	}
 	
-	public static String nextRfidCode(String wineryName){
+	public synchronized static String nextRfidCode(String wineryName){
 		//send command
 		String REQ;
 		String reponse;
@@ -256,7 +256,7 @@ public class SFClient {
 		return reponse;
 	}
 	
-	public static void saveCard(String rfidcode,String uuid,String wineryName,String cardTypeName) throws CardException {
+	public synchronized static void saveCard(String rfidcode,String uuid,String wineryName,String cardTypeName) throws CardException {
 		//send command
 		String REQ;
 		String reponse;
@@ -294,7 +294,7 @@ public class SFClient {
 	
 //	private Integer userId;
 
-	public static Integer processLogin(String userName,String userPassWord){
+	public synchronized static Integer processLogin(String userName,String userPassWord){
 		//send command
 		String REQ;
 		String reponse;
