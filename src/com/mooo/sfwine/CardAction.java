@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Vector;
 
@@ -29,10 +28,6 @@ import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 public class CardAction {
 	private static Log log = LogFactory.getLog(CardAction.class);
 
-	private final static Object initLock = new Object();
-
-	private boolean runEnable = false;
-	
 	private JLabel disLabel;
 	private JLabel messageLabel;
 
@@ -40,6 +35,8 @@ public class CardAction {
 	private JComboBox cardType;
 
 	private Card card;
+
+	private	boolean runEnable = true;
 
 	public void promptNewWineCard() {
 		try {
@@ -140,6 +137,7 @@ public class CardAction {
 					}else{
 						Global.message="发卡开始..";
 						messageLabel.setText(Global.message);
+						runEnable=true;
 						
 						new Thread (new CardProcessRegister(messageLabel)).start();
 					}
@@ -246,21 +244,17 @@ public class CardAction {
 	
 	 class CardProcessRegister implements Runnable {
 		 
-			private JLabel messageLabel;
 			private ISO14443AAction cardRFID;
-
+			Runnable saveCard;
+			
 			CardProcessRegister(JLabel messageLabel){
-				this.messageLabel=messageLabel;
 				
 				cardRFID = new ISO14443AAction();
 				//初始化
 				cardRFID.initSerial();
-			}	
-			
-			public void run(){
-				Runnable runner = new Runnable() {
-						public void run() {
-							synchronized (initLock) {
+				
+				saveCard=new Runnable(){
+					   public void run(){
 								try {
 									cardRFID.initCard();
 									
@@ -308,44 +302,35 @@ public class CardAction {
 									Global.message=e.getMessage();
 
 									e.printStackTrace();
-								} finally {
-									cardRFID.beep(10);
-//									SFWine.global.getMessage() = "finally";
-									messageLabel.setText(Global.message);
 								}
-							}
-						}
+								
+								cardRFID.beep(10);
+								cardRFID.destroy();
+								//messageLabel.setText(Global.message);
+					   		}//run
+						};//Runnable
 					};
 					
-					//do while
-					runEnable = true;
-					while(runEnable){
-						try {
-							Global.message="发卡处理";
-							messageLabel.setText(Global.message);
-							
-							SwingUtilities.invokeAndWait(runner);
-							// Our task for each step is to just sleep
-							//Sleep 2400 ms
-							Thread.sleep(2400);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						} catch (InvocationTargetException e) {
-							e.printStackTrace();
-						}
+			public void run() {
+				//do while
+				while(runEnable){
+					try {
+						Global.message="发卡开始";
+						messageLabel.setText(Global.message);
+						
+						SwingUtilities.invokeAndWait(saveCard);
+						//Sleep 2400 ms
+						Thread.sleep(500);
+						
+						Global.message="发卡结束";
+						messageLabel.setText(Global.message);
+						// Our task for each step is to just sleep
+						//Sleep 2400 ms
+						Thread.sleep(2400);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-					
-					cardRFID.beep(10);
-					cardRFID.destroy();
-					/*
-					//Authority verification
-					if(LoginSession.staffSignal){
-						if(LoginSession.allow)
-							promptNewWineCard();
-					}
-					if (log.isDebugEnabled()) log.debug("run finlsh!"+LoginSession.staffSignal);
-					
-					*/
+				}
 			}
-		}
+	 }
 }
