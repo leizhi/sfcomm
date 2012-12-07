@@ -125,7 +125,9 @@ public class SFWine {
 						messageLabel.setText("断开连接");
 						messageLabel.setForeground(Color.GREEN);
 					}else{
-						SFClient.getInstance().connect(hostName.getText(), hostPort.getText());
+						SFClient.host = hostName.getText();
+						SFClient.port = new Integer(hostPort.getText());
+						SFClient.connect();
 						if(SFClient.isOpenNetwork()){
 							messageLabel.setText("连接成功");
 							messageLabel.setForeground(Color.GREEN);

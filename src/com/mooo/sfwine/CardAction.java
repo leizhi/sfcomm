@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Vector;
 
@@ -16,7 +15,6 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.RowSorter;
-import javax.swing.SwingUtilities;
 import javax.swing.table.TableRowSorter;
 
 import org.apache.commons.logging.Log;
@@ -28,8 +26,6 @@ import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 
 public class CardAction {
 	private static Log log = LogFactory.getLog(CardAction.class);
-
-	private final static Object initLock = new Object();
 
 	private boolean runEnable = false;
 	
@@ -245,107 +241,79 @@ public class CardAction {
 	}
 	
 	 class CardProcessRegister implements Runnable {
-		 
-			private JLabel messageLabel;
-			private ISO14443AAction cardRFID;
-
-			CardProcessRegister(JLabel messageLabel){
-				this.messageLabel=messageLabel;
-				
-				cardRFID = new ISO14443AAction();
-				//初始化
-				cardRFID.initSerial();
-			}	
+		 	JLabel messageLabel;
 			
-			public void run(){
-				Runnable runner = new Runnable() {
-						public void run() {
-							synchronized (initLock) {
-								try {
-									cardRFID.initCard();
-									
-									//请正确连接发卡器
-									if(!cardRFID.isOpened()){
-										throw new CardException("发卡器未连接或者端口选择错误!");
-									}
-									if (log.isDebugEnabled()) log.debug("连接发卡器 okay:");
-	
-									//请放人电子标签或者电子卡
-									String serialNumber = cardRFID.getSerialNumber();
-									if(serialNumber == null){
-										throw new CardException("请放人电子标签或者电子卡!");
-									}
-									if (log.isDebugEnabled()) log.debug("卡片 okay:");
-									
-									int cardType = cardRFID.getCardType();
-									if(cardType!=CommandsISO14443A.CARD_14443A_UL){
-										throw new CardException("此卡非标签卡!");
-									}
-										
-									card = new Card();
-									fillCard();
-									card.setUuid(StringUtils.hash(serialNumber));
-									
-									if (log.isDebugEnabled()) log.debug("uuid:"+card.getUuid());
-	
-									if (SFClient.existCard(card.getUuid())){
-										throw new CardException("卡片已经使用,请换新卡!");
-									}
-									if (log.isDebugEnabled()) log.debug("Winery:"+card.getWinery());
-	
-									card.setRfidcode(SFClient.nextRfidCode(card.getWinery()));
-										
-									cardRFID.save(card);
-									if (log.isDebugEnabled()) log.debug("RFID save card");
-	
-									SFClient.saveCard(card.getRfidcode(),card.getUuid(),card.getWinery(),card.getCardTypeName());
-									
-									if (log.isDebugEnabled()) log.debug("DB save card");
-	
-									Global.message="发卡成功";
-								} catch (Exception e) {
-									if (log.isErrorEnabled()) log.error("Exception:" + e.getMessage());
-									Global.message=e.getMessage();
+		 	CardProcessRegister(JLabel messageLabel){
+				this.messageLabel = messageLabel;
+			}
+		 	
+			public void run() {
+				//do while
+				runEnable=true;
 
-									e.printStackTrace();
-								} finally {
-									cardRFID.beep(10);
-//									SFWine.global.getMessage() = "finally";
-									messageLabel.setText(Global.message);
-								}
-							}
-						}
-					};
+				while(runEnable){
+					ISO14443AAction cardRFID = new ISO14443AAction();
+					//初始化
+					cardRFID.initSerial();
 					
-					//do while
-					runEnable = true;
-					while(runEnable){
-						try {
-							Global.message="发卡处理";
-							messageLabel.setText(Global.message);
-							
-							SwingUtilities.invokeAndWait(runner);
-							// Our task for each step is to just sleep
-							//Sleep 2400 ms
-							Thread.sleep(2400);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						} catch (InvocationTargetException e) {
-							e.printStackTrace();
+					if(!SFClient.isOpenNetwork()) SFClient.connect();
+					
+					try {
+						Global.message="发卡开始";
+						messageLabel.setText(Global.message);
+						
+//						SwingUtilities.invokeAndWait(saveCard);
+						
+						cardRFID.initCard();
+						//请正确连接发卡器
+						if(!cardRFID.isOpened()){
+							throw new CardException("发卡器未连接或者端口选择错误!");
 						}
+						if (log.isDebugEnabled()) log.debug("连接发卡器 okay:");
+
+						//请放人电子标签或者电子卡
+						String serialNumber = cardRFID.getSerialNumber();
+						if(serialNumber == null){
+							throw new CardException("请放人电子标签或者电子卡!");
+						}
+						if (log.isDebugEnabled()) log.debug("卡片 okay:");
+						
+						int cardType = cardRFID.getCardType();
+						if(cardType!=CommandsISO14443A.CARD_14443A_UL){
+							throw new CardException("此卡非标签卡!");
+						}
+							
+						card = new Card();
+						fillCard();
+
+						card.setUuid(StringUtils.hash(serialNumber));
+						if (log.isDebugEnabled()) log.debug("uuid:"+card.getUuid());
+
+						if (SFClient.existCard(card.getUuid())){
+							throw new CardException("卡片已经使用,请换新卡!");
+						}
+
+						if (log.isDebugEnabled()) log.debug("Winery:"+card.getWinery());
+
+						card.setRfidcode(SFClient.nextRfidCode(card.getWinery()));
+							
+						cardRFID.save(card);
+						if (log.isDebugEnabled()) log.debug("RFID save card");
+
+						SFClient.saveCard(card.getRfidcode(),card.getUuid(),card.getWinery(),card.getCardTypeName());
+						
+						if (log.isDebugEnabled()) log.debug("DB save card");
+					} catch (Exception e) {
+						if (log.isErrorEnabled()) log.error("Exception:" + e.getMessage());
+						Global.message=e.getMessage();
+
+						e.printStackTrace();
 					}
 					
 					cardRFID.beep(10);
 					cardRFID.destroy();
-					/*
-					//Authority verification
-					if(LoginSession.staffSignal){
-						if(LoginSession.allow)
-							promptNewWineCard();
-					}
-					if (log.isDebugEnabled()) log.debug("run finlsh!"+LoginSession.staffSignal);
-					
-					*/
-			}
-		}
+					messageLabel.setText(Global.message);
+		   		}//end while
+			}//end run
+	 }
 }

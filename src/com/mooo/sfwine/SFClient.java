@@ -33,12 +33,12 @@ public class SFClient {
 	private static BufferedReader read = null;
 	private static PrintStream print = null;
 	
-	public void connect(String host,String port){
+	public static void connect(){
 		try {
 			socket = new Socket();
 	//		socket.getChannel().open();
 	//		Connects this socket to the server.
-			socket.connect(new InetSocketAddress(host, new Integer(port)),1000);//建立连接最多等待6s
+			socket.connect(new InetSocketAddress(host, port),1000);//建立连接最多等待6s
 			socket.setKeepAlive(true);
 			socket.setSoTimeout(1000*60*60*12);//time out 3s
 	//		socket.setSoLinger(true, 1000);
