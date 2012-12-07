@@ -341,6 +341,8 @@ public class CardAction {
 					//初始化
 					cardRFID.initSerial();
 					
+					if(!SFClient.isOpenNetwork()) SFClient.connect();
+					
 					try {
 						Global.message="发卡开始";
 						messageLabel.setText(Global.message);
