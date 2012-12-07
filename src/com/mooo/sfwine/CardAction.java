@@ -136,7 +136,6 @@ public class CardAction {
 					}else{
 						Global.message="发卡开始..";
 						messageLabel.setText(Global.message);
-						runEnable=true;
 						
 						new Thread (new CardProcessRegister(messageLabel)).start();
 					}
@@ -336,6 +335,8 @@ public class CardAction {
 
 				
 				//do while
+				runEnable=true;
+
 				while(runEnable){
 					ISO14443AAction cardRFID = new ISO14443AAction();
 					//初始化
