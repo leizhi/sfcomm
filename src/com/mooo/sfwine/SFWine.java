@@ -127,10 +127,6 @@ public class SFWine {
 					}else{
 						SFClient.host = hostName.getText();
 						SFClient.port = new Integer(hostPort.getText());
-<<<<<<< HEAD
-=======
-						
->>>>>>> 4029d9d1334b9d56dd20e658bbde126c71b94a67
 						SFClient.connect();
 						if(SFClient.isOpenNetwork()){
 							messageLabel.setText("连接成功");
