@@ -380,15 +380,18 @@ public class CardAction {
 						}
 						
 						if (log.isDebugEnabled()) log.debug("Winery:"+card.getWinery());
-						card.setRfidcode(SFClient.nextRfidCode(card.getWinery()));
 
-						cardRFID.save(card);
-						if (log.isDebugEnabled()) log.debug("RFID save card");
-
-						SFClient.saveCard(card.getRfidcode(),card.getUuid(),card.getWinery(),card.getCardTypeName());
 						
+						String rfidcode = SFClient.saveCard(card.getUuid(),card.getWinery(),card.getCardTypeName());
 						if (log.isDebugEnabled()) log.debug("DB save card");
 
+						if(rfidcode==null)
+							throw new CardException("发卡未知错误!");
+						
+						card.setRfidcode(rfidcode);
+						cardRFID.save(card);
+						if (log.isDebugEnabled()) log.debug("RFID save card");
+						
 						Global.message="发卡成功";
 					} catch (Exception e) {
 						if (log.isErrorEnabled()) log.error("Exception:" + e.getMessage());
