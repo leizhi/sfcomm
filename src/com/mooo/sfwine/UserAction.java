@@ -103,7 +103,8 @@ public class UserAction {
 		confirm.setBounds(x+width,y,execWidth,hight);//一个字符9 point
 		confirm.setBackground(new Color(105,177,35));
 		confirm.setForeground(Color.WHITE);
-
+		confirm.isDefaultButton();
+		
 		confirm.addActionListener( new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -242,9 +243,11 @@ public class UserAction {
 		JButton confirm = new JButton("注册");
 		confirm.requestFocus();
 		confirm.setBounds(x+width,y,execWidth,hight);
+		confirm.isDefaultButton();
+
 		confirm.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					processRegister();
+					saveUser();
 				}
 			});
 		//为按钮添加键盘适配器
@@ -272,21 +275,23 @@ public class UserAction {
 		}
 	}
 	
-	public void processRegister(){
-		if(log.isDebugEnabled()) log.debug("processRegister");	
-
-        long count=0;
+	public void saveUser(){
 		ISO14443AAction cardRFID = new ISO14443AAction();
         try {
     		cardRFID.initSerial();
-    		cardRFID.initCard();
-    		
-    		if(log.isDebugEnabled()) log.debug("processLogin getName:"+userNameText.getText());	
-    		if(log.isDebugEnabled()) log.debug("processLogin getPassword:"+String.valueOf(passwordText.getPassword()));	
-    		
+			
+    		if(!SFClient.isOpenNetwork()) SFClient.connect();
+
+			String userName =String.valueOf(userNameText.getText());
+			String password =String.valueOf(passwordText.getPassword());
+			
+			if (log.isDebugEnabled()) log.debug("processLogin getName:"+userName);
+			if (log.isDebugEnabled()) log.debug("processLogin getPassword:"+password);
+			
     		StringUtils.notEmpty(userNameText.getText());
     		StringUtils.notEmpty(String.valueOf(passwordText.getPassword()));
-    		
+
+    		cardRFID.initCard();
 			// 初始化检查
 			if (!cardRFID.isOpened())
 				throw new NullPointerException("请正确连接发卡器");
@@ -310,30 +315,17 @@ public class UserAction {
     			throw new NullPointerException("请输入密码");
     		
     		cardRFID.cleanAll();
-    		
-			if (log.isDebugEnabled()) log.debug("userNameText:"+String.valueOf(userNameText.getText()));
-			if (log.isDebugEnabled()) log.debug("passwordText:"+String.valueOf(passwordText.getPassword()));
-
-			cardRFID.save(String.valueOf(userNameText.getText()), 1, 1, 16);
-			cardRFID.save(String.valueOf(passwordText.getPassword()), 1, 2, 16);
-
+			cardRFID.save(userName, 1, 1, 16);
+			cardRFID.save(password, 1, 2, 16);
             
-    		if(log.isDebugEnabled()) log.debug("count:"+count);	
+    		String uuid = StringUtils.hash(serialNumber);
+			SFClient.saveUser(userName, password, uuid);
 
-            if(count > 0)
-    			throw new NullPointerException("此用户已注册");
-            
-    		if(log.isDebugEnabled()) log.debug("count:"+count);	
-
-            if(count > 0)
-    			throw new NullPointerException("此卡已注册");
-            
             Global.message = "注册成功";
 			messageLabel.setText(Global.message);
-
 		}catch (Exception e) {
-				Global.message = e.getMessage();
-				messageLabel.setText(Global.message);
+			Global.message = e.getMessage();
+			messageLabel.setText(Global.message);
 			if(log.isErrorEnabled()) log.error("SQLException:"+e.getMessage());	
 		}finally {
 			cardRFID.beep(10);

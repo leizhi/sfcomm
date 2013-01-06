@@ -114,6 +114,7 @@ public class SFWine {
 		connect.setBounds(x+wm,y,100,hight);//一个字符9 point
 		connect.setBackground(new Color(105,177,35));
 		connect.setForeground(Color.WHITE);
+		connect.isDefaultButton();
 
 		connect.addActionListener( new ActionListener() {
 				@Override

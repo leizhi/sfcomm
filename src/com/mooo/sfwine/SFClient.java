@@ -290,9 +290,40 @@ public class SFClient {
 		int ret = new Integer(args[0]);
 		if(ret!=0) throw new CardException(args[1]);
 	}
-	
-	
-//	private Integer userId;
+	//StringUtils.hash(serialNumber)
+	public static void saveUser(String userName,String userPassWord,String uuid) throws CardException {
+		//send command
+		String REQ;
+		String reponse;
+		
+		REQ = "*15";
+		REQ += ";"+user.getId();
+		REQ += ";"+userName;
+		REQ += ";"+StringUtils.hash(userPassWord);
+		REQ += ";"+uuid;
+		REQ += "#";
+		reponse = request(REQ);//0 no limit
+		System.out.println("reponse:"+reponse);
+
+		if(reponse==null || !reponse.startsWith("*")||!reponse.endsWith("#")){
+			throw new CardException("用户注册异常");
+		}
+		
+		String doRequest=reponse.substring(reponse.indexOf("*")+1,
+				reponse.lastIndexOf("#"));
+
+	    String[] args=doRequest.split(";");
+	    
+	    if(log.isDebugEnabled()) log.debug("length:"+args.length);
+	    
+		for(int i=0;i<args.length;i++){
+			args[i]=args[i].trim();
+			if(log.isDebugEnabled()) log.debug(args[i]);
+		}
+		
+		int ret = new Integer(args[0]);
+		if(ret!=0) throw new CardException(args[1]);
+	}
 
 	public static Integer processLogin(String userName,String userPassWord){
 		//send command
