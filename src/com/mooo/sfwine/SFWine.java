@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
@@ -114,10 +116,8 @@ public class SFWine {
 		connect.setBounds(x+wm,y,100,hight);//一个字符9 point
 		connect.setBackground(new Color(105,177,35));
 		connect.setForeground(Color.WHITE);
-		connect.isDefaultButton();
 
 		connect.addActionListener( new ActionListener() {
-				@Override
 				public void actionPerformed(ActionEvent e) {
 					ISO14443AAction.whichPort=whichPort.getSelectedItem().toString();
 
@@ -139,6 +139,32 @@ public class SFWine {
 					}
 				}
 			});
+		
+		//为按钮添加键盘适配器
+		connect.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+		        if(e.getKeyCode() == KeyEvent.VK_ENTER){
+		        	ISO14443AAction.whichPort=whichPort.getSelectedItem().toString();
+
+					if(SFClient.isOpenNetwork()){
+						SFClient.getInstance().end();
+						messageLabel.setText("断开连接");
+						messageLabel.setForeground(Color.GREEN);
+					}else{
+						SFClient.host = hostName.getText();
+						SFClient.port = new Integer(hostPort.getText());
+						SFClient.connect();
+						if(SFClient.isOpenNetwork()){
+							messageLabel.setText("连接成功");
+							messageLabel.setForeground(Color.GREEN);
+						}else{
+							messageLabel.setText("连接失败");
+							messageLabel.setForeground(Color.RED);
+						}
+					}
+		        }
+			}
+		});
 		SFWine.global.getBodyPanel().add(connect);
 
 		y += hight;

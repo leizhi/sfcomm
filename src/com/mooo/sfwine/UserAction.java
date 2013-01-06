@@ -3,6 +3,8 @@ package com.mooo.sfwine;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
@@ -103,10 +105,8 @@ public class UserAction {
 		confirm.setBounds(x+width,y,execWidth,hight);//一个字符9 point
 		confirm.setBackground(new Color(105,177,35));
 		confirm.setForeground(Color.WHITE);
-		confirm.isDefaultButton();
 		
 		confirm.addActionListener( new ActionListener() {
-				@Override
 				public void actionPerformed(ActionEvent e) {
 					if(log.isDebugEnabled()) log.debug("getName->:"+userNameText.getText());	
 					if(log.isDebugEnabled()) log.debug("getPassword->:"+String.valueOf(passwordText.getPassword()));	
@@ -118,7 +118,18 @@ public class UserAction {
 			});
 		
 		//为按钮添加键盘适配器
-		confirm.addKeyListener(new KeyAction());
+		confirm.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+		        if(e.getKeyCode() == KeyEvent.VK_ENTER){
+					if(log.isDebugEnabled()) log.debug("getName->:"+userNameText.getText());	
+					if(log.isDebugEnabled()) log.debug("getPassword->:"+String.valueOf(passwordText.getPassword()));	
+					SFClient.user.setName(userNameText.getText());
+					SFClient.user.setPassword(String.valueOf(passwordText.getPassword()));
+					
+					processLogin();
+		        }
+			}
+		});
 		
 		SFWine.global.getBodyPanel().add(confirm);
 
@@ -250,8 +261,14 @@ public class UserAction {
 					saveUser();
 				}
 			});
+		
 		//为按钮添加键盘适配器
-		confirm.addKeyListener(new KeyAction());
+		confirm.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+		        if(e.getKeyCode() == KeyEvent.VK_ENTER){
+		        }
+			}
+		});
 		
 		SFWine.global.getBodyPanel().add(confirm);
 
@@ -404,7 +421,12 @@ public class UserAction {
 					}
 				});
 			//为按钮添加键盘适配器
-			confirm.addKeyListener(new KeyAction());
+			confirm.addKeyListener(new KeyAdapter() {
+				public void keyPressed(KeyEvent e) {
+			        if(e.getKeyCode() == KeyEvent.VK_ENTER){
+			        }
+				}
+			});
 			
 			SFWine.global.getBodyPanel().add(confirm);
 	
