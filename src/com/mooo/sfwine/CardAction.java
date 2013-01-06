@@ -186,11 +186,11 @@ public class CardAction {
 						Global.message=e1.getMessage();
 
 						e1.printStackTrace();
+					}finally {
+						cardRFID.beep(10);
+						cardRFID.destroy();
+						messageLabel.setText(Global.message);
 					}
-					
-					messageLabel.setText(Global.message);
-					cardRFID.beep(10);
-					cardRFID.destroy();
 				}
 			});
 		//为按钮添加键盘适配器

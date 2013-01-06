@@ -277,59 +277,59 @@ public class UserAction {
 	
 	public void saveUser(){
 		ISO14443AAction cardRFID = new ISO14443AAction();
-        try {
-    		cardRFID.initSerial();
-			
-    		if(!SFClient.isOpenNetwork()) SFClient.connect();
+		//初始化
+		cardRFID.initSerial();
+		if(!SFClient.isOpenNetwork()) SFClient.connect();
 
-			String userName =String.valueOf(userNameText.getText());
-			String password =String.valueOf(passwordText.getPassword());
-			
-			if (log.isDebugEnabled()) log.debug("processLogin getName:"+userName);
-			if (log.isDebugEnabled()) log.debug("processLogin getPassword:"+password);
-			
-    		StringUtils.notEmpty(userNameText.getText());
-    		StringUtils.notEmpty(String.valueOf(passwordText.getPassword()));
+		try {
+	    		if (log.isDebugEnabled()) log.debug(ISO14443AAction.whichPort +"/" + ISO14443AAction.whichSpeed);
 
-    		cardRFID.initCard();
-			// 初始化检查
-			if (!cardRFID.isOpened())
-				throw new NullPointerException("请正确连接发卡器");
+				String userName = String.valueOf(userNameText.getText());
+				String password = String.valueOf(passwordText.getPassword());
+	    		
+				StringUtils.notEmpty(userName);
+	    		StringUtils.notEmpty(password);
 
-			String serialNumber = cardRFID.getSerialNumber();
-			
-			if (serialNumber == null)
-				throw new NullPointerException("请放人电子标签或者电子卡");
-			
-			int cardType = cardRFID.request();
-			if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
-			if (log.isDebugEnabled()) log.debug("falt card:"+CommandsISO14443A.CARD_14443A_M1);
-			
-			if(cardType!=CommandsISO14443A.CARD_14443A_M1)
-				throw new NullPointerException("此卡非员工卡");
-			
-    		if(StringUtils.isNull(String.valueOf(userNameText.getText())))
-    			throw new NullPointerException("请输入用户名");
-    		
-    		if(StringUtils.isNull(String.valueOf(passwordText.getPassword())))
-    			throw new NullPointerException("请输入密码");
-    		
-    		cardRFID.cleanAll();
-			cardRFID.save(userName, 1, 1, 16);
-			cardRFID.save(password, 1, 2, 16);
-            
-    		String uuid = StringUtils.hash(serialNumber);
-			SFClient.saveUser(userName, password, uuid);
+	    		cardRFID.initCard();
+				// 初始化检查
+				if (!cardRFID.isOpened())
+					throw new NullPointerException("请正确连接发卡器");
+				
+				String serialNumber = cardRFID.getSerialNumber();
+				
+				if (serialNumber == null)
+					throw new NullPointerException("请放人电子标签或者电子卡");
+				
+				int cardType = cardRFID.getCardType();
+				if (log.isDebugEnabled()) log.debug("falt card:"+cardType);
+				if (log.isDebugEnabled()) log.debug("falt card:"+CommandsISO14443A.CARD_14443A_M1);
+				
+				if(cardType!=CommandsISO14443A.CARD_14443A_M1)
+					throw new NullPointerException("此卡非员工卡");
+				
+	    		if(StringUtils.isNull(userName))
+	    			throw new NullPointerException("请输入用户名");
+	    		
+	    		if(StringUtils.isNull(password))
+	    			throw new NullPointerException("请输入密码");
+	    		
+	    		cardRFID.cleanAll();
+	    		cardRFID.save(userName, 1, 1, 16);
+				cardRFID.save(password, 1, 2, 16);
+				
+	    		String uuid = StringUtils.hash(serialNumber);
+				SFClient.saveUser(userName, password, uuid);
 
-            Global.message = "注册成功";
-			messageLabel.setText(Global.message);
-		}catch (Exception e) {
-			Global.message = e.getMessage();
-			messageLabel.setText(Global.message);
-			if(log.isErrorEnabled()) log.error("SQLException:"+e.getMessage());	
+	            Global.message = "注册成功";
+				messageLabel.setText(Global.message);
+		 }catch (Exception e) {
+				Global.message = "Exception:"+e.getMessage();
+				messageLabel.setText(Global.message);
+				messageLabel.setForeground(Color.RED);
+				if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());	
 		}finally {
-			cardRFID.beep(10);
-			cardRFID.destroy();
+				cardRFID.beep(10);
+				cardRFID.destroy();
 		}
 	}
 	
@@ -429,15 +429,17 @@ public class UserAction {
 	
 	public void processRestStaff(){
 		ISO14443AAction cardRFID = new ISO14443AAction();
+		cardRFID.initSerial();
 		 try {
-	    		cardRFID.initSerial();
-	    		cardRFID.initCard();
-	    		
 	    		if (log.isDebugEnabled()) log.debug(ISO14443AAction.whichPort +"/" + ISO14443AAction.whichSpeed);
 
-	    		StringUtils.notEmpty(userNameText.getText());
-	    		StringUtils.notEmpty(String.valueOf(passwordText.getPassword()));
+				String userName = String.valueOf(userNameText.getText());
+				String password = String.valueOf(passwordText.getPassword());
 	    		
+				StringUtils.notEmpty(userName);
+	    		StringUtils.notEmpty(password);
+
+	    		cardRFID.initCard();
 				// 初始化检查
 				if (!cardRFID.isOpened())
 					throw new NullPointerException("请正确连接发卡器");
@@ -454,16 +456,15 @@ public class UserAction {
 				if(cardType!=CommandsISO14443A.CARD_14443A_M1)
 					throw new NullPointerException("此卡非员工卡");
 				
-	    		if(StringUtils.isNull(String.valueOf(userNameText.getText())))
+	    		if(StringUtils.isNull(userName))
 	    			throw new NullPointerException("请输入用户名");
 	    		
-	    		if(StringUtils.isNull(String.valueOf(passwordText.getPassword())))
+	    		if(StringUtils.isNull(password))
 	    			throw new NullPointerException("请输入密码");
 	    		
 	    		cardRFID.cleanAll();
-	    		
-	    		cardRFID.save(String.valueOf(userNameText.getText()), 1, 1, 16);
-				cardRFID.save(String.valueOf(passwordText.getPassword()), 1, 2, 16);
+	    		cardRFID.save(userName, 1, 1, 16);
+				cardRFID.save(password, 1, 2, 16);
 				
 				Global.message = "重置完成!";
 				messageLabel.setText(Global.message);
@@ -474,8 +475,8 @@ public class UserAction {
 				messageLabel.setForeground(Color.RED);
 				if(log.isErrorEnabled()) log.error("NullPointerException:"+e.getMessage());	
 		}finally {
-			cardRFID.beep(10);
-			cardRFID.destroy();
+				cardRFID.beep(10);
+				cardRFID.destroy();
 		}
 	}
 }
