@@ -96,16 +96,6 @@ public class UserAction {
 		
 		y += hight;
 		
-		disLabel = new JLabel("用户名:");
-		disLabel.setBounds(x,y,width,hight);
-		disLabel.setForeground(Color.WHITE);
-		SFWine.global.getBodyPanel().add(disLabel);
-		
-		mobileText = new JTextField();
-		mobileText.setBounds(x+width,y,width_1,hight);//一个字符9 point
-		SFWine.global.getBodyPanel().add(mobileText);
-		y += hight;
-		
 		messageLabel= new JLabel();
 		messageLabel.setBounds(x,y,width,hight);
 		SFWine.global.getBodyPanel().add(messageLabel);
@@ -244,6 +234,16 @@ public class UserAction {
 		disLabel.setBounds(x+width+width_1,y,20*display.length(),hight);
 		disLabel.setForeground(Color.RED);
 		SFWine.global.getBodyPanel().add(disLabel);
+		
+		y += hight;
+		
+		disLabel = new JLabel("手机号码:");
+		disLabel.setBounds(x,y,width,hight);
+		SFWine.global.getBodyPanel().add(disLabel);
+		
+		mobileText = new JTextField();
+		mobileText.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		SFWine.global.getBodyPanel().add(mobileText);
 		
 		y += hight;
 		
