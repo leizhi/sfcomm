@@ -32,6 +32,7 @@ public class UserAction {
 
 	private JTextField userNameText;
 	private JPasswordField passwordText;
+	private JTextField mobileText;
 
 	public void promptLogin() {
 		SFClient.staffSignal = false;
@@ -93,6 +94,16 @@ public class UserAction {
 		passwordText.setBounds(x+width,y,width_1,hight);//一个字符9 point
 		SFWine.global.getBodyPanel().add(passwordText);
 		
+		y += hight;
+		
+		disLabel = new JLabel("用户名:");
+		disLabel.setBounds(x,y,width,hight);
+		disLabel.setForeground(Color.WHITE);
+		SFWine.global.getBodyPanel().add(disLabel);
+		
+		mobileText = new JTextField();
+		mobileText.setBounds(x+width,y,width_1,hight);//一个字符9 point
+		SFWine.global.getBodyPanel().add(mobileText);
 		y += hight;
 		
 		messageLabel= new JLabel();
@@ -303,7 +314,8 @@ public class UserAction {
 
 				String userName = String.valueOf(userNameText.getText());
 				String password = String.valueOf(passwordText.getPassword());
-	    		
+				String mobile = String.valueOf(mobileText.getText());
+
 				StringUtils.notEmpty(userName);
 	    		StringUtils.notEmpty(password);
 
@@ -335,7 +347,7 @@ public class UserAction {
 				cardRFID.save(password, 1, 2, 16);
 				
 	    		String uuid = StringUtils.hash(serialNumber);
-				SFClient.saveUser(userName, password, uuid);
+				SFClient.saveUser(userName, password, uuid,mobile);
 
 	            Global.message = "注册成功";
 				messageLabel.setText(Global.message);

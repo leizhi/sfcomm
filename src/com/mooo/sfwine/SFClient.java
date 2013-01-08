@@ -291,7 +291,7 @@ public class SFClient {
 		if(ret!=0) throw new CardException(args[1]);
 	}
 	//StringUtils.hash(serialNumber)
-	public static void saveUser(String userName,String userPassWord,String uuid) throws CardException {
+	public static void saveUser(String userName,String userPassWord,String uuid,String mobile) throws CardException {
 		//send command
 		String REQ;
 		String reponse;
@@ -301,6 +301,7 @@ public class SFClient {
 		REQ += ";"+userName;
 		REQ += ";"+StringUtils.hash(userPassWord);
 		REQ += ";"+uuid;
+		REQ += ";"+mobile;
 		REQ += "#";
 		reponse = request(REQ);//0 no limit
 		System.out.println("reponse:"+reponse);
