@@ -47,7 +47,7 @@ public class SFClient {
 			in = socket.getInputStream();
 			out = socket.getOutputStream();
 			
-			read = new BufferedReader(new InputStreamReader(socket.getInputStream(),"GBK"));  
+			read = new BufferedReader(new InputStreamReader(socket.getInputStream(),"GBK"));
 			print = new PrintStream(socket.getOutputStream(),true,"GBK");
 			
 			if(log.isDebugEnabled())log.debug("\thost:" + host + "\t port:" + port + "\t 连接成功!");

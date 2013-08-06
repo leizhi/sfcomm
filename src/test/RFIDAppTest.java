@@ -1,17 +1,15 @@
 package test;
 
 import com.mooo.sfwine.ISO14443AAction;
-import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
-import es.deusto.smartlab.rfid.iso14443a.ImplementationISO14443A;
 
 
 /**
  * @author Xabier Echevarría Espinosa
  */
-public class ULTest {
+public class RFIDAppTest {
 
 	public static void main(String args[]) throws Exception {
-		byte[] password = {(byte) 0xFF,(byte) 0xFF,(byte) 0xFF,(byte) 0xFF,(byte) 0xFF,(byte) 0xFF};
+//		byte[] password = {(byte) 0xFF,(byte) 0xFF,(byte) 0xFF,(byte) 0xFF,(byte) 0xFF,(byte) 0xFF};
 
 //		ISO14443AAction.whichPort="COM3";
 
@@ -50,7 +48,7 @@ public class ULTest {
 		System.out.println(respnse);
 */
 		String buf = "LZZJ001209030023";
-		buf = "ZZZZ001209030039";
+//		buf = "ZZZZ001209030039";
 		String reponse;
 		try {
 			//request card
@@ -58,9 +56,9 @@ public class ULTest {
 			System.out.println("SerialNumber:"+reponse);
 //			iccrf.cleanAll();
 			//write UL
-//			iccrf.save(buf,4,0,16);
-//			reponse = iccrf.read(4,0);
-//			System.out.println("reponse:"+reponse);
+			iccrf.save(buf,4,0,16);
+			reponse = iccrf.read(4,0);
+			System.out.println("reponse:"+reponse);
 
 			//write M1
 //			iccrf.loadKey((byte)0x01, password);
@@ -73,11 +71,11 @@ public class ULTest {
 //			buf = "000000";
 //			iccrf.save(buf, 1, 2, 16);
 
-			reponse = iccrf.read(1,1);
-			System.out.println("1,1:"+reponse);
-
-			reponse = iccrf.read(1,2);
-			System.out.println("1,2:"+reponse);
+//			reponse = iccrf.read(1,1);
+//			System.out.println("1,1:"+reponse);
+//
+//			reponse = iccrf.read(1,2);
+//			System.out.println("1,2:"+reponse);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

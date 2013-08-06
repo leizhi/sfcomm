@@ -17,6 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.mooo.mycoz.common.StringUtils;
+import com.mooo.swing.LimitDocument;
 
 import es.deusto.smartlab.rfid.iso14443a.CommandsISO14443A;
 
@@ -211,10 +212,11 @@ public class UserAction {
 		SFWine.global.getBodyPanel().add(disLabel);
 		 
 		userNameText = new JTextField();
+		userNameText.setDocument(new LimitDocument(8));
 		userNameText.setBounds(x+width,y,width_1,hight);//一个字符9 point
 		SFWine.global.getBodyPanel().add(userNameText);
 		
-		display = " * 4位中文";
+		display = " * 8位中文";
 		disLabel = new JLabel(display);
 		disLabel.setBounds(x+width+width_1,y,20*display.length(),hight);
 		disLabel.setForeground(Color.RED);
@@ -390,6 +392,7 @@ public class UserAction {
 			SFWine.global.getBodyPanel().add(disLabel);
 			
 			userNameText = new JTextField();
+			userNameText.setDocument(new LimitDocument(8));
 			userNameText.setBounds(x+width,y,width_1,hight);//一个字符9 point
 			SFWine.global.getBodyPanel().add(userNameText);
 			

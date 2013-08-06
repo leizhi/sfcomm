@@ -99,10 +99,10 @@ public class SFWine {
 		for(String value:ports){
 			whichPort.addItem(value);
 		}
+		
 		SFWine.global.getBodyPanel().add(whichPort);
 		
 		whichPort.addItemListener(new ItemListener() {
-			@Override
 			public void itemStateChanged(ItemEvent e) {
 				ISO14443AAction.whichPort=e.getItem().toString();
 			}
@@ -119,7 +119,9 @@ public class SFWine {
 
 		connect.addActionListener( new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					ISO14443AAction.whichPort=whichPort.getSelectedItem().toString();
+					Object port  = whichPort.getSelectedItem();
+					
+					if (port != null) ISO14443AAction.whichPort = port.toString();
 
 					if(SFClient.isOpenNetwork()){
 						SFClient.getInstance().end();
@@ -144,8 +146,10 @@ public class SFWine {
 		connect.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
 		        if(e.getKeyCode() == KeyEvent.VK_ENTER){
-		        	ISO14443AAction.whichPort=whichPort.getSelectedItem().toString();
-
+					Object port  = whichPort.getSelectedItem();
+					
+					if(port!=null)ISO14443AAction.whichPort=port.toString();
+					
 					if(SFClient.isOpenNetwork()){
 						SFClient.getInstance().end();
 						messageLabel.setText("断开连接");
